@@ -1,0 +1,64 @@
+body {
+  background-color: #AAF;
+}
+body.online {
+  background-color: #AFA;
+}
+body.sync {
+  background-color: #FAA;
+}
+#main {
+  color: #444;
+  background-color: white;
+  max-width: 40em;
+  margin: 50px auto;
+  padding: 20px;
+}
+#menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0 0 0 -80px;
+  padding: 0;
+  width: 120px;
+  height: 100%;
+  background-color: #000;
+  color: #FFF;
+}
+#menu .slider {
+  width: 40px;
+  height: 100%;
+  background-color: #888;
+  margin-left: 80px;
+}
+#menu .content {
+  float: right;
+  width: 75px;
+  margin: 10px 50px 10px 10px;
+}
+#menu.show {
+  margin-left: 0;
+}
+#menu .content > p {
+  text-align: center;
+  margin-bottom: 40px;
+}
+#list {
+  list-style-type: none;
+}
+.hidden {
+  display: none;
+}
+a.button {
+  padding: 5px 10px;
+  background-color: #008BC6;
+  border: 2px solid #FFF;
+  border-radius: 15px;
+  color: #FFF;
+  font-size: 24px;
+  letter-spacing: 2px;
+  text-decoration: none;
+  text-shadow: 2px 2px 5px #000;
+  background-image: -moz-linear-gradient(bottom, rgb(0,140,196) 66%, rgb(130,220,255) 99%);
+}
+
