@@ -8,12 +8,22 @@
   <body class="online">
     <div id="menu">
       <div class="content">
-        <p><a class="button toggle hidden">T</a></p>
-        <p><a class="button sync">S</a></p>
-        <p><a class="button offline">Off</a></p>
-        <p><a class="button online hidden">On</a></p>
+        <p><a class="button" data-action="create">N</a></p>
+        <p><a class="button hidden" data-action="toggleContent">T</a></p>
+        <p><a class="button" data-action="sync">S</a></p>
+        <p><a class="button" data-action="offline">Off</a></p>
+        <p><a class="button hidden" data-action="online">On</a></p>
       </div>
-      <div class="slider"></div>
+      <div class="slider" data-action="toggleMenu"></div>
+    </div>
+    <div id="input" class="hidden">
+      <form>
+        <p><label for="id">Id</label><input type="text" name="id" /></p>
+        <p><label for="url">Url</label><input type="text" name="url" /></p>
+        <p><label for="title">Title</label><input type="text" name="title" /></p>
+        <p><label for="html">Content</label><textarea rows="5" cols="40" name="html"></textarea></p>
+        <p><input type="button" value="Public" name="public" /><input type="button" value="Privé" name="private" /><input type="button" value="Annuler" name="cancel" /></p>
+      </form>
     </div>
     <ul id="list">
     </ul>

@@ -1,11 +1,11 @@
 body {
-  background-color: #AAF;
-}
-body.online {
-  background-color: #AFA;
+  background-color: #FFF;
 }
 body.sync {
-  background-color: #FAA;
+  background-color: #FEE;
+}
+body.menu {
+  margin-left: 130px;
 }
 #main {
   color: #444;
@@ -18,9 +18,9 @@ body.sync {
   position: fixed;
   top: 0;
   left: 0;
-  margin: 0 0 0 -80px;
+  margin: 0 0 0 -110px;
   padding: 0;
-  width: 120px;
+  width: 150px;
   height: 100%;
   background-color: #000;
   color: #FFF;
@@ -29,12 +29,16 @@ body.sync {
   width: 40px;
   height: 100%;
   background-color: #888;
-  margin-left: 80px;
+  margin-left: calc(100% - 40px);
+}
+body.online #menu .slider {
+  background-color: #0F0;
 }
 #menu .content {
   float: right;
   width: 75px;
-  margin: 10px 50px 10px 10px;
+  margin: 10px 70px 10px 10px;
+  line-height: 4em;
 }
 #menu.show {
   margin-left: 0;
@@ -43,9 +47,27 @@ body.sync {
   text-align: center;
   margin-bottom: 40px;
 }
+#menu a.button {
+  padding: 20px 20px;
+}
 #list {
   list-style-type: none;
 }
+#list > li {
+  margin: 5px;
+  padding: 1px 10px;
+  border-color: #000;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+}
+/*
+#list > li.public {
+  border-color: #AFA;
+}
+#list > li.private {
+  border-color: #FAA;
+}
+*/
 .hidden {
   display: none;
 }
@@ -55,10 +77,16 @@ a.button {
   border: 2px solid #FFF;
   border-radius: 15px;
   color: #FFF;
-  font-size: 24px;
+  font-size: 2em;
   letter-spacing: 2px;
   text-decoration: none;
   text-shadow: 2px 2px 5px #000;
   background-image: -moz-linear-gradient(bottom, rgb(0,140,196) 66%, rgb(130,220,255) 99%);
 }
-
+#input {
+  margin-left: 50px;
+}
+#input label {
+  width: 100px;
+  float: left;
+}
