@@ -100,10 +100,10 @@ function updateList() {
         Object.keys(objects).forEach(function (key) {
           var obj   = objects[key],
               title = obj.title || key;
-          listHtml += format('<li data-key="%s" data-context="%s" class="%s"><h2>%s</h2>', key, context, context, title);
+          listHtml += format('<li data-key="%s" data-context="%s" class="%s"><h2 data-action="toggle">%s</h2>', key, context, context, title);
           listHtml += '<p class="actions">';
-          listHtml += format('<a class="button" data-key="%s" data-action="toggle" href="#">Toggle</a> ', key);
-          listHtml += format('<a class="button" data-key="%s" data-action="delete" href="#">Delete</a> ', key);
+          listHtml += format('<a class="action-icon forward toggle" data-action="toggle" href="#"></a> ', key);
+          listHtml += format('<a class="action-icon delete" data-action="delete" href="#"></a> ', key);
           listHtml += '</p>';
           listHtml += format('<div class="content hidden"><a class="url" href="%s" target="_blank">%s</a><div class="html">%s</div></div></li>', obj.url || '#', obj.url || '', obj.html);
         });
@@ -160,15 +160,18 @@ function initUI() {
     },
     offline: function doOffline() {
       remoteStorage.alir.goOffline();
-      UI.menu.offline.classList.toggle('hidden');
-      UI.menu.online.classList.toggle('hidden');
       document.body.classList.toggle('online');
     },
     online: function doOnline() {
       remoteStorage.alir.goOnline();
-      UI.menu.online.classList.toggle('hidden');
-      UI.menu.offline.classList.toggle('hidden');
       document.body.classList.toggle('online');
+    },
+    onoff: function doOnOff() {
+      if (UI.menu.onoff.checked) {
+        menuActions.offline();
+      } else {
+        menuActions.online();
+      }
     }
   };
   forElement('#menu .content [data-action]', function () {
@@ -178,9 +181,14 @@ function initUI() {
 
   UI.list.addEventListener('click', function onClick(event) {
     var target = event.target,
-        context, key;
+        context, key, tmp, keyNode = target;
     if (target.dataset.action) {
-      key = target.dataset.key;
+      while (typeof keyNode.dataset.key === 'undefined' && keyNode.parentNode) {
+        keyNode = keyNode.parentNode;
+      }
+      if (typeof keyNode.dataset.key !== 'undefined') {
+        key = keyNode.dataset.key;
+      }
       context = target.parentNode.parentNode.dataset.context;
       switch (target.dataset.action) {
       case 'toggle':
@@ -189,6 +197,9 @@ function initUI() {
         });
         $('[data-key="' + key + '"]').classList.toggle('hidden');
         $('[data-key="' + key + '"] .content').classList.toggle('hidden');
+        tmp = $('[data-key="' + key + '"] .toggle').classList;
+        tmp.toggle('back');
+        tmp.toggle('forward');
         UI.menu.toggleContent.classList.toggle('hidden');
         break;
       case 'delete':

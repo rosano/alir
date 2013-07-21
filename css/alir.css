@@ -1,3 +1,6 @@
+html {
+  font-size: 10px; /* Needed for icons */
+}
 body {
   background-color: #FFF;
 }
@@ -52,6 +55,7 @@ body.online #menu .slider {
 }
 #list {
   list-style-type: none;
+  font-size: 1.2em;
 }
 #list > li {
   margin: 5px;
@@ -59,6 +63,15 @@ body.online #menu .slider {
   border-color: #000;
   border-width: 0 0 1px 0;
   border-style: solid;
+}
+#list a.action-icon:before {
+  background-color: #000000;
+  border-radius: 5px;
+  margin: -7px 0 0 -60px;
+}
+#list a.action-icon {
+  margin: 20px;
+  padding: 0 40px;
 }
 /*
 #list > li.public {

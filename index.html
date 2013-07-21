@@ -3,16 +3,27 @@
   <head>
     <meta charset="utf-8" />
     <title>Alir</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/alir.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="css/gaia/icons/styles/action_icons.css" rel="stylesheet" type="text/css">
+    <link href="css/gaia/style/switches.css" rel="stylesheet" type="text/css">
   </head>
   <body class="online">
     <div id="menu">
       <div class="content">
-        <p><a class="button" data-action="create">N</a></p>
-        <p><a class="button hidden" data-action="toggleContent">T</a></p>
-        <p><a class="button" data-action="sync">S</a></p>
+        <p><a class="action-icon new" data-action="create">&nbsp;</a></p>
+        <p><a class="action-icon back hidden" data-action="toggleContent">&nbsp;</a></p>
+        <p><a class="action-icon email-sync" data-action="sync">&nbsp;</a></p>
+        <!--
         <p><a class="button" data-action="offline">Off</a></p>
         <p><a class="button hidden" data-action="online">On</a></p>
+        -->
+        <p>
+          <label>
+            <input type="checkbox" data-type="switch" data-action="onoff" checked="">
+            <span></span>
+          </label>
+        </p>
       </div>
       <div class="slider" data-action="toggleMenu"></div>
     </div>
