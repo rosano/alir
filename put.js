@@ -5,13 +5,18 @@ var crypto   = require('crypto'),
     fs       = require('fs'),
     https    = require("https"),
     optimist = require("optimist"),
+    util     = require('util'),
     argv,
-    parser,
     shasum   = crypto.createHash('sha1');
 
 // to accept self-signed certificates
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
+function entities(str) {
+  "use strict";
+  var re = new RegExp('&#([^\\s]*);', 'g');
+  return str.replace(re, function (match, match2) {return String.fromCharCode(Number(match2)); });
+}
 /**
  * Parse url with Readability SAX
  */
@@ -40,13 +45,14 @@ function readaSax(url, cb) {
 
   request.get({url: url, followRedirect: true, headers: {'user-agent': 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1.16) Gecko/20120421 Gecko Firefox/11.0'}}, function (error, response, body) {
     function format(str) {
-      return str.replace(/&#([^\s]*);/g, function (match, match2) {return String.fromCharCode(Number(match2)); }).match(/.{1,80}(\s|$)|\S+?(\s|$)/g).join("\n");
+      var re = new RegExp('.{1,80}(\\s|$)|\\S+?(\\s|$)', 'g');
+      return entities(str).match(re).join("\n");
     }
     if (!error) {
       parser.parseComplete(body);
       var res = {
         url: url,
-        title: readable.getTitle().replace(/&#([^\s]*);/g, function (match, match2) {return String.fromCharCode(Number(match2)); }),
+        title: entities(readable.getTitle()),
         html: readable.getHTML(),
         text: format(readable.getText())
       };
@@ -78,15 +84,14 @@ argv = optimist
        .usage('$0 --url <url>')
        .check(function (argv) {
           "use strict";
-          if (!argv.url) {
+          if (!argv.url && argv._.length !== 1 && !argv.i) {
             throw "You must specify a url";
           }
         })
-       .string('url')
-       .boolean('sax')
+       .string('url').describe("url", "url to fetch")
+       .boolean('i').describe("i", "interactive mode")
+       .boolean('sax').describe("sax", "use Sax parser")
        .argv;
-
-parser = argv.sax ? readaSax : readaNode;
 
 function put(obj) {
   "use strict";
@@ -135,11 +140,134 @@ function put(obj) {
   });
 }
 
-parser(argv.url, function onReada(err, res) {
+function doPut(url, parser) {
   "use strict";
-  if (err) {
-    console.log(err);
-  } else {
-    put(res);
+  parser(url, function onReada(err, res) {
+    if (err) {
+      console.log(err);
+    } else {
+      res.date = Date.now();
+      put(res);
+    }
+  });
+}
+
+function interactive() {
+  "use strict";
+  var input = '';
+  function interact(content) {
+    var re       = new RegExp('http[^\\s]*', 'g'), // yes, I know
+        matches  = content.match(re),
+        i        = 1,
+        readline = require('readline'),
+        rl,
+        actions;
+
+    /**
+     * Check answer
+     *
+     * @param {Array}    choices
+     * @param {String}   answer
+     * @param {function} onOk
+     * @param {function} [onKo]
+     *
+     * @return void
+     */
+    function checkAnswer(choices, answer, onOk, onKo) {
+      if (typeof onKo !== 'function') {
+        onKo = function () {
+          rl.write("Wrong answer !");
+          process.exit(1);
+        };
+      }
+      answer = parseInt(answer, 10);
+      if (isNaN(answer)) {
+        onKo();
+      } else {
+        answer--;
+        if (typeof choices[answer] === 'undefined') {
+          onKo();
+        } else {
+          onOk(choices[answer]);
+        }
+      }
+    }
+    rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    actions = [
+      {
+        "label": "put",
+        "action": function (url) {
+          doPut(url, readaNode);
+        }
+      },
+      {
+        "label": "put with Sax",
+        "action": function (url) {
+          doPut(url, readaSax);
+        }
+      },
+      {
+        "label": "view with Sax",
+        "action": function (url) {
+          readaSax(url, function (err, res) {
+            console.log(util.inspect(res, {depth: 1}));
+            process.exit(0);
+          });
+        }
+      },
+      {
+        "label": "view",
+        "action": function (url) {
+          readaNode(url, function (err, res) {
+            console.log(util.inspect(res, {depth: 1}));
+            process.exit(0);
+          });
+        }
+      },
+      {
+        "label": "test",
+        "action": function (url) {
+          console.log(url);
+          process.exit(0);
+        }
+      }
+    ];
+    if (matches === null) {
+      console.log("Sorry, I'm enable to find an url in this file");
+      process.exit(1);
+    }
+    matches.forEach(function onUrl(url) {
+      console.log(util.format("%d) %s", i++, url));
+    });
+    rl.question("Laquelle : ", function onAnswer(answer) {
+      checkAnswer(matches, answer, function (url) {
+        var j = 1;
+        actions.forEach(function (action) {
+          console.log(util.format("%d) %s", j++, action.label));
+        });
+        rl.question("Laquelle : ", function onAnswer(answer) {
+          checkAnswer(actions, answer, function (action) {
+            action.action(url);
+          });
+        });
+      });
+    });
   }
-});
+  if (!argv.f || !fs.existsSync(argv.f)) {
+    console.log('You must specify a valid file with -f');
+    process.exit(1);
+  }
+
+  input = fs.readFileSync(argv.f, {encoding: 'utf8'});
+  //process.stdin.pause();
+  interact(input);
+}
+
+if (argv.i) {
+  interactive();
+} else {
+  doPut(argv.url || argv._[0], argv.sax ? readaSax : readaNode);
+}
