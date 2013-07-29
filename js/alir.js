@@ -100,6 +100,7 @@ function updateList() {
         Object.keys(objects).forEach(function (key) {
           var obj   = objects[key],
               title = obj.title || key;
+          title = title.replace(/</g, '&lt;').replace(/>/g, '&gt;');
           listHtml += format('<li data-key="%s" data-context="%s" class="%s"><h2 data-action="toggle">%s</h2>', key, context, context, title);
           listHtml += '<p class="actions">';
           listHtml += format('<a class="action-icon forward toggle" data-action="toggle" href="#"></a> ', key);
@@ -127,12 +128,20 @@ function initUI() {
     list: $('#list'),
     menu: {}
   };
+  function displayTile(name) {
+    forElement('[data-tile]', function (e) {
+      if (e.dataset.tile === name) {
+        e.classList.remove('hidden');
+      } else {
+        e.classList.add('hidden');
+      }
+    });
+  }
   // left menu actions
   menuActions = {
     create: function doCreate() {
-      UI.list.classList.toggle('hidden');
-      UI.input.classList.toggle('hidden');
       menuActions.toggleMenu();
+      displayTile('input');
     },
     toggleContent: function doToggle() {
       forElement('#list .content', function (e) {
@@ -157,6 +166,10 @@ function initUI() {
         document.body.classList.remove('sync');
         window.alert('Synk ko');
       });
+    },
+    settings: function doMenu() {
+      menuActions.toggleMenu();
+      displayTile('settings');
     },
     offline: function doOffline() {
       remoteStorage.alir.goOffline();
@@ -230,8 +243,23 @@ function initUI() {
     menuActions.create();
   });
   $('#input [name="cancel"]').addEventListener('click', function () {
-    UI.list.classList.toggle('hidden');
-    UI.input.classList.toggle('hidden');
+    displayTile('list');
+  });
+  // }}
+  // {{ Settings
+  $('#settings [name="cancel"]').addEventListener('click', function () {
+    displayTile('list');
+  });
+  $('#settings [name="install"]').addEventListener('click', function () {
+    var request = window.navigator.mozApps.install("http://alir.clochix.net/manifest.webapp");
+    request.onerror = function () {
+      window.alert("Error");
+      console.log(this.error, 'error');
+    };
+    request.onsuccess = function () {
+      window.alert("Yeah");
+      displayTile('list');
+    };
   });
   // }}
   // Left menu {{
@@ -240,8 +268,6 @@ function initUI() {
         action = target.dataset.action;
     if (action && menuActions[action]) {
       menuActions[action]();
-    } else {
-      console.log("Unknown action", target.dataset.action, menuActions);
     }
   });
   // }}

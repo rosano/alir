@@ -47,8 +47,8 @@ body.online #menu .slider {
   margin-left: 0;
 }
 #menu .content > p {
-  text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+  padding-left: 30px;
 }
 #menu a.button {
   padding: 20px 20px;
@@ -96,10 +96,11 @@ a.button {
   text-shadow: 2px 2px 5px #000;
   background-image: -moz-linear-gradient(bottom, rgb(0,140,196) 66%, rgb(130,220,255) 99%);
 }
-#input {
+#input, #settings {
   margin-left: 50px;
+  margin-top: 60px;
 }
-#input label {
-  width: 100px;
-  float: left;
+#input > form , #settings > form {
+  max-width: 600px;
+  margin: auto;
 }

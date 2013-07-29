@@ -6,7 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/alir.css" media="all" rel="stylesheet" type="text/css" />
     <link href="css/gaia/icons/styles/action_icons.css" rel="stylesheet" type="text/css">
+    <link href="css/gaia/style/input_areas.css" rel="stylesheet" type="text/css">
+    <link href="css/gaia/style/buttons.css" rel="stylesheet" type="text/css">
     <link href="css/gaia/style/switches.css" rel="stylesheet" type="text/css">
+    <link rel="shortcut icon" type="image/png" href="img/icon-32.png" />
   </head>
   <body class="online">
     <div id="menu">
@@ -14,30 +17,41 @@
         <p><a class="action-icon new" data-action="create">&nbsp;</a></p>
         <p><a class="action-icon back hidden" data-action="toggleContent">&nbsp;</a></p>
         <p><a class="action-icon email-sync" data-action="sync">&nbsp;</a></p>
+        <p><a class="action-icon menu" data-action="settings">&nbsp;</a></p>
         <!--
         <p><a class="button" data-action="offline">Off</a></p>
         <p><a class="button hidden" data-action="online">On</a></p>
         -->
         <p>
-          <label>
-            <input type="checkbox" data-type="switch" data-action="onoff" checked="">
+          <label style="margin-left: -10px;" data-action="onoff">
+            <input type="checkbox" data-type="switch" checked="">
             <span></span>
           </label>
         </p>
       </div>
       <div class="slider" data-action="toggleMenu"></div>
     </div>
-    <div id="input" class="hidden">
+    <div id="input" class="hidden" data-tile="input">
       <form>
-        <p><label for="id">Id</label><input type="text" name="id" /></p>
-        <p><label for="url">Url</label><input type="text" name="url" /></p>
-        <p><label for="title">Title</label><input type="text" name="title" /></p>
-        <p><label for="html">Content</label><textarea rows="5" cols="40" name="html"></textarea></p>
-        <p><input type="button" value="Public" name="public" /><input type="button" value="Privé" name="private" /><input type="button" value="Annuler" name="cancel" /></p>
+        <p><input type="text" name="id" placeholder="Identifiant" required=""/></p>
+        <p><input type="text" name="url" placeholder="Url" /></p>
+        <p><input type="text" name="title" placeholder="Titre" /></p>
+        <p><textarea rows="5" cols="40" name="html"></textarea></p>
+        <p>
+          <button value="Public" name="public">Public</button>
+          <button value="Privé"  name="private">Privé</button>
+          <button value="Annuler" name="cancel">Annuler</button>
+        </p>
       </form>
     </div>
-    <ul id="list">
+    <ul id="list" data-tile="list">
     </ul>
+    <div id="settings" class="hidden" data-tile="settings">
+      <form >
+        <button name="install">Installer</button>
+        <button name="cancel">Annuler</button>
+      </form>
+    </div>
     <script type="text/javascript" src="lib/remotestorage.min.js"></script>
     <!--
     <script type="text/javascript" src="lib/remotestorage-debug.js"></script>
