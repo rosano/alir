@@ -17,6 +17,9 @@ body.menu {
   margin: 50px auto;
   padding: 20px;
 }
+#templates {
+  display: none;
+}
 #menu {
   position: fixed;
   top: 0;

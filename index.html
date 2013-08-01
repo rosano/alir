@@ -12,6 +12,22 @@
     <link rel="shortcut icon" type="image/png" href="img/icon-32.png" />
   </head>
   <body class="online">
+    <div id="templates">
+      <div id="tmpl-item">
+        <li data-key="{{=it.key}}}" data-context="{{=it.context}}" class="{{=it.context}}">
+          <h2 data-action="toggle">{{=it.title}}</h2>
+          <p class="actions">
+            <a class="action-icon forward toggle" data-action="toggle" href="#"></a>
+            <a class="action-icon delete" data-action="delete" href="#"></a>
+            <a class="action-icon compose" data-action="compose" href="#"></a>
+          </p>
+          <div class="content">
+            <a class="url" href="{{=it.url}}" target="_blank">{{=it.title}}</a>
+            <div class="{{=it.type}}">{{=it.content}}</div>
+          </div>
+        </li>
+      </div>
+    </div>
     <div id="menu">
       <div class="content">
         <p><a class="action-icon new" data-action="create">&nbsp;</a></p>
@@ -80,6 +96,7 @@
       </form>
     </div>
     <script type="text/javascript" src="lib/htmlparser.js"></script>
+    <script type="text/javascript" src="lib/doT.min.js"></script>
     <script type="text/javascript" src="lib/remotestorage.min.js"></script>
     <!--
     <script type="text/javascript" src="lib/remotestorage-debug.js"></script>

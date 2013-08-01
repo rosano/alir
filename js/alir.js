@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, HTMLtoXML */
+/*global remoteStorage: true, HTMLtoXML: true, doT: true */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -36,7 +36,8 @@
  * 'unbusy'
  */
 
-var list = document.getElementById('list'),
+var templates = {},
+    list = document.getElementById('list'),
     listHtml = '';
 
 remoteStorage.defineModule('alir', function module(privateClient, publicClient) {
@@ -86,13 +87,6 @@ remoteStorage.defineModule('alir', function module(privateClient, publicClient) 
     }
   };
 });
-// Common utilities {{{
-function format(str) {
-  "use strict";
-  var params = Array.prototype.splice.call(arguments, 1);
-  return (str.replace(/%s/g, function () {return params.shift(); }));
-}
-// }}}
 function updateList() {
   "use strict";
   remoteStorage.alir.private.getAll('').then(function onAll(objectsPrivate) {
@@ -102,27 +96,27 @@ function updateList() {
         Object.keys(objects).forEach(function (key) {
           var obj   = objects[key],
               title = obj.title || key,
-              type, content;
+              datas = {};
+          datas = {
+            key: key,
+            context: context,
+            title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+            url: obj.url || '#'
+          };
           if (obj.html) {
-            type    = 'html';
+            datas.type = 'html';
             try {
-              content = HTMLtoXML(obj.html);
+              datas.content = HTMLtoXML(obj.html);
             } catch (e) {
               console.log('Error sanityzing ' + obj.title);
-              content = "Content contains errors";
+              datas.content = "Content contains errors";
             }
           } else {
-            type    = 'text';
-            content = obj.text;
+            datas.type = 'text';
+            datas.content = obj.text;
           }
-          title = title.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-          listHtml += format('<li data-key="%s" data-context="%s" class="%s"><h2 data-action="toggle">%s</h2>', key, context, context, title);
-          listHtml += '<p class="actions">';
-          listHtml += format('<a class="action-icon forward toggle" data-action="toggle" href="#"></a> ', key);
-          listHtml += format('<a class="action-icon delete" data-action="delete" href="#"></a> ', key);
-          listHtml += format('<a class="action-icon compose" data-action="compose" href="#"></a> ', key);
-          listHtml += '</p>';
-          listHtml += format('<div class="content"><a class="url" href="%s" target="_blank">%s</a><div class="%s">%s</div></div></li>', obj.url || '#', obj.url || '', type, content);
+
+          listHtml += templates.item(datas);
         });
       }
       listHtml = '';
@@ -307,6 +301,8 @@ function initUI() {
     }
   });
   // }}
+  // Prepare templates
+  templates.item = doT.template($('#tmpl-item').innerHTML);
 }
 // }}
 
