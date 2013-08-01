@@ -33,10 +33,37 @@
     </div>
     <div id="input" class="hidden" data-tile="input">
       <form>
-        <p><input type="text" name="id" placeholder="Identifiant" required=""/></p>
-        <p><input type="text" name="url" placeholder="Url" /></p>
-        <p><input type="text" name="title" placeholder="Titre" /></p>
-        <p><textarea rows="5" cols="40" name="html"></textarea></p>
+        <fieldset>
+          <legend>Id</legend>
+          <section>
+            <p>
+              <input type="text" name="id" placeholder="Identifiant" required=""/>
+              <button type="reset">Clear</button>
+            </p>
+          </section>
+        </fieldset>
+        <fieldset>
+          <legend>Url</legend>
+          <section>
+            <p>
+              <input type="text" name="url" placeholder="Url" />
+              <button type="reset">Clear</button>
+            </p>
+          </section>
+        </fieldset>
+        <fieldset>
+          <legend>Title</legend>
+          <section>
+            <p>
+              <input type="text" name="title" placeholder="Titre" />
+              <button type="reset">Clear</button>
+            </p>
+          </section>
+        </fieldset>
+        <p></p>
+        <p>
+          <textarea rows="5" cols="40" name="text" placeholder="Contenu"></textarea>
+        </p>
         <p>
           <button value="Public" name="public">Public</button>
           <button value="Privé"  name="private">Privé</button>

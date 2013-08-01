@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true*/
+/*global remoteStorage: true, HTMLtoXML */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -120,6 +120,7 @@ function updateList() {
           listHtml += '<p class="actions">';
           listHtml += format('<a class="action-icon forward toggle" data-action="toggle" href="#"></a> ', key);
           listHtml += format('<a class="action-icon delete" data-action="delete" href="#"></a> ', key);
+          listHtml += format('<a class="action-icon compose" data-action="compose" href="#"></a> ', key);
           listHtml += '</p>';
           listHtml += format('<div class="content"><a class="url" href="%s" target="_blank">%s</a><div class="%s">%s</div></div></li>', obj.url || '#', obj.url || '', type, content);
         });
@@ -152,6 +153,12 @@ function initUI() {
       }
     });
   }
+  forElement('form', function (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      return false;
+    });
+  });
   // left menu actions
   menuActions = {
     create: function doCreate() {
@@ -234,6 +241,17 @@ function initUI() {
         if (window.confirm("Supprimer ???")) {
           remoteStorage.alir[context].remove(key);
         }
+        break;
+      case 'compose':
+        remoteStorage.alir[context].getObject(key).then(function (object) {
+          console.log(object);
+          $('#input [name="id"]').value    = key;
+          $('#input [name="title"]').value = object.title;
+          $('#input [name="url"]').value   = object.url;
+          $('#input [name="text"]').value  = object.text;
+          displayTile('input');
+        });
+        break;
       }
     }
   });
@@ -242,7 +260,7 @@ function initUI() {
     var obj = {
       id: $('#input [name="id"]').value,
       title: $('#input [name="title"]').value,
-      html: $('#input [name="html"]').value
+      text: $('#input [name="text"]').value
     };
     remoteStorage.alir.addPublic(obj);
     menuActions.create();
@@ -252,7 +270,7 @@ function initUI() {
       id: $('#input [name="id"]').value,
       url: $('#input [name="url"]').value,
       title: $('#input [name="title"]').value,
-      html: $('#input [name="html"]').value
+      text: $('#input [name="text"]').value
     };
     remoteStorage.alir.addPrivate(obj);
     menuActions.create();
