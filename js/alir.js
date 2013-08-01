@@ -166,11 +166,9 @@ function initUI() {
       displayTile('input');
     },
     toggleContent: function doToggle() {
-      forElement('#list .content', function (e) {
-        e.classList.add('hidden');
-      });
       forElement('#list li[data-key]', function (e) {
         e.classList.remove('hidden');
+        e.classList.remove('current');
       });
       UI.menu.toggleContent.classList.toggle('hidden');
       menuActions.toggleMenu();
@@ -216,7 +214,7 @@ function initUI() {
 
   UI.list.addEventListener('click', function onClick(event) {
     var target = event.target,
-        context, key, tmp, keyNode = target;
+        context, key, tmp, keyNode = target, parent;
     if (target.dataset.action) {
       while (typeof keyNode.dataset.key === 'undefined' && keyNode.parentNode) {
         keyNode = keyNode.parentNode;
@@ -224,14 +222,19 @@ function initUI() {
       if (typeof keyNode.dataset.key !== 'undefined') {
         key = keyNode.dataset.key;
       }
-      context = target.parentNode.parentNode.dataset.context;
+      parent  = target;
+      while (typeof parent.dataset.context === 'undefined' && parent.parentNode) {
+        parent = parent.parentNode;
+      }
+      context = parent.dataset.context;
       switch (target.dataset.action) {
       case 'toggle':
         Array.prototype.forEach.call($$('li[data-key]'), function (e) {
           e.classList.toggle('hidden');
         });
-        $('[data-key="' + key + '"]').classList.toggle('hidden');
-        $('[data-key="' + key + '"] .content').classList.toggle('hidden');
+        tmp = $('[data-key="' + key + '"]').classList;
+        tmp.toggle('hidden');
+        tmp.toggle('current');
         tmp = $('[data-key="' + key + '"] .toggle').classList;
         tmp.toggle('back');
         tmp.toggle('forward');
@@ -311,9 +314,10 @@ initUI();
 
 remoteStorage.claimAccess({ alir: 'rw' });
 remoteStorage.displayWidget();
-remoteStorage.alir.private.on('change', function onChange() {
+remoteStorage.alir.private.on('change', function onChange(ev) {
   "use strict";
-  console.log('change');
+  //console.log('change');
+  //console.log(ev);
   updateList();
 });
 updateList();

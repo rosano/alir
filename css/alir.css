@@ -57,21 +57,27 @@ body.online #menu .slider {
   list-style-type: none;
   font-size: 1.2em;
 }
+#list .content, #list .actions {
+  display: none;
+}
+#list .current .content, #list .current .actions {
+  display: block;
+}
 #list > li {
   margin: 5px;
   padding: 1px 10px;
-  border-color: #000;
+  border-color: #888;
   border-width: 0 0 1px 0;
   border-style: solid;
 }
 #list a.action-icon:before {
   background-color: #000000;
   border-radius: 5px;
-  margin: -7px 0 0 -60px;
+  margin: -7px 0 0 -40px;
 }
 #list a.action-icon {
   margin: 20px;
-  padding: 0 40px;
+  padding: 0 20px;
 }
 /*
 #list > li.public {
@@ -81,6 +87,10 @@ body.online #menu .slider {
   border-color: #FAA;
 }
 */
+#list .text {
+  margin: 40px;
+  white-space: pre-wrap;
+}
 .hidden {
   display: none;
 }
