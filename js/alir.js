@@ -38,6 +38,7 @@
 
 var list = document.getElementById('list'),
     listHtml = '';
+
 remoteStorage.defineModule('alir', function module(privateClient, publicClient) {
   "use strict";
 
@@ -97,16 +98,30 @@ function updateList() {
   remoteStorage.alir.private.getAll('').then(function onAll(objectsPrivate) {
     remoteStorage.alir.public.getAll('').then(function onAll(objectsPublic) {
       function createList(objects, context) {
+        /*jshint newcap: false*/
         Object.keys(objects).forEach(function (key) {
           var obj   = objects[key],
-              title = obj.title || key;
+              title = obj.title || key,
+              type, content;
+          if (obj.html) {
+            type    = 'html';
+            try {
+              content = HTMLtoXML(obj.html);
+            } catch (e) {
+              console.log('Error sanityzing ' + obj.title);
+              content = "Content contains errors";
+            }
+          } else {
+            type    = 'text';
+            content = obj.text;
+          }
           title = title.replace(/</g, '&lt;').replace(/>/g, '&gt;');
           listHtml += format('<li data-key="%s" data-context="%s" class="%s"><h2 data-action="toggle">%s</h2>', key, context, context, title);
           listHtml += '<p class="actions">';
           listHtml += format('<a class="action-icon forward toggle" data-action="toggle" href="#"></a> ', key);
           listHtml += format('<a class="action-icon delete" data-action="delete" href="#"></a> ', key);
           listHtml += '</p>';
-          listHtml += format('<div class="content hidden"><a class="url" href="%s" target="_blank">%s</a><div class="html">%s</div></div></li>', obj.url || '#', obj.url || '', obj.html);
+          listHtml += format('<div class="content"><a class="url" href="%s" target="_blank">%s</a><div class="%s">%s</div></div></li>', obj.url || '#', obj.url || '', type, content);
         });
       }
       listHtml = '';
