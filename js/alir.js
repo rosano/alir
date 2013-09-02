@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, HTMLtoXML: true, doT: true */
+/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, doT: true */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -34,13 +34,29 @@
  * 'sync'
  * 'timeout'
  * 'unbusy'
+ *
+ * @TODO use notifications
+ * https://developer.mozilla.org/en-US/docs/WebAPI/Using_Web_Notifications
  */
 
 var templates = {},
     list = document.getElementById('list'),
     listHtml = '';
 
-remoteStorage.defineModule('alir', function module(privateClient, publicClient) {
+/*
+(function () {
+  "use strict";
+  var l = console.log;
+  console.log = function log() {
+    l.apply(console, arguments);
+    if (Notification && Notification.permission === "granted") {
+      var n = new Notification(arguments[0]);
+    }
+  };
+})();
+*/
+
+RemoteStorage.defineModule('alir', function module(privateClient, publicClient) {
   "use strict";
 
   // Define a common data type using JSON Schema
@@ -75,12 +91,11 @@ remoteStorage.defineModule('alir', function module(privateClient, publicClient) 
         return publicClient.storeObject('article', obj.id, obj);
       },
       goOffline: function () {
-        privateClient.release('');
-        publicClient.release('');
+        // @FIXME this has little to do with offline
+        remoteStorage.caching.disable('/alir/');
       },
       goOnline: function () {
-        privateClient.use('');
-        publicClient.use('');
+        remoteStorage.caching.enable('/alir/');
       },
       private: privateClient,
       public: publicClient
@@ -93,31 +108,35 @@ function updateList() {
     remoteStorage.alir.public.getAll('').then(function onAll(objectsPublic) {
       function createList(objects, context) {
         /*jshint newcap: false*/
-        Object.keys(objects).forEach(function (key) {
-          var obj   = objects[key],
-              title = obj.title || key,
-              datas = {};
-          datas = {
-            key: key,
-            context: context,
-            title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-            url: obj.url || '#'
-          };
-          if (obj.html) {
-            datas.type = 'html';
-            try {
-              datas.content = HTMLtoXML(obj.html);
-            } catch (e) {
-              console.log('Error sanityzing ' + obj.title);
-              datas.content = "Content contains errors";
+        if (typeof objects === "object") {
+          Object.keys(objects).forEach(function (key) {
+            var obj   = objects[key],
+                title = obj.title || key,
+                datas = {};
+            datas = {
+              key: key,
+              context: context,
+              title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+              url: obj.url || '#'
+            };
+            if (obj.html) {
+              datas.type = 'html';
+              try {
+                datas.content = HTMLtoXML(obj.html);
+              } catch (e) {
+                console.log('Error sanityzing ' + obj.title);
+                datas.content = "Content contains errors";
+              }
+            } else {
+              datas.type = 'text';
+              datas.content = obj.text;
             }
-          } else {
-            datas.type = 'text';
-            datas.content = obj.text;
-          }
 
-          listHtml += templates.item(datas);
-        });
+            listHtml += templates.item(datas);
+          });
+        } else {
+          console.log('Unable to create list of undefined objects');
+        }
       }
       listHtml = '';
       createList(objectsPublic, 'public');
@@ -306,9 +325,23 @@ function initUI() {
 }
 // }}
 
+/*
+window.addEventListener('load', function () {
+  "use strict";
+  if (Notification && Notification.permission !== "granted") {
+    Notification.requestPermission(function (status) {
+      // This allows to use Notification.permission with Chrome/Safari
+      if (Notification.permission !== status) {
+        Notification.permission = status;
+      }
+    });
+  }
+});
+*/
+
 initUI();
 
-remoteStorage.claimAccess({ alir: 'rw' });
+remoteStorage.access.claim('alir', 'rw');
 remoteStorage.displayWidget();
 remoteStorage.alir.private.on('change', function onChange(ev) {
   "use strict";
