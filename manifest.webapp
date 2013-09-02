@@ -11,6 +11,11 @@
     "name": "Clochix",
     "url": "http://clochix.net"
   },
+  "permissions": {
+    "desktop-notification": {
+      "description": "Allows to display notifications"
+    }
+  },
   "default_locale": "en",
   "type": "web",
   "version": "0.0.1"

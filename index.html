@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Alir</title>
+    <title>À Lire</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/alir.css" media="all" rel="stylesheet" type="text/css" />
     <link href="css/gaia/icons/styles/action_icons.css" rel="stylesheet" type="text/css">
@@ -14,10 +14,10 @@
   <body class="online">
     <div id="templates">
       <div id="tmpl-item">
-        <li data-key="{{=it.key}}}" data-context="{{=it.context}}" class="{{=it.context}}">
-          <h2 data-action="toggle">{{=it.title}}</h2>
+        <li data-key="{{=it.key}}" data-context="{{=it.context}}" class="{{=it.context}}" id="{{=it.key}}">
+          <h2><a data-action="toggle" href="#{{=it.key}}">{{=it.title}}</a></h2>
           <p class="actions">
-            <a class="action-icon forward toggle" data-action="toggle" href="#"></a>
+            <a class="action-icon back" data-action="toggle" href="#"></a>
             <a class="action-icon delete" data-action="delete" href="#"></a>
             <a class="action-icon compose" data-action="compose" href="#"></a>
           </p>
@@ -28,10 +28,11 @@
         </li>
       </div>
     </div>
-    <div id="menu">
+    <div id="menu" class="list">
       <div class="content">
         <p><a class="action-icon new" data-action="create">&nbsp;</a></p>
-        <p><a class="action-icon back hidden" data-action="toggleContent">&nbsp;</a></p>
+        <p><a class="top" href="#list">^</a></p>
+        <p><a class="action-icon back" data-action="toggleContent">&nbsp;</a></p>
         <p><a class="action-icon email-sync" data-action="sync">&nbsp;</a></p>
         <p><a class="action-icon menu" data-action="settings">&nbsp;</a></p>
         <!--
@@ -83,7 +84,7 @@
         <p>
           <button value="Public" name="public">Public</button>
           <button value="Privé"  name="private">Privé</button>
-          <button value="Annuler" name="cancel">Annuler</button>
+          <button value="Annuler" name="done">Terminé</button>
         </p>
       </form>
     </div>

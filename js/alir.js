@@ -179,11 +179,13 @@ function initUI() {
       displayTile('input');
     },
     toggleContent: function doToggle() {
+      var cl = $('#menu').classList;
+      cl.toggle("detail");
+      cl.toggle("list");
       forElement('#list li[data-key]', function (e) {
         e.classList.remove('hidden');
         e.classList.remove('current');
       });
-      UI.menu.toggleContent.classList.toggle('hidden');
       menuActions.toggleMenu();
     },
     toggleMenu: function doToggleMenu() {
@@ -227,7 +229,19 @@ function initUI() {
 
   UI.list.addEventListener('click', function onClick(event) {
     var target = event.target,
-        context, key, tmp, keyNode = target, parent;
+        context, key, keyNode = target, parent;
+    function toggleItem(key) {
+      var clItem = $('[data-key="' + key + '"]').classList,
+          clMenu = $('#menu').classList;
+      clMenu.toggle("detail");
+      clMenu.toggle("list");
+      Array.prototype.forEach.call($$('li[data-key]'), function (e) {
+        e.classList.toggle('hidden');
+      });
+      clItem.toggle('hidden');
+      clItem.toggle('current');
+      $('#menu.detail .content .top').href = '#' + key;
+    }
     if (target.dataset.action) {
       while (typeof keyNode.dataset.key === 'undefined' && keyNode.parentNode) {
         keyNode = keyNode.parentNode;
@@ -242,16 +256,7 @@ function initUI() {
       context = parent.dataset.context;
       switch (target.dataset.action) {
       case 'toggle':
-        Array.prototype.forEach.call($$('li[data-key]'), function (e) {
-          e.classList.toggle('hidden');
-        });
-        tmp = $('[data-key="' + key + '"]').classList;
-        tmp.toggle('hidden');
-        tmp.toggle('current');
-        tmp = $('[data-key="' + key + '"] .toggle').classList;
-        tmp.toggle('back');
-        tmp.toggle('forward');
-        UI.menu.toggleContent.classList.toggle('hidden');
+        toggleItem(key);
         break;
       case 'delete':
         if (window.confirm("Supprimer ???")) {
@@ -279,7 +284,7 @@ function initUI() {
       text: $('#input [name="text"]').value
     };
     remoteStorage.alir.addPublic(obj);
-    menuActions.create();
+    //menuActions.create();
   });
   $('#input [name="private"]').addEventListener('click', function () {
     var obj = {
@@ -289,9 +294,9 @@ function initUI() {
       text: $('#input [name="text"]').value
     };
     remoteStorage.alir.addPrivate(obj);
-    menuActions.create();
+    //menuActions.create();
   });
-  $('#input [name="cancel"]').addEventListener('click', function () {
+  $('#input [name="done"]').addEventListener('click', function () {
     displayTile('list');
   });
   // }}

@@ -28,4 +28,6 @@ self.port.on("readaSax", function readaSax() {
   unsafeWindow.saxParser(document.childNodes[document.childNodes.length - 1], readable);
   article = readable.getArticle();
   document.body.innerHTML = "<h1>" + article.title + "</h1>" + article.html;
+  document.body.style.maxWidth = "600px";
+  document.body.style.margin = "auto";
 });
