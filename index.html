@@ -11,7 +11,7 @@
     <link href="css/gaia/style/switches.css" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" type="image/png" href="img/icon-32.png" />
   </head>
-  <body class="online">
+  <body class="online menu-left">
     <div id="templates">
       <div id="tmpl-item">
         <li data-key="{{=it.key}}" data-context="{{=it.context}}" class="{{=it.context}}" id="{{=it.key}}">
@@ -93,6 +93,7 @@
     <div id="settings" class="hidden" data-tile="settings">
       <form >
         <button name="install">Installer</button>
+        <button onClick="document.body.classList.toggle('menu-left');document.body.classList.toggle('menu-right');">Menu</button>
         <button name="cancel">Annuler</button>
       </form>
     </div>

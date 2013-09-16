@@ -7,8 +7,11 @@ body {
 body.sync {
   background-color: #FEE;
 }
-body.menu {
+body.menu.menu-left {
   margin-left: 130px;
+}
+body.menu.menu-right {
+  margin-right: 130px;
 }
 #main {
   color: #444;
@@ -23,19 +26,31 @@ body.menu {
 #menu {
   position: fixed;
   top: 0;
-  left: 0;
-  margin: 0 0 0 -110px;
   padding: 0;
-  width: 150px;
   height: 100%;
   background-color: #000;
   color: #FFF;
+}
+body.menu-left #menu {
+  width: 150px;
+  left: 0;
+  margin: 0 0 0 -110px;
+}
+body.menu-right #menu {
+  width: 130px;
+  right: 0;
+  margin: 0 -90px 0 0;
 }
 #menu .slider {
   width: 40px;
   height: 100%;
   background-color: #888;
+}
+body.menu-left #menu .slider {
   margin-left: calc(100% - 40px);
+}
+body.menu-right #menu .slider {
+  margin-right: calc(100% - 40px);
 }
 body.online #menu .slider {
   background-color: #0F0;
@@ -43,11 +58,19 @@ body.online #menu .slider {
 #menu .content {
   float: right;
   width: 75px;
-  margin: 10px 70px 10px 10px;
   line-height: 4em;
 }
-#menu.show {
+body.menu-left #menu .content {
+  margin: 10px 70px 10px 10px;
+}
+body.menu-right #menu .content {
+  margin: 10px 10px 10px 70px;
+}
+body.menu-left #menu.show {
   margin-left: 0;
+}
+body.menu-right #menu.show {
+  margin-right: 0;
 }
 #menu .content > p {
   margin-bottom: 20px;
@@ -56,6 +79,7 @@ body.online #menu .slider {
 #menu a.button {
   padding: 20px 20px;
 }
+#menu .content .inspect,
 #menu .content .top {
   color: #FFFFFF;
   font-size: 4em;
@@ -84,8 +108,17 @@ body.online #menu .slider {
   display: inline;
 }
 #list {
+  padding-top: 2em;
   list-style-type: none;
   font-size: 1.2em;
+}
+body.menu-left #list {
+  padding-left: 40px;
+  padding-right: 0;
+}
+body.menu-right #list {
+  padding-left: 0px;
+  padding-right: 40px;
 }
 #list .content, #list .actions {
   display: none;
@@ -143,8 +176,14 @@ a.button {
   text-shadow: 2px 2px 5px #000;
   background-image: -moz-linear-gradient(bottom, rgb(0,140,196) 66%, rgb(130,220,255) 99%);
 }
-#input, #settings {
+body.menu-left #input,
+body.menu-left #settings {
   margin-left: 50px;
+  margin-top: 60px;
+}
+body.menu-right #input,
+body.menu-right #settings {
+  margin-right: 50px;
   margin-top: 60px;
 }
 #input > form , #settings > form {
