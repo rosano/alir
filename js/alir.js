@@ -43,6 +43,45 @@ var templates = {},
     list = document.getElementById('list'),
     listHtml = '';
 
+var utils = {
+  device: {
+    type: '',
+    orientation: ''
+  },
+  logLevel: 'debug',
+  logLevels: ['debug', 'info', 'warning', 'error'],
+  // @src http://blog.snowfinch.net/post/3254029029/uuid-v4-js
+  // @licence Public domain
+  uuid : function uuid() {
+    /*jshint bitwise: false */
+    "use strict";
+    var id = "", i, random;
+    for (i = 0; i < 32; i++) {
+      random = Math.random() * 16 | 0;
+      if (i === 8 || i === 12 || i === 16 || i === 20) {
+        id += "-";
+      }
+      id += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random)).toString(16);
+    }
+    return id;
+  },
+  format:  function format(str) {
+    "use strict";
+    var params = Array.prototype.splice.call(arguments, 1);
+    return (str.replace(/%s/g, function () {return params.shift(); }));
+  },
+  log: function log() {
+    "use strict";
+    var level    = arguments[arguments.length - 1],
+        levelNum = utils.logLevels.indexOf(level);
+    if (levelNum === -1) {
+      console.log("Unknown log level " + level);
+    }
+    if (levelNum >= utils.logLevels.indexOf(utils.logLevel)) {
+      console.log('[' + level + '] ' + utils.format.apply(utils, arguments));
+    }
+  }
+};
 /*
 (function () {
   "use strict";
@@ -86,16 +125,11 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
         var obj = privateClient.buildObject('article', article);
         return privateClient.storeObject('article', obj.id, obj);
       },
-      addPublic: function (article) {
-        var obj = publicClient.buildObject('article', article);
-        return publicClient.storeObject('article', obj.id, obj);
-      },
       goOffline: function () {
-        // @FIXME this has little to do with offline
-        remoteStorage.caching.disable('/alir/');
+        remoteStorage.stopSync();
       },
       goOnline: function () {
-        remoteStorage.caching.enable('/alir/');
+        remoteStorage.syncCycle();
       },
       private: privateClient,
       public: publicClient
@@ -176,6 +210,7 @@ function initUI() {
   menuActions = {
     create: function doCreate() {
       menuActions.toggleMenu();
+      $('#input [name="id"]').value = utils.uuid();
       displayTile('input');
     },
     toggleContent: function doToggle() {
@@ -194,7 +229,7 @@ function initUI() {
     },
     sync: function doSync() {
       document.body.classList.add('sync');
-      remoteStorage.fullSync().then(function onSyncDone() {
+      remoteStorage.sync().then(function onSyncDone() {
         document.body.classList.remove('sync');
         window.alert('Synk ok');
       }, function onSynFail() {
@@ -215,7 +250,7 @@ function initUI() {
       document.body.classList.toggle('online');
     },
     onoff: function doOnOff() {
-      if (UI.menu.onoff.checked) {
+      if (UI.menu.onoffcheck.checked) {
         menuActions.offline();
       } else {
         menuActions.online();
@@ -226,6 +261,7 @@ function initUI() {
     var elmt = arguments[0];
     UI.menu[elmt.dataset.action] = elmt;
   });
+  UI.menu.onoffcheck = $('#menu .content [data-action="onoff"] input');
 
   UI.list.addEventListener('click', function onClick(event) {
     var target = event.target,
@@ -240,7 +276,7 @@ function initUI() {
       });
       clItem.toggle('hidden');
       clItem.toggle('current');
-      $('#menu.detail .content .top').href = '#' + key;
+      $('#menu .content .top').href = '#' + key;
     }
     if (target.dataset.action) {
       while (typeof keyNode.dataset.key === 'undefined' && keyNode.parentNode) {
@@ -262,6 +298,7 @@ function initUI() {
         if (window.confirm("Supprimer ???")) {
           remoteStorage.alir[context].remove(key);
         }
+        toggleItem(key);
         break;
       case 'compose':
         remoteStorage.alir[context].getObject(key).then(function (object) {
@@ -277,15 +314,6 @@ function initUI() {
     }
   });
   // input {{
-  $('#input [name="public"]').addEventListener('click', function () {
-    var obj = {
-      id: $('#input [name="id"]').value,
-      title: $('#input [name="title"]').value,
-      text: $('#input [name="text"]').value
-    };
-    remoteStorage.alir.addPublic(obj);
-    //menuActions.create();
-  });
   $('#input [name="private"]').addEventListener('click', function () {
     var obj = {
       id: $('#input [name="id"]').value,
@@ -347,6 +375,8 @@ window.addEventListener('load', function () {
 initUI();
 
 remoteStorage.access.claim('alir', 'rw');
+remoteStorage.caching.enable('/alir/');
+remoteStorage.caching.enable('/public/alir/');
 remoteStorage.displayWidget();
 remoteStorage.alir.private.on('change', function onChange(ev) {
   "use strict";
