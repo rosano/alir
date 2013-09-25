@@ -355,6 +355,24 @@ function initUI() {
   // }}
   // Prepare templates
   templates.item = doT.template($('#tmpl-item').innerHTML);
+
+
+  (function () {
+    var height = document.body.clientHeight,
+        scroll = $("#menu .scrollbar");
+    scroll.style.height = (window.innerHeight / document.body.clientHeight * 100) + '%';
+    setInterval(function checkSize() {
+      var h = document.body.clientHeight;
+      if (h !== height) {
+        height = h;
+        scroll.style.height = (window.innerHeight / document.body.clientHeight * 100) + '%';
+        scroll.style.top = (window.scrollY / document.body.clientHeight * 100) + '%';
+      }
+    }, 250);
+    window.onscroll = function () {
+      scroll.style.top = (window.scrollY / document.body.clientHeight * 100) + '%';
+    };
+  })();
 }
 // }}
 

@@ -55,6 +55,27 @@ body.menu-right #menu .slider {
 body.online #menu .slider {
   background-color: #0F0;
 }
+#menu .scrollbar {
+  position: fixed;
+  top: 0px;
+  width: 40px;
+  background-color: #FF0080;
+  opacity: 0.5;
+  z-index: 1000;
+  pointer-events: none;
+}
+body.menu-left #menu .scrollbar {
+  left: 0;
+}
+body.menu-left #menu.show .scrollbar {
+  left: 110px;
+}
+body.menu-right #menu .scrollbar {
+  right: 0;
+}
+body.menu-right #menu.show .scrollbar {
+  right: 90px;
+}
 #menu .content {
   float: right;
   width: 75px;
