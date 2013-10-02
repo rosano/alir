@@ -19,22 +19,6 @@
 */
 
 /**
- * @TODO handle events
- * 'busy'
- * 'change'
- * 'conflict'
- * 'connect'
- * 'connected'
- * 'disconnect'
- * 'disconnected'
- * 'error'
- * 'ready'
- * 'reconnect'
- * 'state'
- * 'sync'
- * 'timeout'
- * 'unbusy'
- *
  * @TODO use notifications
  * https://developer.mozilla.org/en-US/docs/WebAPI/Using_Web_Notifications
  */
@@ -80,6 +64,44 @@ var utils = {
     if (levelNum >= utils.logLevels.indexOf(utils.logLevel)) {
       console.log('[' + level + '] ' + utils.format.apply(utils, arguments));
     }
+  },
+  createXPathFromElement: function createXPathFromElement(elm) {
+    // source: http://stackoverflow.com/a/5178132
+    //jshint maxcomplexity: 10
+    "use strict";
+    var allNodes = document.getElementsByTagName('*'),
+        uniqueIdCount,
+        i, n,
+        sib, segs;
+    for (segs = []; elm && elm.nodeType === 1; elm = elm.parentNode) {
+      if (elm.hasAttribute('id')) {
+        uniqueIdCount = 0;
+        for (n = 0;n < allNodes.length;n++) {
+          if (allNodes[n].hasAttribute('id') && allNodes[n].id === elm.id) {
+            uniqueIdCount++;
+          }
+          if (uniqueIdCount > 1) {
+            break;
+          }
+        }
+        if (uniqueIdCount === 1) {
+          segs.unshift('id("' + elm.getAttribute('id') + '")');
+          return segs.join('/');
+        } else {
+          segs.unshift(elm.localName.toLowerCase() + '[@id="' + elm.getAttribute('id') + '"]');
+        }
+      } else if (elm.hasAttribute('class')) {
+        segs.unshift(elm.localName.toLowerCase() + '[@class="' + elm.getAttribute('class') + '"]');
+      } else {
+        for (i = 1, sib = elm.previousSibling; sib; sib = sib.previousSibling) {
+          if (sib.localName === elm.localName) {
+            i++;
+          }
+        }
+        segs.unshift(elm.localName.toLowerCase() + '[' + i + ']');
+      }
+    }
+    return segs.length ? '/' + segs.join('/') : null;
   }
 };
 /*
@@ -122,8 +144,7 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
   return {
     exports: {
       addPrivate: function (article) {
-        var obj = privateClient.buildObject('article', article);
-        return privateClient.storeObject('article', obj.id, obj);
+        return privateClient.storeObject('article', article.id, article);
       },
       goOffline: function () {
         remoteStorage.stopSync();
@@ -168,8 +189,9 @@ function updateList() {
 
             listHtml += templates.item(datas);
           });
-        } else {
-          console.log('Unable to create list of undefined objects');
+        //} else {
+        // No object in this context
+        //  console.log('Unable to create list of undefined objects for context ' + context);
         }
       }
       listHtml = '';
@@ -180,6 +202,7 @@ function updateList() {
   });
 }
 function initUI() {
+  // jshint maxstatements: 30
   "use strict";
   var $  = function (sel) {return document.querySelector.call(document, sel); },
       $$ = function (sel) {return document.querySelectorAll.call(document, sel); },
@@ -228,12 +251,9 @@ function initUI() {
       document.body.classList.toggle("menu");
     },
     sync: function doSync() {
-      document.body.classList.add('sync');
       remoteStorage.sync().then(function onSyncDone() {
-        document.body.classList.remove('sync');
         window.alert('Synk ok');
       }, function onSynFail() {
-        document.body.classList.remove('sync');
         window.alert('Synk ko');
       });
     },
@@ -243,17 +263,17 @@ function initUI() {
     },
     offline: function doOffline() {
       remoteStorage.alir.goOffline();
-      document.body.classList.toggle('online');
     },
     online: function doOnline() {
       remoteStorage.alir.goOnline();
-      document.body.classList.toggle('online');
     },
     onoff: function doOnOff() {
       if (UI.menu.onoffcheck.checked) {
         menuActions.offline();
+        document.body.classList.remove('online');
       } else {
         menuActions.online();
+        document.body.classList.add('online');
       }
     }
   };
@@ -262,7 +282,40 @@ function initUI() {
     UI.menu[elmt.dataset.action] = elmt;
   });
   UI.menu.onoffcheck = $('#menu .content [data-action="onoff"] input');
+  if (!remoteStorage.connected) {
+    UI.menu.onoffcheck.checked  = false;
+    UI.menu.onoffcheck.disabled = true;
+    document.body.classList.remove('online');
+  }
+  remoteStorage.on("disconnected", function (e) {
+    UI.menu.onoffcheck.checked  = false;
+    UI.menu.onoffcheck.disabled = true;
+    document.body.classList.remove('online');
+  });
+  remoteStorage.on("sync-busy", function (e) {
+    document.body.classList.add('sync');
+  });
+  remoteStorage.on("sync-done", function (e) {
+    document.body.classList.remove('sync');
+  });
+  // @FIXME - connected doesn't exists
+  //remoteStorage.on("connected", function (e) {
+  //  UI.menu.onoffcheck.checked  = true;
+  //  UI.menu.onoffcheck.disabled = false;
+  //  document.body.classList.add('online');
+  //});
 
+  // @TODO
+  //remoteStorage.on("authing", function (e) { });
+  //remoteStorage.on("conflict", function (e) { });
+  //remoteStorage.on("connecting", function e() { });
+  //remoteStorage.on("disconnect", function (e) { });
+  //remoteStorage.on("error", function (e) { });
+  //remoteStorage.on("features-loaded", function (e) { });
+  //remoteStorage.on("ready", function (e) { });
+  //UI.list.addEventListener('contextmenu', function (e) {
+  //  window.alert(utils.createXPathFromElement(e.originalTarget));
+  //});
   UI.list.addEventListener('click', function onClick(event) {
     var target = event.target,
         context, key, keyNode = target, parent;
