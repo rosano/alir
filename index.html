@@ -19,7 +19,9 @@
           <p class="actions">
             <a class="action-icon back" data-action="toggle" href="#"></a>
             <a class="action-icon delete" data-action="delete" href="#"></a>
+            <!--
             <a class="action-icon compose" data-action="compose" href="#"></a>
+            -->
           </p>
           <div class="content">
             <a class="url" href="{{=it.url}}" target="_blank">{{=it.title}}</a>
@@ -45,6 +47,7 @@
             <span></span>
           </label>
         </p>
+        <p><a class="inspect" onClick="remoteStorage.inspect();">?</a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
         <div class="scrollbar"></div>
@@ -84,9 +87,8 @@
           <textarea rows="5" cols="40" name="text" placeholder="Contenu"></textarea>
         </p>
         <p>
-          <button value="Public" name="public">Public</button>
-          <button value="Privé"  name="private">Privé</button>
-          <button value="Annuler" name="done">Terminé</button>
+          <button value="Privé"  name="private">Créer</button>
+          <button value="Annuler" name="done">Annuler</button>
         </p>
       </form>
     </div>
