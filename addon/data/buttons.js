@@ -1,14 +1,5 @@
 /*jshint browser: true, devel: true */
 /*global self: true, unsafeWindow: true */
-self.port.on('getToken', function getToken() {
-  "use strict";
-  if (unsafeWindow.remoteStorage) {
-    self.port.emit("token", {
-      url: unsafeWindow.remoteStorage.getStorageInfo().href,
-      token: unsafeWindow.remoteStorage.getBearerToken()
-    });
-  }
-});
 self.port.on("getBody", function getBody() {
   "use strict";
   var obj = {
