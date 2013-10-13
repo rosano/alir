@@ -495,6 +495,7 @@ function initUI() {
   templates.item = doT.template($('#tmpl-item').innerHTML);
 
 
+  // Manage scroll
   (function () {
     var height = document.body.clientHeight,
         scroll = $("#menu .scrollbar");
@@ -511,12 +512,27 @@ function initUI() {
       scroll.style.top = (window.scrollY / document.body.clientHeight * 100) + '%';
     };
   })();
+
+  // Preferences
+  (function () {
+    var gesture = document.getElementById('prefGesture');
+    gesture.checked = config.gesture;
+    console.log(config);
+    gesture.addEventListener('change', function () {
+      config.gesture = gesture.checked;
+    });
+  }());
 }
 // }}
 
-/*
 window.addEventListener('load', function () {
   "use strict";
+  var conf = localStorage.getItem('config');
+  if (conf) {
+    config = JSON.parse(conf);
+  }
+  initUI();
+/*
   if (Notification && Notification.permission !== "granted") {
     Notification.requestPermission(function (status) {
       // This allows to use Notification.permission with Chrome/Safari
@@ -525,10 +541,13 @@ window.addEventListener('load', function () {
       }
     });
   }
-});
 */
+});
+window.addEventListener('unload', function () {
+  "use strict";
+  localStorage.setItem('config', JSON.stringify(config));
+});
 
-initUI();
 
 remoteStorage.access.claim('alir', 'rw');
 remoteStorage.caching.enable('/alir/');
