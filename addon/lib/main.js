@@ -11,6 +11,7 @@ var data          = require("sdk/self").data,
 
 // Init storage
 ss.storage.params = {
+  address: "",
   url: "",
   token: ""
 };
@@ -110,6 +111,7 @@ require("sdk/widget").Widget({
 panel.port.on("discover", function (address) {
   "use strict";
   console.debug("discovering " + address);
+  ss.storage.params.token = address;
   discover(address, function onDiscover(href, storageApi, authURL) {
     var events    = require("sdk/system/events"),
         { Ci }    = require("chrome"),
@@ -151,7 +153,6 @@ panel.port.on("discover", function (address) {
           } else {
             if (params.access_token) {
               ss.storage.params.token = params.access_token;
-              console.debug(ss.storage.params);
               notify.info("Successfully connected to remote storage");
             } else {
               console.error("No auth token in " + loc);
@@ -196,6 +197,16 @@ panel.port.on('readaSax', function () {
     ]
   });
   worker.port.emit('readaSax');
+});
+panel.port.on('selectContent', function () {
+  "use strict";
+  var worker;
+  worker = tabs.activeTab.attach({
+    contentScriptFile: [
+      data.url("buttons.js")
+    ]
+  });
+  worker.port.emit('selectContent');
 });
 panel.port.on('putContent', function () {
   "use strict";

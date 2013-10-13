@@ -7,6 +7,10 @@ $('#readaSax').addEventListener('click', function () {
   "use strict";
   self.port.emit('readaSax');
 });
+$('#selectContent').addEventListener('click', function () {
+  "use strict";
+  self.port.emit('selectContent');
+});
 $('#putContent').addEventListener('click', function () {
   "use strict";
   self.port.emit('putContent');
