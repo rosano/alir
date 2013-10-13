@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, doT: true */
+/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, doT: true, Gesture: true */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -25,7 +25,12 @@
 
 var templates = {},
     list = document.getElementById('list'),
-    listHtml = '';
+    listHtml = '',
+    config;
+config = {
+  gesture: false
+};
+
 
 var utils = {
   device: {
@@ -275,6 +280,9 @@ function initUI() {
         menuActions.online();
         document.body.classList.add('online');
       }
+    },
+    inspect: function doInspect() {
+      remoteStorage.inspect();
     }
   };
   forElement('#menu .content [data-action]', function () {
@@ -316,22 +324,22 @@ function initUI() {
   //UI.list.addEventListener('contextmenu', function (e) {
   //  window.alert(utils.createXPathFromElement(e.originalTarget));
   //});
+  function toggleItem(key) {
+    var clItem = $('[data-key="' + key + '"]').classList,
+        clMenu = $('#menu').classList;
+    clMenu.toggle("detail");
+    clMenu.toggle("list");
+    Array.prototype.forEach.call($$('li[data-key]'), function (e) {
+      e.classList.toggle('hidden');
+    });
+    clItem.toggle('hidden');
+    clItem.toggle('current');
+    $('#menu .content .top').href = '#' + key;
+  }
   UI.list.addEventListener('click', function onClick(event) {
     var target = event.target,
         context, key, keyNode = target, parent;
-    function toggleItem(key) {
-      var clItem = $('[data-key="' + key + '"]').classList,
-          clMenu = $('#menu').classList;
-      clMenu.toggle("detail");
-      clMenu.toggle("list");
-      Array.prototype.forEach.call($$('li[data-key]'), function (e) {
-        e.classList.toggle('hidden');
-      });
-      clItem.toggle('hidden');
-      clItem.toggle('current');
-      $('#menu .content .top').href = '#' + key;
-    }
-    if (target.dataset.action) {
+    if (target.dataset && target.dataset.action) {
       while (typeof keyNode.dataset.key === 'undefined' && keyNode.parentNode) {
         keyNode = keyNode.parentNode;
       }
@@ -366,6 +374,79 @@ function initUI() {
       }
     }
   });
+  if (config.gesture) {
+    Gesture.attach(UI.list, {
+      gesture: function (e) {
+        var items;
+        function getItems() {
+          var current  = $("#list > .current"),
+              previous,
+              next,
+              items = [].slice.call($$("#list > li")),
+              currentIndex;
+          if (current === null) {
+            return false;
+          }
+          if (items.length === 1) {
+            previous = next = current;
+          } else {
+            items.some(function (e, i) {
+              if (e.classList.contains("current")) {
+                currentIndex = i;
+              } else {
+                return false;
+              }
+            });
+            if (currentIndex === 0) {
+              previous = items[items.length - 1];
+              next     = items[currentIndex + 1];
+            } else if (currentIndex === items.length - 1) {
+              previous = items[currentIndex - 1];
+              next     = items[0];
+            } else {
+              previous = items[currentIndex - 1];
+              next     = items[currentIndex + 1];
+            }
+          }
+          return [previous, current, next];
+        }
+        switch (e.detail.dir) {
+        case 'E':
+          items = getItems();
+          if (items) {
+            window.scroll(0, 0);
+            items[1].classList.add('hideRight');
+            items[2].classList.add('showLeft');
+            window.setTimeout(function () {
+              items[1].classList.remove('current');
+              items[1].classList.remove('hideRight');
+              items[1].classList.add('hidden');
+              items[2].classList.remove('hidden');
+              items[2].classList.remove('showLeft');
+              items[2].classList.add('current');
+            }, 500);
+          }
+          break;
+        case 'W':
+          items = getItems();
+          if (items) {
+            window.scroll(0, 0);
+            items[1].classList.add('hideLeft');
+            items[0].classList.add('showRight');
+            window.setTimeout(function () {
+              items[1].classList.remove('current');
+              items[1].classList.remove('hideLeft');
+              items[1].classList.add('hidden');
+              items[0].classList.remove('hidden');
+              items[0].classList.remove('showRight');
+              items[0].classList.add('current');
+            }, 500);
+          }
+          break;
+        }
+      }
+    });
+  }
   // input {{
   $('#input [name="private"]').addEventListener('click', function () {
     var obj = {
@@ -384,6 +465,10 @@ function initUI() {
   // {{ Settings
   $('#settings [name="cancel"]').addEventListener('click', function () {
     displayTile('list');
+  });
+  $('#settings [name="menu"]').addEventListener('click', function () {
+    document.body.classList.toggle('menu-left');
+    document.body.classList.toggle('menu-right');
   });
   $('#settings [name="install"]').addEventListener('click', function () {
     var request = window.navigator.mozApps.install("http://alir.clochix.net/manifest.webapp");

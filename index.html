@@ -42,12 +42,12 @@
         <p><a class="button hidden" data-action="online">On</a></p>
         -->
         <p>
-          <label style="margin-left: -10px;" data-action="onoff">
+          <label class="onoff" data-action="onoff">
             <input type="checkbox" data-type="switch" checked="">
             <span></span>
           </label>
         </p>
-        <p><a class="inspect" onClick="remoteStorage.inspect();">?</a></p>
+        <p><a class="inspect">?</a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
         <div class="scrollbar"></div>
@@ -97,7 +97,7 @@
     <div id="settings" class="hidden" data-tile="settings">
       <form >
         <button name="install">Installer</button>
-        <button onClick="document.body.classList.toggle('menu-left');document.body.classList.toggle('menu-right');">Menu</button>
+        <button name="menu">Menu</button>
         <button name="cancel">Annuler</button>
       </form>
     </div>
@@ -107,6 +107,7 @@
     <!--
     <script type="text/javascript" src="lib/remotestorage-debug.js"></script>
     -->
+    <script type="text/javascript" src="js/touch.js"></script>
     <script type="text/javascript" src="js/alir.js"></script>
   </body>
 </html>
