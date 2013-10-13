@@ -1,6 +1,6 @@
 //jshint browser: true
 /*global CustomEvent: true */
-/*exports Gesture: true */
+/*exported Gesture */
 // @TODO add a polyfill for IE
 // https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent#Polyfill
 
@@ -31,13 +31,17 @@ var Gesture = (function () {
     cursor.startX    = ev.pageX;
     cursor.startY    = ev.pageY;
     listeners.forEach(function (elmt) {
-      elmt.dispatchEvent(new CustomEvent("gestureStart", {detail: ev}));
+      if (elmt.contains(ev.target)) {
+        elmt.dispatchEvent(new CustomEvent("gestureStart", {detail: ev}));
+      }
     });
   }
   function onTouchMove(event) {
     var ev = getEvent(event);
     listeners.forEach(function (elmt) {
-      elmt.dispatchEvent(new CustomEvent("gestureMove", {detail: ev}));
+      if (elmt.contains(ev.target)) {
+        elmt.dispatchEvent(new CustomEvent("gestureMove", {detail: ev}));
+      }
     });
   }
   function onTouchEnd(event) {
@@ -51,9 +55,11 @@ var Gesture = (function () {
     }
 
     listeners.forEach(function (elmt) {
-      elmt.dispatchEvent(new window.CustomEvent("gestureEnd", {detail: ev}));
-      if (dir) {
-        elmt.dispatchEvent(new window.CustomEvent("gesture", {detail: {dir: dir}}));
+      if (elmt.contains(ev.target)) {
+        elmt.dispatchEvent(new window.CustomEvent("gestureEnd", {detail: ev}));
+        if (dir) {
+          elmt.dispatchEvent(new window.CustomEvent("gesture", {detail: {dir: dir}}));
+        }
       }
     });
   }
