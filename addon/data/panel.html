@@ -1,5 +1,10 @@
 <html>
   <head>
+  <style>
+.hidden {
+  display: none;
+}
+  </style>
   </head>
   <body>
     <form>
@@ -7,11 +12,16 @@
       <button id="selectContent">Select Content</button>
     </form>
     <p>
-      <button id="putContent">Put content</button>
+      <button id="putToRemote" class="hidden">Put to RemoteStorage</button>
+      <button id="putToDropbox" class="hidden">Put to Dropbox</button>
     </p>
-    <p>
+    <p id="rsLogin"> Connect Remote Storage
       <input type="texte" id="address"></input>
-      <a href="#" id="connect">Connect</a>
+      <button id="connectRs">Connect</button>
+    </p>
+    <p id="dropboxLogin">
+      Connect Dropbox
+      <button id="connectDropbox">Connect</button>
     </p>
   </body>
 </html>

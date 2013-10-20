@@ -1,4 +1,4 @@
-/*jshint browser: true, devel: true, esnext: true */
+/*jshint browser: true, devel: true, esnext: true, node: true */
 /*global require: true */
 var data          = require("sdk/self").data,
     notifications = require("sdk/notifications"),
@@ -9,14 +9,22 @@ var data          = require("sdk/self").data,
     notify,
     panel;
 
+const {Cc, Ci, Cr} = require('chrome');
+
 // Init storage
 ss.storage.params = {
-  address: "",
-  url: "",
-  token: ""
+  rs: {
+    address: "",
+    url: "",
+    token: ""
+  },
+  dropbox: {
+    token: ""
+  }
 };
 
-(function () {
+// Display notifications
+var notify = (function () {
   "use strict";
   function make(level) {
     return function (message) {
@@ -26,12 +34,99 @@ ss.storage.params = {
       });
     };
   }
-  notify = {
+  return {
     info: make('Information'),
     warn: make('Warning'),
     error: make('Error')
   };
 })();
+
+//require("sdk/preferences/service").set("extensions.sdk.console.logLevel", "all");
+
+// Listen for HTTP response and analyze headers to extract Location:
+var listener = (function () {
+  "use strict";
+  var observerService = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService),
+      observer,
+      onParams;
+  observer = {
+    // Observer called on response
+    observe: function observe(aSubject, aTopic, aData) {
+      //jshint maxstatements: 25
+      if (aTopic === "http-on-examine-response") {
+        var channel = aSubject.QueryInterface(Ci.nsIHttpChannel),
+            loc = false,
+            re,
+            params = {};
+        console.debug("Response: " + channel.responseStatus);
+        if (channel.responseStatus > 299 && channel.responseStatus < 400) {
+          try {
+            loc = channel.getResponseHeader("Location");
+            console.debug("Location: " + loc);
+          } catch (e) {}
+        }
+        if (loc) {
+          re = new RegExp("^chrome://" + chromeApp);
+          if (re.test(loc)) {
+            listener.stop();
+            tabs.activeTab.close();
+            loc = decodeURIComponent(loc);
+            if (loc.indexOf('#') !== -1) {
+              params = require('querystring').parse(loc.split('#')[1]);
+            } else {
+              console.error("Enable to extract auth token from " + loc);
+              notify.error("Enable to extract auth token from " + loc);
+            }
+            if (params.error) {
+              notify.error("Unable to authenticate : " + params.error + " : " + params.error_description);
+              console.error("Unable to authenticate : " + params.error + " : " + params.error_description);
+            } else {
+              onParams(params);
+            }
+          }
+        }
+      }
+    }
+  };
+  // Start to listen for responses
+  function start(cb) {
+    onParams = cb;
+    observerService.addObserver(observer, "http-on-examine-response", false);
+  }
+  function stop() {
+    observerService.removeObserver(observer, "http-on-examine-response");
+  }
+
+  return {
+    start: start,
+    stop: stop
+  };
+}());
+
+/**
+ * Call oAuth provider
+ *
+ * @param {String}   url
+ * @param {Dict}     params
+ * @param {Function} onParams
+ */
+function doAuth(url, params, onParams) {
+  "use strict";
+  var tmp = [];
+  listener.start(onParams);
+  Object.keys(params).forEach(function (param) {
+    tmp.push(param + '=' + encodeURIComponent(params[param]));
+  });
+  url += url.indexOf('?') > 0 ? '&' : '?';
+  url += tmp.join('&');
+  tabs.open({
+    url: url,
+    onReady: function onReady(tab) {
+      tab.on('load', function onLoad() {
+      });
+    }
+  });
+}
 
 // Discover remote storage
 // Source https://github.com/remotestorage/remotestorage.js/blob/master/src/discover.js
@@ -95,96 +190,108 @@ function discover(userAddress, callback) {
   }
   tryOne();
 }
+/**
+ * Put content
+ *
+ * @param {String} url
+ * @param {String} token
+ * @param {Dict}   content
+ */
+function putContent(url, token, content) {
+  "use strict";
+  var slug;
+
+  slug   = require('sdk/util/uuid').uuid().toString().replace(/\W/g, '');
+  content.id = slug;
+  request({
+    url: url + slug,
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Content-Type": "application/json"
+    },
+    content: JSON.stringify(content),
+    onComplete: function putComplete(response) {
+      if (response.status < 300) {
+        notify.info("OK");
+      } else {
+        notify.error("Unable to put content : " + response.status + " " + response.statusText + " " + response.text);
+      }
+    }
+  }).put();
+}
 
 // Create panel and widget
 panel = require("sdk/panel").Panel({
   contentURL: data.url("panel.html"),
   contentScriptFile: data.url("panel.js")
 });
-require("sdk/widget").Widget({
-  label: "alir",
-  id: "alir",
-  panel: panel,
-  contentURL: data.url("alir.png")
-});
 
 panel.port.on("discover", function (address) {
   "use strict";
   console.debug("discovering " + address);
-  ss.storage.params.token = address;
+  ss.storage.params.rs.address = address;
   discover(address, function onDiscover(href, storageApi, authURL) {
-    var events    = require("sdk/system/events"),
-        { Ci }    = require("chrome"),
-        listening = false,
-        url       = authURL;
-    // Listen for HTTP response and analyze headers to extract Location:
-    function listener(event) {
-      //jshint maxstatements: 25
-      var channel = event.subject.QueryInterface(Ci.nsIHttpChannel),
-      loc,
-      re,
-      params = {};
-      try {
-        loc = channel.getResponseHeader("Location");
-      } catch (e) {}
-      console.debug("Location: " + loc);
-      if (loc) {
-        re = new RegExp("^chrome://" + chromeApp);
-        if (re.test(loc)) {
-          events.off("http-on-examine-response", listener);
-          listening = false;
-          tabs.activeTab.close(function onClosed() {});
-          loc = decodeURIComponent(loc);
-          if (loc.indexOf('#') !== -1) {
-            loc.split('#')[1].split('&').forEach(function (item) {
-              // Dirty, but my access token ends with '=' :S
-              var param = item.split('='),
-                  key   = param.shift(),
-                  val   = param.join('=');
-              params[key] = val;
-            });
-          } else {
-            console.error("Enable to extract auth token from " + loc);
-            notify.error("Enable to extract auth token from " + loc);
-          }
-          if (params.error) {
-            notify.error("Unable to authenticate : " + params.error + " : " + params.error_description);
-            console.error("Unable to authenticate : " + params.error + " : " + params.error_description);
-          } else {
-            if (params.access_token) {
-              ss.storage.params.token = params.access_token;
-              notify.info("Successfully connected to remote storage");
-            } else {
-              console.error("No auth token in " + loc);
-              notify.error("No auth token in " + loc);
-            }
-          }
-        }
+    var params;
+    params = {
+      'redirect_uri': 'chrome://' + chromeApp,
+      'scope': 'alir:rw',
+      'client_id': 'addon',
+      'response_type': 'token'
+    };
+    function onParams(params) {
+      if (params.access_token) {
+        ss.storage.params.rs.token = params.access_token;
+        notify.info("Successfully connected to remote storage");
+        panel.port.emit('rs.connected');
+      } else {
+        console.error("No auth token");
+        notify.error("No auth token");
       }
     }
-    if (url) {
-      events.on("http-on-examine-response", listener);
-      listening = true;
-      ss.storage.params.url = href + '/alir/';
-      // @see https://raw.github.com/remotestorage/remotestorage.js/master/src/authorize.js
-      url += authURL.indexOf('?') > 0 ? '&' : '?';
-      url += '&redirect_uri=' + encodeURIComponent('chrome://' + chromeApp);
-      url += '&scope=' + encodeURIComponent('alir:rw');
-      url += '&client_id=' + encodeURIComponent('addon');
-      url += '&response_type=token';
-      tabs.open({
-        url: url,
-        onReady: function onReady(tab) {
-          tab.on('load', function onLoad() {
-
-          });
-        }
-      });
+    if (authURL) {
+      ss.storage.params.rs.url = href + '/alir/';
+      doAuth(authURL, params, onParams);
     } else {
       console.error("Unable to get authURL");
       notify.error("Unable to discover storage for this address");
     }
   });
+});
+panel.port.on("connectDropbox", function () {
+  "use strict";
+  var key  = require('sdk/simple-prefs').prefs.dropboxApiKey,
+      url  = "https://www.dropbox.com/1/oauth2/authorize?",
+      csrf = require('sdk/util/uuid').uuid().toString().replace(/\W/g, ''),
+      params;
+  function onParams(params) {
+    if (params.access_token) {
+      if (params.state === csrf) {
+        ss.storage.params.dropbox.token = params.access_token;
+        notify.info("Successfully connected to Dropbox");
+        panel.port.emit('dropbox.connected');
+      } else {
+        notify.error("Wrong CSRF");
+      }
+    } else {
+      console.error("No auth token");
+      notify.error("No auth token");
+    }
+  }
+  if (!key) {
+    notify.error("Enter your dropbox API key in the preferences");
+  } else {
+    params = {
+      "client_id" : key,
+      "redirect_uri": "chrome://" + chromeApp,
+      "response_type": "token",
+      "state": csrf
+    };
+    tabs.on('open', function (tab) {
+      tab.on('ready', function (tab) {
+      });
+    });
+    doAuth(url, params, onParams);
+  }
 });
 panel.port.on('readaSax', function () {
   "use strict";
@@ -208,12 +315,12 @@ panel.port.on('selectContent', function () {
   });
   worker.port.emit('selectContent');
 });
-panel.port.on('putContent', function () {
+panel.port.on('putToRemote', function () {
   "use strict";
   var worker;
 
-  if (!ss.storage.params.url || !ss.storage.params.token) {
-    notify.error("Please connect first to a remote storage server");
+  if (!ss.storage.params.rs.url || !ss.storage.params.rs.token) {
+    notify.error("Please connect first to remote storage");
     return;
   }
 
@@ -223,52 +330,40 @@ panel.port.on('putContent', function () {
     ]
   });
   worker.port.on("body", function put(obj) {
-    var url,
-    token,
-    slug;
+    putContent(ss.storage.params.rs.url, ss.storage.params.rs.token, obj);
+  });
+  worker.port.emit('getBody');
+});
+panel.port.on('putToDropbox', function () {
+  "use strict";
+  var worker;
 
-    url   = ss.storage.params.url;
-    token = ss.storage.params.token;
-    slug = require('sdk/util/uuid').uuid().toString().replace(/\W/g, '');
-    request({
-      url: url + slug,
-      headers: {
-        "Authorization": "Bearer " + token,
-        "Content-Type": "application/json"
-      },
-      content: JSON.stringify(obj),
-      onComplete: function putComplete(response) {
-        if (response.status < 300) {
-          notify.info("OK");
-        } else {
-          notify.error("Unable to put content : " + response.status + " " + response.statusText + " " + response.text);
-        }
-      }
-    }).put();
+  if (!ss.storage.params.dropbox.token) {
+    notify.error("Please connect first to dropbox");
+    return;
+  }
+
+  worker = tabs.activeTab.attach({
+    contentScriptFile: [
+      data.url("buttons.js")
+    ]
+  });
+  worker.port.on("body", function put(obj) {
+    putContent('https://api-content.dropbox.com/1/files_put/auto/alir/', ss.storage.params.dropbox.token, obj);
   });
   worker.port.emit('getBody');
 });
 
-/*
-var btn = require("toolbarbutton").ToolbarButton({
-  id: 'my-toolbar-button',
-  label: 'Test',
-  image: 'http://clochix.net/favicon.png',
-  onCommand: function () {
-    "use strict";
-    if (typeof(tabs.activeTab._worker) === 'undefined') {
-      var worker = tabs.activeTab.attach({
-        contentScript: 'self.port.on("sayhello", function() { alert("Hello world!"); })'
-      });
-      tabs.activeTab._worker = worker;
-    }
-    tabs.activeTab._worker.port.emit("sayhello");
-  }
-});
-if (require('self').loadReason === "install") {
-  btn.moveTo({
-    toolbarID: "nav-bar",
-    forceMove: false // only move from palette
-  });
+if (ss.storage.params.dropbox.token) {
+  panel.port.emit('dropbox.connected');
 }
-*/
+if (ss.storage.params.rs.token) {
+  panel.port.emit('rs.connected');
+}
+
+require("sdk/widget").Widget({
+  label: "alir",
+  id: "alir",
+  panel: panel,
+  contentURL: data.url("alir.png")
+});

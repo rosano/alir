@@ -1,7 +1,9 @@
 /*jshint browser: true, devel: true */
 /*global self: true */
-var $  = function (sel) {"use strict"; return document.querySelector.call(document, sel); },
-    $$ = function (sel) {"use strict"; return document.querySelectorAll.call(document, sel); };
+var $  = function (sel) {
+  "use strict";
+  return document.querySelector.call(document, sel);
+};
 
 $('#readaSax').addEventListener('click', function () {
   "use strict";
@@ -11,11 +13,29 @@ $('#selectContent').addEventListener('click', function () {
   "use strict";
   self.port.emit('selectContent');
 });
-$('#putContent').addEventListener('click', function () {
+$('#putToRemote').addEventListener('click', function () {
   "use strict";
-  self.port.emit('putContent');
+  self.port.emit('putToRemote');
 });
-$('#connect').addEventListener('click', function () {
+$('#putToDropbox').addEventListener('click', function () {
+  "use strict";
+  self.port.emit('putToDropbox');
+});
+$('#connectRs').addEventListener('click', function () {
   "use strict";
   self.port.emit('discover', $('#address').value);
+});
+$('#connectDropbox').addEventListener('click', function () {
+  "use strict";
+  self.port.emit('connectDropbox');
+});
+self.port.on('dropbox.connected', function onDropboxConnected() {
+  "use strict";
+  $('#dropboxLogin').classList.add('hidden');
+  $('#putToDropbox').classList.remove('hidden');
+});
+self.port.on('rs.connected', function onRsConnected() {
+  "use strict";
+  $('#rsLogin').classList.add('hidden');
+  $('#putToRemote').classList.remove('hidden');
 });
