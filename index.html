@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/alir.css" media="all" rel="stylesheet" type="text/css" />
     <link href="css/gaia/icons/styles/action_icons.css" rel="stylesheet" type="text/css">
-    <link href="css/gaia/style/input_areas.css" rel="stylesheet" type="text/css">
     <link href="css/gaia/style/buttons.css" rel="stylesheet" type="text/css">
+    <link href="css/gaia/style/input_areas.css" rel="stylesheet" type="text/css">
+    <link href="css/gaia/style_unstable/lists.css" rel="stylesheet" type="text/css">
     <link href="css/gaia/style/switches.css" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" type="image/png" href="img/icon-32.png" />
   </head>
@@ -47,7 +48,7 @@
             <span></span>
           </label>
         </p>
-        <p><a class="inspect">?</a></p>
+        <p><a class="inspect" data-action="inspect">?</a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
         <div class="scrollbar"></div>
@@ -55,7 +56,7 @@
     </div>
     <div id="input" class="hidden" data-tile="input">
       <form>
-        <fieldset>
+        <fieldset class="hidden">
           <legend>Id</legend>
           <section>
             <p>
@@ -64,7 +65,7 @@
             </p>
           </section>
         </fieldset>
-        <fieldset>
+        <fieldset class="hidden">
           <legend>Url</legend>
           <section>
             <p>
@@ -96,23 +97,83 @@
     </ul>
     <div id="settings" class="hidden" data-tile="settings">
       <form >
+        <!--
         <button name="install">Installer</button>
-        <button name="menu">Menu</button>
-        <p>
-          Navigate with gestures
-          <label >
-            <input id="prefGesture" type="checkbox" data-type="switch" checked="">
-            <span></span>
-          </label>
-        </p>
-        <button name="cancel">Annuler</button>
+        -->
+        <section data-type="list">
+          <header>
+            Préférences
+          </header>
+          <ul>
+            <li>
+              <span>Menu à gauche</menu>
+              <label class="pack-radio">
+                <input type="radio" name="menu" id="prefMenuLeft" checked>
+                <span></span>
+              </label>
+              <span>Menu à droite</menu>
+              <label class="pack-radio">
+                <input type="radio" name="menu" id="prefMenuRight">
+                <span></span>
+              </label>
+            </li>
+            <li>
+          </ul>
+          <section id="prefDropbox">
+            <header>Dropbox</header>
+            <fieldset>
+              <legend>Clé</legend>
+              <section>
+                <p>
+                  <input type="text" id="dropboxApiKey" placeholder="DropBox API Key" />
+                  <button type="reset">Clear</button>
+                </p>
+              </section>
+            </fieldset>
+          </section>
+          <section id="prefDrive">
+            <header>Google Drive</header>
+            <fieldset>
+              <legend>ID</legend>
+              <section>
+                <p>
+                  <input type="text" id="driveClientId" placeholder="Google Drive Client Id" />
+                  <button type="reset">Clear</button>
+                </p>
+              </section>
+            </fieldset>
+            <fieldset>
+              <legend>Clé</legend>
+              <section>
+                <p>
+                  <input type="text" id="driveApiKey" placeholder="Google Drive API Key" />
+                  <button type="reset">Clear</button>
+                </p>
+              </section>
+            </fieldset>
+          </section>
+          <section>
+            <header>Secret Token</header>
+            <input type="text" id="prefToken" disabled></input>
+          </section>
+          <p>
+            <span>Navigation gestuelle</span>
+            <label class="pack-switch">
+              <input id="prefGesture" type="checkbox" data-type="switch" checked="">
+              <span></span>
+            </label>
+          </p>
+        </section>
+
+
+        <button name="done">Ok</button>
       </form>
     </div>
     <script type="text/javascript" src="lib/htmlparser.js"></script>
     <script type="text/javascript" src="lib/doT.min.js"></script>
-    <script type="text/javascript" src="lib/remotestorage.min.js"></script>
+    <script type="text/javascript" src="lib/remotestorage.js"></script>
     <!--
-    <script type="text/javascript" src="lib/remotestorage-debug.js"></script>
+    <script type="text/javascript" src="lib/remotestorage.min.js"></script>
     -->
     <script type="text/javascript" src="js/touch.js"></script>
     <script type="text/javascript" src="js/alir.js"></script>

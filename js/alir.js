@@ -28,7 +28,14 @@ var templates = {},
     listHtml = '',
     config;
 config = {
-  gesture: false
+  gesture: false,
+  dropBox: {
+    apiKey: ''
+  },
+  google: {
+    clientId: '',
+    apiKey: ''
+  }
 };
 
 
@@ -164,50 +171,50 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
 });
 function updateList() {
   "use strict";
-  remoteStorage.alir.private.getAll('').then(function onAll(objectsPrivate) {
-    remoteStorage.alir.public.getAll('').then(function onAll(objectsPublic) {
-      function createList(objects, context) {
-        /*jshint newcap: false*/
-        if (typeof objects === "object") {
-          Object.keys(objects).forEach(function (key) {
-            var obj   = objects[key],
-                title = obj.title || key,
-                datas = {};
-            datas = {
-              key: key,
-              context: context,
-              title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-              url: obj.url || '#'
-            };
-            if (obj.html) {
-              datas.type = 'html';
-              try {
-                datas.content = HTMLtoXML(obj.html);
-              } catch (e) {
-                console.log('Error sanityzing ' + obj.title);
-                datas.content = "Content contains errors";
-              }
-            } else {
-              datas.type = 'text';
-              datas.content = obj.text;
-            }
-
-            listHtml += templates.item(datas);
-          });
-        //} else {
-        // No object in this context
-        //  console.log('Unable to create list of undefined objects for context ' + context);
+  function createList(objects, context) {
+    /*jshint newcap: false*/
+    if (typeof objects === "object") {
+      Object.keys(objects).forEach(function (key) {
+        var obj   = objects[key],
+            title = obj.title || key,
+            datas = {};
+        datas = {
+          key: key,
+          context: context,
+          title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+          url: obj.url || '#'
+        };
+        if (obj.html) {
+          datas.type = 'html';
+          try {
+            datas.content = HTMLtoXML(obj.html);
+          } catch (e) {
+            console.log('Error sanityzing ' + obj.title);
+            datas.content = "Content contains errors";
+          }
+        } else {
+          datas.type = 'text';
+          datas.content = obj.text;
         }
-      }
-      listHtml = '';
-      createList(objectsPublic, 'public');
-      createList(objectsPrivate, 'private');
-      list.innerHTML = listHtml;
-    });
+
+        listHtml += templates.item(datas);
+      });
+    //} else {
+    // No object in this context
+    //  console.log('Unable to create list of undefined objects for context ' + context);
+    }
+  }
+  remoteStorage.alir.private.getAll('').then(function onAll(objectsPrivate) {
+    //remoteStorage.alir.public.getAll('').then(function onAll(objectsPublic) {
+    listHtml = '';
+    //createList(objectsPublic, 'public');
+    createList(objectsPrivate, 'private');
+    list.innerHTML = listHtml;
+    //});
   });
 }
 function initUI() {
-  // jshint maxstatements: 30
+  // jshint maxstatements: 40
   "use strict";
   var $  = function (sel) {return document.querySelector.call(document, sel); },
       $$ = function (sel) {return document.querySelectorAll.call(document, sel); },
@@ -219,6 +226,34 @@ function initUI() {
     list: $('#list'),
     menu: {}
   };
+  // reload configuration
+  (function () {
+    var conf = localStorage.getItem('config');
+    if (conf) {
+      config = JSON.parse(conf);
+      if (!config.dropbox) {
+        config.dropbox = {
+          apiKey: ''
+        };
+      }
+      if (config.dropbox.apiKey) {
+        $('#dropboxApiKey').value = config.dropbox.apiKey;
+        remoteStorage.setApiKeys('dropbox', {api_key: config.dropbox.apiKey});
+      }
+      if (!config.google) {
+        config.google = {
+          clientId: '',
+          apiKey: ''
+        };
+      }
+      if (config.google.apiKey && config.google.clientId) {
+        $('#driveClientId').value = config.goole.clientId;
+        $('#driveApiKey').value   = config.google.apiKey;
+        remoteStorage.setApiKeys('googledrive', {client_id: config.google.clientId, api_key: config.google.apiKey});
+      }
+    }
+  }());
+
   function displayTile(name) {
     forElement('[data-tile]', function (e) {
       if (e.dataset.tile === name) {
@@ -238,7 +273,10 @@ function initUI() {
   menuActions = {
     create: function doCreate() {
       menuActions.toggleMenu();
-      $('#input [name="id"]').value = utils.uuid();
+      $('#input [name="id"]').value    = utils.uuid();
+      $('#input [name="url"]').value   = "";
+      $('#input [name="title"]').value = "";
+      $('#input [name="text"]').value  = "";
       displayTile('input');
     },
     toggleContent: function doToggle() {
@@ -306,20 +344,26 @@ function initUI() {
   remoteStorage.on("sync-done", function (e) {
     document.body.classList.remove('sync');
   });
-  // @FIXME - connected doesn't exists
-  //remoteStorage.on("connected", function (e) {
-  //  UI.menu.onoffcheck.checked  = true;
-  //  UI.menu.onoffcheck.disabled = false;
-  //  document.body.classList.add('online');
-  //});
 
-  // @TODO
-  //remoteStorage.on("authing", function (e) { });
-  //remoteStorage.on("conflict", function (e) { });
-  //remoteStorage.on("connecting", function e() { });
-  //remoteStorage.on("disconnect", function (e) { });
-  //remoteStorage.on("error", function (e) { });
-  //remoteStorage.on("features-loaded", function (e) { });
+  remoteStorage.on("features-loaded", function (e) {
+    var features = [];
+    remoteStorage.features.forEach(function (feature) {
+      if (feature.supported === true) {
+        features.push(feature.name);
+      }
+    });
+    if (features.indexOf('Dropbox') !== -1) {
+      $('#prefDropbox').style.display = '';
+    } else {
+      $('#prefDropbox').style.display = 'none';
+    }
+    if (features.indexOf('GoogleDrive') !== -1) {
+      $('#prefDrive').style.display = '';
+    } else {
+      $('#prefDrive').style.display = 'none';
+    }
+
+  });
   //remoteStorage.on("ready", function (e) { });
   //UI.list.addEventListener('contextmenu', function (e) {
   //  window.alert(utils.createXPathFromElement(e.originalTarget));
@@ -410,6 +454,7 @@ function initUI() {
           }
           return [previous, current, next];
         }
+        console.log(e.detail.dir);
         switch (e.detail.dir) {
         case 'E':
           items = getItems();
@@ -463,13 +508,44 @@ function initUI() {
   });
   // }}
   // {{ Settings
-  $('#settings [name="cancel"]').addEventListener('click', function () {
+
+  $('#settings [name="done"]').addEventListener('click', function () {
     displayTile('list');
   });
-  $('#settings [name="menu"]').addEventListener('click', function () {
-    document.body.classList.toggle('menu-left');
-    document.body.classList.toggle('menu-right');
+  $('#dropboxApiKey').addEventListener('change', function () {
+    remoteStorage.setApiKeys('dropbox', {api_key: this.value});
+    //remoteStorage.widget.view.reload();
+    config.dropbox.apiKey = this.value;
   });
+  $('#driveClientId').addEventListener('change', function () {
+    remoteStorage.setApiKeys('googledrive', {client_id: this.value, api_key: $('#driveApiKey').value});
+    //remoteStorage.widget.view.reload();
+    config.google.clientId = this.value;
+  });
+  $('#driveApiKey').addEventListener('change', function () {
+    remoteStorage.setApiKeys('googledrive', {client_id: $('#driveClientId').value, api_key: this.value});
+    //remoteStorage.widget.view.reload();
+    config.google.apiKey = this.value;
+  });
+  $('#prefMenuLeft').addEventListener('click', function () {
+    if (this.checked) {
+      document.body.classList.remove('menu-right');
+      document.body.classList.add('menu-left');
+    } else {
+      document.body.classList.remove('menu-left');
+      document.body.classList.add('menu-right');
+    }
+  });
+  $('#prefMenuRight').addEventListener('click', function () {
+    if (!this.checked) {
+      document.body.classList.remove('menu-right');
+      document.body.classList.add('menu-left');
+    } else {
+      document.body.classList.remove('menu-left');
+      document.body.classList.add('menu-right');
+    }
+  });
+  /*
   $('#settings [name="install"]').addEventListener('click', function () {
     var request = window.navigator.mozApps.install("http://alir.clochix.net/manifest.webapp");
     request.onerror = function () {
@@ -481,6 +557,7 @@ function initUI() {
       displayTile('list');
     };
   });
+  */
   // }}
   // Left menu {{
   $('#menu').addEventListener('click', function (event) {
@@ -527,11 +604,18 @@ function initUI() {
 
 window.addEventListener('load', function () {
   "use strict";
-  var conf = localStorage.getItem('config');
-  if (conf) {
-    config = JSON.parse(conf);
-  }
   initUI();
+  remoteStorage.enableLog();
+  remoteStorage.access.claim('alir', 'rw');
+  remoteStorage.caching.enable('/alir/');
+  //remoteStorage.caching.enable('/public/alir/');
+  remoteStorage.displayWidget();
+  remoteStorage.alir.private.on('change', function onChange(ev) {
+    //console.log('change');
+    //console.log(ev);
+    updateList();
+  });
+  updateList();
 /*
   if (Notification && Notification.permission !== "granted") {
     Notification.requestPermission(function (status) {
@@ -547,16 +631,12 @@ window.addEventListener('unload', function () {
   "use strict";
   localStorage.setItem('config', JSON.stringify(config));
 });
-
-
-remoteStorage.access.claim('alir', 'rw');
-remoteStorage.caching.enable('/alir/');
-remoteStorage.caching.enable('/public/alir/');
-remoteStorage.displayWidget();
-remoteStorage.alir.private.on('change', function onChange(ev) {
+remoteStorage.remote.on("connected", function (e) {
   "use strict";
-  //console.log('change');
-  //console.log(ev);
-  updateList();
+  var onoffcheck = document.querySelector('#menu .onoff input');
+  document.getElementById('prefToken').value = remoteStorage.remote.token;
+  onoffcheck.checked  = true;
+  onoffcheck.disabled = false;
+  document.body.classList.add('online');
 });
-updateList();
+

@@ -1,5 +1,6 @@
 html {
   font-size: 10px; /* Needed for icons */
+  font-family: sans-serif;
 }
 body {
   background-color: #FFF;
@@ -129,7 +130,7 @@ body.menu-right #menu.show {
 #list {
   padding-top: 2em;
   list-style-type: none;
-  font-size: 1.2em;
+  font-size: 1.6em;
   max-width: 72em;
 }
 body.menu-left #list {
@@ -148,9 +149,10 @@ body.menu-right #list {
 #list .current .actions {
   display: block;
 }
+#list .current .actions {
+  margin-left: 30px;
+}
 #list > li {
-  margin: 5px;
-  padding: 1px 10px;
   border-color: #888;
   border-width: 0 0 1px 0;
   border-style: solid;
@@ -213,6 +215,9 @@ a.button {
   background-image: -moz-linear-gradient(bottom, rgb(0,140,196) 66%, rgb(130,220,255) 99%);
 }
 body.menu-left #input,
+#settings {
+  font-size: 16px;
+}
 body.menu-left #settings {
   margin-left: 50px;
   margin-top: 60px;
