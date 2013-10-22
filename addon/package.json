@@ -1,0 +1,19 @@
+{
+  "name": "alir",
+  "fullName": "alir",
+  "id": "jid1-1jRZ4AIaxjOEcQ",
+  "description": "Alir add-on",
+  "author": "Clochix (http://clochix.net)",
+  "license": "GPLv3",
+  "version": "0.1",
+  "homepage": "https://github.com/clochix/alir/",
+  "preferences": [
+    {
+      "name": "dropboxApiKey",
+      "title": "Dropbox: API key",
+      "description": "API key of Dropbox application",
+      "type": "string"
+    }
+  ]
+}
+
