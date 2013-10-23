@@ -71,13 +71,17 @@ function readaNode(url, cb) {
   var readability = require('node-readability');
 
   readability.read(url, function (err, article) {
+    if (err) {
+      cb(err);
+    } else {
       var res = {
         url: url,
         title: article.getTitle().replace(/&#([^\s]*);/g, function (match, match2) {return String.fromCharCode(Number(match2)); }),
         html: article.getContent()
       };
       cb(null, res);
-    });
+    }
+  });
 }
 
 argv = optimist
@@ -156,7 +160,7 @@ function interactive() {
   "use strict";
   var input = '';
   function interact(content) {
-    var re       = new RegExp('http[^\\s]*', 'g'), // yes, I know
+    var re       = new RegExp('http[^\\s>]*', 'g'), // yes, I know
         matches  = content.match(re),
         i        = 1,
         readline = require('readline'),
