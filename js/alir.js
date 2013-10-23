@@ -149,6 +149,9 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
       },
       "text": {
         "type": "string"
+      },
+      "tags": {
+        "type": "array"
       }
     }
   });
@@ -182,7 +185,8 @@ function updateList() {
           key: key,
           context: context,
           title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-          url: obj.url || '#'
+          url: obj.url || '#',
+          tags: obj.tags ? obj.tags.join(',') : ''
         };
         if (obj.html) {
           datas.type = 'html';
@@ -206,9 +210,11 @@ function updateList() {
   }
   remoteStorage.alir.private.getAll('').then(function onAll(objectsPrivate) {
     //remoteStorage.alir.public.getAll('').then(function onAll(objectsPublic) {
-    listHtml = '';
+    listHtml = document.querySelector('#list > li:nth-of-type(1)').outerHTML + "\n";
     //createList(objectsPublic, 'public');
     createList(objectsPrivate, 'private');
+    list.classList.add('list');
+    list.classList.remove('detail');
     list.innerHTML = listHtml;
     //});
   });
@@ -283,6 +289,9 @@ function initUI() {
       var cl = $('#menu').classList;
       cl.toggle("detail");
       cl.toggle("list");
+      cl = $('#list').classList;
+      cl.toggle("detail");
+      cl.toggle("list");
       forElement('#list li[data-key]', function (e) {
         e.classList.remove('hidden');
         e.classList.remove('current');
@@ -306,36 +315,32 @@ function initUI() {
     },
     offline: function doOffline() {
       remoteStorage.alir.goOffline();
+      document.body.classList.remove('online');
     },
     online: function doOnline() {
       remoteStorage.alir.goOnline();
+      document.body.classList.add('online');
     },
     onoff: function doOnOff() {
-      if (UI.menu.onoffcheck.checked) {
+      if (document.body.classList.contains('online')) {
         menuActions.offline();
-        document.body.classList.remove('online');
       } else {
-        menuActions.online();
-        document.body.classList.add('online');
+        if (remoteStorage.connected) {
+          menuActions.online();
+        } else {
+          window.alert('Not connected');
+        }
       }
     },
-    inspect: function doInspect() {
-      remoteStorage.inspect();
-    }
   };
   forElement('#menu .content [data-action]', function () {
     var elmt = arguments[0];
     UI.menu[elmt.dataset.action] = elmt;
   });
-  UI.menu.onoffcheck = $('#menu .content [data-action="onoff"] input');
   if (!remoteStorage.connected) {
-    UI.menu.onoffcheck.checked  = false;
-    UI.menu.onoffcheck.disabled = true;
     document.body.classList.remove('online');
   }
   remoteStorage.on("disconnected", function (e) {
-    UI.menu.onoffcheck.checked  = false;
-    UI.menu.onoffcheck.disabled = true;
     document.body.classList.remove('online');
   });
   remoteStorage.on("sync-busy", function (e) {
@@ -370,9 +375,12 @@ function initUI() {
   //});
   function toggleItem(key) {
     var clItem = $('[data-key="' + key + '"]').classList,
-        clMenu = $('#menu').classList;
+        clMenu = $('#menu').classList,
+        clList = $('#list').classList;
     clMenu.toggle("detail");
     clMenu.toggle("list");
+    clList.toggle("detail");
+    clList.toggle("list");
     Array.prototype.forEach.call($$('li[data-key]'), function (e) {
       e.classList.toggle('hidden');
     });
@@ -381,21 +389,50 @@ function initUI() {
     $('#menu .content .top').href = '#' + key;
   }
   UI.list.addEventListener('click', function onClick(event) {
+    /*jshint maxcomplexity: 13 */
     var target = event.target,
         context, key, keyNode = target, parent;
     if (target.dataset && target.dataset.action) {
-      while (typeof keyNode.dataset.key === 'undefined' && keyNode.parentNode) {
+      while (keyNode.id !== 'list' && typeof keyNode.dataset.key === 'undefined' && keyNode.parentNode) {
         keyNode = keyNode.parentNode;
       }
       if (typeof keyNode.dataset.key !== 'undefined') {
         key = keyNode.dataset.key;
       }
-      parent  = target;
-      while (typeof parent.dataset.context === 'undefined' && parent.parentNode) {
+      parent = target;
+      while (parent.id !== 'list' && typeof parent.dataset.context === 'undefined' && parent.parentNode) {
         parent = parent.parentNode;
       }
       context = parent.dataset.context;
       switch (target.dataset.action) {
+      case 'archive':
+        (function () {
+          var tags = keyNode.dataset.tags.split(','),
+              i    = tags.indexOf('archive');
+          if (i !== -1) {
+            tags.splice(i, 1);
+            keyNode.dataset.tags = tags.join(',');
+          } else {
+            tags.splice(1, 0, 'archive');
+            keyNode.dataset.tags = tags.join(',').replace(',,,', ',,');
+          }
+          remoteStorage.get('/alir/' + key).then(function (err, article, contentType, revision) {
+            if (err !== 200) {
+              window.alert(err);
+            } else {
+              article.tags = tags.filter(function (t) {return t !== ''; });
+              remoteStorage.put('/alir/' + key, article, contentType).then(function (err) {
+                if (err !== 200) {
+                  window.alert(err);
+                }
+              });
+            }
+          });
+        }());
+        break;
+      case 'filterArchive':
+        $('#list').classList.toggle('archives');
+        break;
       case 'toggle':
         toggleItem(key);
         break;
@@ -407,7 +444,6 @@ function initUI() {
         break;
       case 'compose':
         remoteStorage.alir[context].getObject(key).then(function (object) {
-          console.log(object);
           $('#input [name="id"]').value    = key;
           $('#input [name="title"]').value = object.title;
           $('#input [name="url"]').value   = object.url;
@@ -512,6 +548,9 @@ function initUI() {
   $('#settings [name="done"]').addEventListener('click', function () {
     displayTile('list');
   });
+  $('#settings [name="inspect"]').addEventListener('click', function () {
+    remoteStorage.inspect();
+  });
   $('#dropboxApiKey').addEventListener('change', function () {
     remoteStorage.setApiKeys('dropbox', {api_key: this.value});
     //remoteStorage.widget.view.reload();
@@ -529,15 +568,6 @@ function initUI() {
   });
   $('#prefMenuLeft').addEventListener('click', function () {
     if (this.checked) {
-      document.body.classList.remove('menu-right');
-      document.body.classList.add('menu-left');
-    } else {
-      document.body.classList.remove('menu-left');
-      document.body.classList.add('menu-right');
-    }
-  });
-  $('#prefMenuRight').addEventListener('click', function () {
-    if (!this.checked) {
       document.body.classList.remove('menu-right');
       document.body.classList.add('menu-left');
     } else {
@@ -611,8 +641,6 @@ window.addEventListener('load', function () {
   //remoteStorage.caching.enable('/public/alir/');
   remoteStorage.displayWidget();
   remoteStorage.alir.private.on('change', function onChange(ev) {
-    //console.log('change');
-    //console.log(ev);
     updateList();
   });
   updateList();
@@ -633,10 +661,7 @@ window.addEventListener('unload', function () {
 });
 remoteStorage.remote.on("connected", function (e) {
   "use strict";
-  var onoffcheck = document.querySelector('#menu .onoff input');
   document.getElementById('prefToken').value = remoteStorage.remote.token;
-  onoffcheck.checked  = true;
-  onoffcheck.disabled = false;
   document.body.classList.add('online');
 });
 
