@@ -26,7 +26,8 @@
 var templates = {},
     list = document.getElementById('list'),
     listHtml = '',
-    config;
+    config,
+    tiles;
 config = {
   gesture: false,
   dropBox: {
@@ -116,6 +117,35 @@ var utils = {
     return segs.length ? '/' + segs.join('/') : null;
   }
 };
+function Tiles(global) {
+  "use strict";
+  var current,
+      tiles = [];
+  return {
+    show: function (name) {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
+        if (e.dataset.tile === name) {
+          e.classList.remove('hidden');
+          window.scrollTo(0, 0);
+          current = name;
+        } else {
+          e.classList.add('hidden');
+        }
+      });
+      console.log(current, tiles);
+    },
+    go: function (name) {
+      tiles.push({name: current, y: window.scrollY});
+      this.show(name);
+    },
+    back: function () {
+      var next = tiles.pop();
+      this.show(next.name);
+      window.scrollTo(0, next.y);
+    }
+  };
+}
+tiles = new Tiles();
 /*
 (function () {
   "use strict";
@@ -260,15 +290,6 @@ function initUI() {
     }
   }());
 
-  function displayTile(name) {
-    forElement('[data-tile]', function (e) {
-      if (e.dataset.tile === name) {
-        e.classList.remove('hidden');
-      } else {
-        e.classList.add('hidden');
-      }
-    });
-  }
   forElement('form', function (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -283,7 +304,7 @@ function initUI() {
       $('#input [name="url"]').value   = "";
       $('#input [name="title"]').value = "";
       $('#input [name="text"]').value  = "";
-      displayTile('input');
+      tiles.show('input');
     },
     toggleContent: function doToggle() {
       var cl = $('#menu').classList;
@@ -311,7 +332,7 @@ function initUI() {
     },
     settings: function doMenu() {
       menuActions.toggleMenu();
-      displayTile('settings');
+      tiles.show('settings');
     },
     offline: function doOffline() {
       remoteStorage.alir.goOffline();
@@ -448,7 +469,7 @@ function initUI() {
           $('#input [name="title"]').value = object.title;
           $('#input [name="url"]').value   = object.url;
           $('#input [name="text"]').value  = object.text;
-          displayTile('input');
+          tiles.show('input');
         });
         break;
       }
@@ -540,13 +561,13 @@ function initUI() {
     //menuActions.create();
   });
   $('#input [name="done"]').addEventListener('click', function () {
-    displayTile('list');
+    tiles.show('list');
   });
   // }}
   // {{ Settings
 
   $('#settings [name="done"]').addEventListener('click', function () {
-    displayTile('list');
+    tiles.show('list');
   });
   $('#settings [name="inspect"]').addEventListener('click', function () {
     remoteStorage.inspect();
@@ -584,7 +605,7 @@ function initUI() {
     };
     request.onsuccess = function () {
       window.alert("Yeah");
-      displayTile('list');
+      tiles.show('list');
     };
   });
   */
@@ -629,6 +650,9 @@ function initUI() {
       config.gesture = gesture.checked;
     });
   }());
+
+
+  tiles.show('list');
 }
 // }}
 
