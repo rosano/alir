@@ -132,7 +132,6 @@ function Tiles(global) {
           e.classList.add('hidden');
         }
       });
-      console.log(current, tiles);
     },
     go: function (name) {
       tiles.push({name: current, y: window.scrollY});
@@ -182,6 +181,9 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
       },
       "tags": {
         "type": "array"
+      },
+      "flags": {
+        "type": "object"
       }
     }
   });
@@ -216,7 +218,8 @@ function updateList() {
           context: context,
           title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
           url: obj.url || '#',
-          tags: obj.tags ? obj.tags.join(',') : ''
+          tags: Array.isArray(obj.tags) ? obj.tags.join(',') : '',
+          flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
         };
         if (obj.html) {
           datas.type = 'html';
@@ -550,18 +553,42 @@ function initUI() {
     });
   }
   // input {{
-  $('#input [name="private"]').addEventListener('click', function () {
-    var obj = {
-      id: $('#input [name="id"]').value,
-      url: $('#input [name="url"]').value,
-      title: $('#input [name="title"]').value,
-      text: $('#input [name="text"]').value
-    };
-    remoteStorage.alir.addPrivate(obj);
-    //menuActions.create();
-  });
-  $('#input [name="done"]').addEventListener('click', function () {
-    tiles.show('list');
+  $('#input [name="save"]').addEventListener('click', function () {
+    var id = $('#input [name="id"]').value,
+        obj;
+
+    if (id) {
+      // update
+      remoteStorage.get('/alir/' + id).then(function (err, article, contentType, revision) {
+        if (err !== 200) {
+          window.alert(err);
+          tiles.show('list');
+        } else {
+          article.url   = $('#input [name="url"]').value;
+          article.title = $('#input [name="title"]').value;
+          article.text  = $('#input [name="text"]').value;
+          remoteStorage.put('/alir/' + id, article, contentType).then(function (err) {
+            if (err !== 200) {
+              window.alert(err);
+            }
+            tiles.show('list');
+          });
+        }
+      });
+    } else {
+      // create
+      obj = {
+        id: id,
+        url: $('#input [name="url"]').value,
+        title: $('#input [name="title"]').value,
+        text: $('#input [name="text"]').value,
+        flags: {
+          editable: true
+        }
+      };
+      remoteStorage.alir.addPrivate(obj);
+      tiles.show('list');
+    }
   });
   // }}
   // {{ Settings

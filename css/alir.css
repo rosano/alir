@@ -52,7 +52,8 @@ body.menu-right #menu .slider {
   position: fixed;
   top: 0px;
   width: 38px;
-  border: 1px solid black;
+  border: 1px solid #080;
+  color: #080;
   background-color: rgba(0, 255, 0, .3);
   z-index: 1000;
   pointer-events: none;
@@ -160,6 +161,12 @@ body.menu-right #settings {
 #list .current .actions {
   display: block;
 }
+#list .actions .compose {
+  display: none;
+}
+#list [data-flags*=",editable,"] .compose {
+  display: inline;
+}
 #list .filters a,
 #list .current .actions a {
   padding: 1em;
@@ -251,7 +258,7 @@ a[class*="icon-"] {
   font-size: 1.6em;
 }
 /** Buttons **/
-@media (max-width: 481px) {
+/* @media (max-width: 481px) { */
   button {
     display: block;
     width: 100%;
@@ -324,4 +331,4 @@ a[class*="icon-"] {
     border-radius: 2px;
     width: 100%;
   }
-}
+/* } */

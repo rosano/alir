@@ -11,15 +11,13 @@
   <body class="online menu-left">
     <div id="templates">
       <div id="tmpl-item">
-        <li data-key="{{=it.key}}" data-context="{{=it.context}}" class="{{=it.context}}" id="{{=it.key}}" data-tags=",{{=it.tags}},">
+        <li data-key="{{=it.key}}" data-context="{{=it.context}}" class="{{=it.context}}" id="{{=it.key}}" data-tags=",{{=it.tags}}," data-flags=",{{=it.flags}},">
           <h2><a data-action="toggle" href="#{{=it.key}}">{{=it.title}}</a></h2>
           <p class="actions">
             <a class="icon-chevron-left" data-action="toggle" href="#"></a>
             <a class="icon-inbox archive" data-action="archive" href="#"></a>
             <a class="icon-trash" data-action="delete" href="#"></a>
-            <!--
             <a class="icon-pencil compose" data-action="compose" href="#"></a>
-            -->
           </p>
           <div class="content">
             <a class="url" href="{{=it.url}}" target="_blank">{{=it.title}}</a>
@@ -72,8 +70,7 @@
           <textarea rows="10" cols="40" name="text" placeholder="Contenu"></textarea>
         </fieldset>
         <p>
-          <button value="Privé"  name="private">Créer</button>
-          <button value="Annuler" name="done">Annuler</button>
+          <button value="Privé"  name="save">Save</button>
         </p>
       </form>
     </div>
