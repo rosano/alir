@@ -291,9 +291,15 @@ function displayItem(obj) {
   "use strict";
   var title = obj.title || obj.id,
       data  = {},
-      item;
+      item,
+      nextNode;
   if (typeof obj.notes !== 'object') {
     obj.notes = {};
+  }
+  if (typeof obj.date === undefined) {
+    obj.date = new Date().toISOString();
+  } else {
+    obj.date = new Date(obj.date).toISOString();
   }
   data = {
     key: obj.id,
@@ -301,6 +307,7 @@ function displayItem(obj) {
     hasNotes: Object.keys(obj.notes).length > 0 ? 'hasNotes' : '',
     title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
     url: obj.url || '#',
+    date: obj.date,
     tags: Array.isArray(obj.tags) ? obj.tags.join(',') : '',
     notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
     flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
@@ -312,7 +319,7 @@ function displayItem(obj) {
     data.type = 'text';
     data.content = obj.text;
   }
-  item = template('#tmpl-item', {it: data}).querySelector("div > li[id]");
+  item = template('#tmpl-item', data).querySelector("div > li[id]");
   // Notes
   if (typeof obj.notes === 'object') {
     Object.keys(obj.notes).forEach(function (noteId, i) {
@@ -325,10 +332,25 @@ function displayItem(obj) {
         a.setAttribute('data-note', noteId);
         a.setAttribute('href', '#' + obj.id + '/' + noteId);
         target.insertBefore(a, target.firstChild);
+      } else {
+        console.log("Unable to evaluate xpath " + note.xpath);
       }
     });
   }
-  list.appendChild(item);
+  // Sort items by date {{
+  // @TODO allow multiple sorts
+  Array.prototype.slice.call(document.querySelectorAll("#list [data-key]")).some(function (e) {
+    if (e.dataset.date > obj.date) {
+      nextNode = e;
+      return true;
+    }
+  });
+  if (typeof nextNode === 'undefined') {
+    list.appendChild(item);
+  } else {
+    list.insertBefore(item, nextNode);
+  }
+  // }}
 }
 function initUI() {
   // jshint maxstatements: 40

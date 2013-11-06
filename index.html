@@ -12,8 +12,8 @@
   <body class="online menu-left">
     <div id="templates">
       <div id="tmpl-item">
-        <li data-key="{{=it.key}}" data-context="{{=it.context}}" class="{{=it.context}} {{=it.hasNotes}}" id="{{=it.key}}" data-tags=",{{=it.tags}}," data-flags=",{{=it.flags}},">
-          <h2><a data-action="toggle" href="#{{=it.key}}"><span class="icon-tags hasNotes"></span>{{=it.title}}</a></h2>
+        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags}}," data-flags=",{{=flags}}," data-date="{{=date}}">
+          <h2><a data-action="toggle" href="#{{=key}}"><span class="icon-tags hasNotes"></span>{{=title}}</a></h2>
           <div class="actions">
             <a class="icon-chevron-left" data-action="toggle" href="#"></a>
             <a class="icon-inbox archive" data-action="archive" href="#"></a>
@@ -21,10 +21,10 @@
             <a class="icon-pencil compose" data-action="compose" href="#"></a>
           </div>
           <div class="content">
-            <p><a class="url" href="{{=it.url}}" target="_blank">{{=it.url}}</a></p>
+            <p><a class="url" href="{{=url}}" target="_blank">{{=url}}</a></p>
             <p class="notes">
             </p>
-            <div class="{{=it.type}}">{{=it.content}}</div>
+            <div class="{{=type}}">{{=content}}</div>
           </div>
         </li>
       </div>
