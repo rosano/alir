@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, doT: true, Gesture: true */
+/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -23,9 +23,7 @@
  * https://developer.mozilla.org/en-US/docs/WebAPI/Using_Web_Notifications
  */
 
-var templates = {},
-    list = document.getElementById('list'),
-    listHtml = '',
+var list = document.getElementById('list'),
     config,
     tiles;
 config = {
@@ -157,6 +155,46 @@ tiles = new Tiles();
   };
 })();
 */
+/**
+ * My own mini-templating system
+ *
+ * @param {String} sel  selector of the template
+ * @param {Object} data data to populate the template
+ *
+ * @return {DOMDocumentFragment}
+ */
+function template(sel, data) {
+  "use strict";
+  var re  = new RegExp("{{(=.*?)}}", 'g'),
+      frag,
+      xpathResult,
+      i, j, elmt, name, value;
+  function repl(match) {
+    var res = data;
+    match = match.substr(3, match.length - 5).split('.');
+    while (res && match.length > 0) {
+      res = res[match.shift()];
+    }
+    return res;
+  }
+  frag = document.querySelector(sel).cloneNode(true);
+  xpathResult = document.evaluate('//*[contains(@*, "{{=")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  for (i = 0; i < xpathResult.snapshotLength; i++) {
+    elmt = xpathResult.snapshotItem(i);
+    for (j = 0; j < elmt.attributes.length; j++) {
+      name  = elmt.attributes[j].name;
+      value = elmt.attributes[j].value;
+      elmt.attributes[name].value = value.replace(re, repl);
+    }
+  }
+  xpathResult = document.evaluate('//*[contains(., "{{=")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  for (i = 0; i < xpathResult.snapshotLength; i++) {
+    elmt = xpathResult.snapshotItem(i);
+    elmt.innerHTML = elmt.innerHTML.replace(re, repl);
+  }
+  return frag;
+}
+
 
 RemoteStorage.defineModule('alir', function module(privateClient, publicClient) {
   "use strict";
@@ -182,6 +220,9 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
       "tags": {
         "type": "array"
       },
+      "notes": {
+        "type": "object"
+      },
       "flags": {
         "type": "object"
       }
@@ -190,7 +231,7 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
 
   return {
     exports: {
-      addPrivate: function (article) {
+      savePrivate: function (article) {
         return privateClient.storeObject('article', article.id, article);
       },
       goOffline: function () {
@@ -204,53 +245,90 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
     }
   };
 });
-function updateList() {
+/**
+ * Convert a string into a DOM tree
+ *
+ * @param {String} str
+ *
+ * @return {DOMNode}
+ *
+ * @TODO Improve sanitizing
+ */
+function toDom(str) {
+  /*jshint newcap: false*/
   "use strict";
-  function createList(objects, context) {
-    /*jshint newcap: false*/
-    if (typeof objects === "object") {
-      Object.keys(objects).forEach(function (key) {
-        var obj   = objects[key],
-            title = obj.title || key,
-            datas = {};
-        datas = {
-          key: key,
-          context: context,
-          title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-          url: obj.url || '#',
-          tags: Array.isArray(obj.tags) ? obj.tags.join(',') : '',
-          flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
-        };
-        if (obj.html) {
-          datas.type = 'html';
-          try {
-            datas.content = HTMLtoXML(obj.html);
-          } catch (e) {
-            console.log('Error sanityzing ' + obj.title);
-            datas.content = "Content contains errors";
-          }
-        } else {
-          datas.type = 'text';
-          datas.content = obj.text;
-        }
-
-        listHtml += templates.item(datas);
-      });
-    //} else {
-    // No object in this context
-    //  console.log('Unable to create list of undefined objects for context ' + context);
-    }
+  var sandbox = document.createElement('div');
+  try {
+    sandbox.innerHTML = HTMLtoXML(str);
+    Array.prototype.forEach.call(sandbox.querySelectorAll('script, style'), function (e) {
+      e.parentNode.removeChild(e);
+    });
+    Array.prototype.forEach.call(sandbox.querySelectorAll('* [id]'), function (e) {
+      e.removeAttribute('id');
+    });
+    Array.prototype.forEach.call(sandbox.querySelectorAll('* [class]'), function (e) {
+      e.removeAttribute('class');
+    });
+    Array.prototype.forEach.call(sandbox.querySelectorAll('* [style]'), function (e) {
+      e.removeAttribute('style');
+    });
+    Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]'), function (e) {
+      e.setAttribute('target', '_blank');
+    });
+    return sandbox.innerHTML;
+  } catch (e) {
+    console.log('Error sanityzing');
+    return "Content contains errors";
   }
-  remoteStorage.alir.private.getAll('').then(function onAll(objectsPrivate) {
-    //remoteStorage.alir.public.getAll('').then(function onAll(objectsPublic) {
-    listHtml = document.querySelector('#list > li:nth-of-type(1)').outerHTML + "\n";
-    //createList(objectsPublic, 'public');
-    createList(objectsPrivate, 'private');
-    list.classList.add('list');
-    list.classList.remove('detail');
-    list.innerHTML = listHtml;
-    //});
-  });
+}
+/**
+ * Add an item to the content list
+ *
+ * @param {Object} obj
+ *
+ */
+function displayItem(obj) {
+  "use strict";
+  var title = obj.title || obj.id,
+      data  = {},
+      item;
+  if (typeof obj.notes !== 'object') {
+    obj.notes = {};
+  }
+  data = {
+    key: obj.id,
+    context: 'private',
+    hasNotes: Object.keys(obj.notes).length > 0 ? 'hasNotes' : '',
+    title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+    url: obj.url || '#',
+    tags: Array.isArray(obj.tags) ? obj.tags.join(',') : '',
+    notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
+    flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
+  };
+  if (obj.html) {
+    data.type = 'html';
+    data.content = toDom(obj.html);
+  } else {
+    data.type = 'text';
+    data.content = obj.text;
+  }
+  item = template('#tmpl-item', {it: data}).querySelector("div > li[id]");
+  // Notes
+  if (typeof obj.notes === 'object') {
+    Object.keys(obj.notes).forEach(function (noteId, i) {
+      var note   = obj.notes[noteId],
+          target = document.evaluate(note.xpath, item, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
+          a;
+      if (target) {
+        a = document.createElement('a');
+        a.setAttribute('class', 'note icon-tag');
+        a.setAttribute('data-note', noteId);
+        a.setAttribute('href', '#' + obj.id + '/' + noteId);
+        target.insertBefore(a, target.firstChild);
+      }
+    });
+  }
+  list.appendChild(item);
 }
 function initUI() {
   // jshint maxstatements: 40
@@ -303,7 +381,7 @@ function initUI() {
   menuActions = {
     create: function doCreate() {
       menuActions.toggleMenu();
-      $('#input [name="id"]').value    = utils.uuid();
+      $('#input [name="id"]').value    = "";
       $('#input [name="url"]').value   = "";
       $('#input [name="title"]').value = "";
       $('#input [name="text"]').value  = "";
@@ -394,9 +472,6 @@ function initUI() {
 
   });
   //remoteStorage.on("ready", function (e) { });
-  //UI.list.addEventListener('contextmenu', function (e) {
-  //  window.alert(utils.createXPathFromElement(e.originalTarget));
-  //});
   function toggleItem(key) {
     var clItem = $('[data-key="' + key + '"]').classList,
         clMenu = $('#menu').classList,
@@ -412,44 +487,52 @@ function initUI() {
     clItem.toggle('current');
     $('#menu .content .top').href = '#' + key;
   }
-  UI.list.addEventListener('click', function onClick(event) {
-    /*jshint maxcomplexity: 13 */
+  function onContentEvent(event) {
     var target = event.target,
-        context, key, keyNode = target, parent;
-    if (target.dataset && target.dataset.action) {
-      while (keyNode.id !== 'list' && typeof keyNode.dataset.key === 'undefined' && keyNode.parentNode) {
-        keyNode = keyNode.parentNode;
-      }
-      if (typeof keyNode.dataset.key !== 'undefined') {
-        key = keyNode.dataset.key;
-      }
-      parent = target;
-      while (parent.id !== 'list' && typeof parent.dataset.context === 'undefined' && parent.parentNode) {
-        parent = parent.parentNode;
-      }
-      context = parent.dataset.context;
-      switch (target.dataset.action) {
+        ce, parent;
+    ce = {
+      action: target.dataset.action,
+      keyNode: target
+    };
+    while (ce.keyNode.id !== 'list' && typeof ce.keyNode.dataset.key === 'undefined' && ce.keyNode.parentNode) {
+      ce.keyNode = ce.keyNode.parentNode;
+    }
+    if (typeof ce.keyNode.dataset.key !== 'undefined') {
+      ce.key = ce.keyNode.dataset.key;
+    }
+    parent = target;
+    while (parent.id !== 'list' && typeof parent.dataset.context === 'undefined' && parent.parentNode) {
+      parent = parent.parentNode;
+    }
+    ce.context = parent.dataset.context;
+    if (target.dataset.note) {
+      ce.action = 'note';
+      ce.noteId = target.dataset.note;
+    }
+    return ce;
+  }
+  UI.list.addEventListener('click', function onClick(event) {
+    var ce = onContentEvent(event);
+    if (ce.action) {
+      switch (ce.action) {
       case 'archive':
         (function () {
-          var tags = keyNode.dataset.tags.split(','),
+          var tags = ce.keyNode.dataset.tags.split(','),
               i    = tags.indexOf('archive');
           if (i !== -1) {
             tags.splice(i, 1);
-            keyNode.dataset.tags = tags.join(',');
+            ce.keyNode.dataset.tags = tags.join(',');
           } else {
             tags.splice(1, 0, 'archive');
-            keyNode.dataset.tags = tags.join(',').replace(',,,', ',,');
+            ce.keyNode.dataset.tags = tags.join(',').replace(',,,', ',,');
           }
-          remoteStorage.get('/alir/' + key).then(function (err, article, contentType, revision) {
+          remoteStorage.get('/alir/' + ce.key).then(function (err, article, contentType, revision) {
             if (err !== 200) {
               window.alert(err);
             } else {
+              article.id   = ce.key;
               article.tags = tags.filter(function (t) {return t !== ''; });
-              remoteStorage.put('/alir/' + key, article, contentType).then(function (err) {
-                if (err !== 200) {
-                  window.alert(err);
-                }
-              });
+              remoteStorage.alir.savePrivate(article);
             }
           });
         }());
@@ -458,26 +541,54 @@ function initUI() {
         $('#list').classList.toggle('archives');
         break;
       case 'toggle':
-        toggleItem(key);
+        toggleItem(ce.key);
         break;
       case 'delete':
         if (window.confirm("Supprimer ???")) {
-          remoteStorage.alir[context].remove(key);
+          remoteStorage.alir[ce.context].remove(ce.key);
         }
-        toggleItem(key);
+        toggleItem(ce.key);
         break;
       case 'compose':
-        remoteStorage.alir[context].getObject(key).then(function (object) {
-          $('#input [name="id"]').value    = key;
+        remoteStorage.alir[ce.context].getObject(ce.key).then(function (object) {
+          $('#input [name="id"]').value    = ce.key;
           $('#input [name="title"]').value = object.title;
           $('#input [name="url"]').value   = object.url;
           $('#input [name="text"]').value  = object.text;
           tiles.show('input');
         });
         break;
+      case 'note':
+        remoteStorage.get('/alir/' + ce.key).then(function (err, article, contentType, revision) {
+          if (err !== 200) {
+            window.alert(err);
+          } else {
+            // @TODO: sanitize
+            $('#noteView .content').textContent     = article.notes[ce.noteId].content;
+            $('#noteView [name="articleId"]').value = ce.key;
+            $('#noteView [name="noteId"]').value    = ce.noteId;
+            $('#noteView [name="xpath"]').value     = article.notes[ce.noteId].xpath;
+            tiles.go('noteView');
+          }
+        });
+        break;
       }
     }
   });
+  /**
+   * Display the tile to add a note
+   */
+  function doNote(event) {
+    var ce = onContentEvent(event);
+    if (ce.key) {
+      $('#noteEdit [name="articleId"]').value = ce.key;
+      $('#noteEdit [name="xpath"]').value = utils.createXPathFromElement(event.originalTarget);
+      $('#noteEdit [name="text"]').value = '';
+      tiles.go('noteEdit');
+    }
+  }
+  UI.list.addEventListener('contextmenu', doNote);
+  UI.list.addEventListener('dblclick', doNote);
   if (config.gesture) {
     Gesture.attach(UI.list, {
       gesture: function (e) {
@@ -564,21 +675,18 @@ function initUI() {
           window.alert(err);
           tiles.show('list');
         } else {
+          article.id    = id;
           article.url   = $('#input [name="url"]').value;
           article.title = $('#input [name="title"]').value;
           article.text  = $('#input [name="text"]').value;
-          remoteStorage.put('/alir/' + id, article, contentType).then(function (err) {
-            if (err !== 200) {
-              window.alert(err);
-            }
-            tiles.show('list');
-          });
+          remoteStorage.alir.savePrivate(article);
+          tiles.show('list');
         }
       });
     } else {
       // create
       obj = {
-        id: id,
+        id: utils.uuid(),
         url: $('#input [name="url"]').value,
         title: $('#input [name="title"]').value,
         text: $('#input [name="text"]').value,
@@ -586,9 +694,61 @@ function initUI() {
           editable: true
         }
       };
-      remoteStorage.alir.addPrivate(obj);
+      remoteStorage.alir.savePrivate(obj);
       tiles.show('list');
     }
+  });
+  // }}
+  // Notes {{
+  $('#noteEdit [name="save"]').addEventListener('click', function () {
+    var articleId = $('#noteEdit [name="articleId"]').value,
+        noteId    = $('#noteEdit [name="noteId"]').value;
+
+    if (!noteId) {
+      noteId = utils.uuid();
+    }
+    remoteStorage.get('/alir/' + articleId).then(function (err, article, contentType, revision) {
+      if (err !== 200) {
+        window.alert(err);
+        tiles.back();
+      } else {
+        if (typeof article.notes !== 'object') {
+          article.notes = {};
+        }
+        article.id = articleId;
+        article.notes[noteId] = {
+          xpath: $('#noteEdit [name="xpath"]').value,
+          content: $('#noteEdit [name="text"]').value
+        };
+        remoteStorage.alir.savePrivate(article);
+        tiles.back();
+      }
+    });
+  });
+  $('#noteEdit [name="cancel"]').addEventListener('click', function () {
+    tiles.back();
+  });
+  $('#noteView [name="back"]').addEventListener('click', function () {
+    tiles.back();
+  });
+  $('#noteView [name="delete"]').addEventListener('click', function () {
+    if (window.confirm("Voulez vous vraiment supprimer cette note ")) {
+      var articleId = $('#noteView [name="articleId"]').value,
+          noteId    = $('#noteView [name="noteId"]').value;
+
+      remoteStorage.get('/alir/' + articleId).then(function (err, article, contentType, revision) {
+        if (err !== 200) {
+          window.alert(err);
+          tiles.back();
+        } else {
+          delete article.notes[noteId];
+          article.id = articleId;
+          remoteStorage.alir.savePrivate(article);
+          tiles.back();
+        }
+      });
+    }
+    tiles.back();
   });
   // }}
   // {{ Settings
@@ -646,8 +806,6 @@ function initUI() {
     }
   });
   // }}
-  // Prepare templates
-  templates.item = doT.template($('#tmpl-item').innerHTML);
 
 
   // Manage scroll
@@ -692,9 +850,32 @@ window.addEventListener('load', function () {
   //remoteStorage.caching.enable('/public/alir/');
   remoteStorage.displayWidget();
   remoteStorage.alir.private.on('change', function onChange(ev) {
-    updateList();
+    var elmt;
+    console.log(ev);
+    if (typeof ev.oldValue === 'undefined' && typeof ev.newValue !== 'undefined') {
+      console.log("Create " + ev.relativePath);
+      if (typeof ev.newValue.id === 'undefined') {
+        ev.newValue.id = ev.relativePath;
+      }
+      displayItem(ev.newValue);
+    } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue === 'undefined') {
+      console.log("Delete " + ev.relativePath);
+      elmt = document.getElementById(ev.relativePath);
+      if (elmt) {
+        elmt.remove();
+      }
+    } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue !== 'undefined') {
+      console.log("Update " + ev.relativePath);
+      elmt = document.getElementById(ev.relativePath);
+      if (elmt) {
+        elmt.remove();
+      }
+      if (typeof ev.newValue.id === 'undefined') {
+        ev.newValue.id = ev.relativePath;
+      }
+      displayItem(ev.newValue);
+    }
   });
-  updateList();
 /*
   if (Notification && Notification.permission !== "granted") {
     Notification.requestPermission(function (status) {

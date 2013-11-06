@@ -1,3 +1,6 @@
 ExpiresByType text/cache-manifest "access plus 0 seconds"
 AddType application/x-web-app-manifest+json .webapp
 AddType text/cache-manifest .appcache
+<FilesMatch index.html$> 
+  Header set Content-Security-Policy "default-src 'self'; media-src *; img-src *; script-src 'self'; style-src 'self'; connect-src *" 
+</FilesMatch>

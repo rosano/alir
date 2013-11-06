@@ -6,21 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/alir.css" media="all" rel="stylesheet" type="text/css" />
     <link href="css/font.css" rel="stylesheet" type="text/css">
+    <link href="css/widgetCss.css" rel="stylesheet" type="text/css">
     <link rel="shortcut icon" type="image/png" href="img/icon-32.png" />
   </head>
   <body class="online menu-left">
     <div id="templates">
       <div id="tmpl-item">
-        <li data-key="{{=it.key}}" data-context="{{=it.context}}" class="{{=it.context}}" id="{{=it.key}}" data-tags=",{{=it.tags}}," data-flags=",{{=it.flags}},">
-          <h2><a data-action="toggle" href="#{{=it.key}}">{{=it.title}}</a></h2>
-          <p class="actions">
+        <li data-key="{{=it.key}}" data-context="{{=it.context}}" class="{{=it.context}} {{=it.hasNotes}}" id="{{=it.key}}" data-tags=",{{=it.tags}}," data-flags=",{{=it.flags}},">
+          <h2><a data-action="toggle" href="#{{=it.key}}"><span class="icon-tags hasNotes"></span>{{=it.title}}</a></h2>
+          <div class="actions">
             <a class="icon-chevron-left" data-action="toggle" href="#"></a>
             <a class="icon-inbox archive" data-action="archive" href="#"></a>
             <a class="icon-trash" data-action="delete" href="#"></a>
             <a class="icon-pencil compose" data-action="compose" href="#"></a>
-          </p>
+          </div>
           <div class="content">
-            <a class="url" href="{{=it.url}}" target="_blank">{{=it.title}}</a>
+            <p><a class="url" href="{{=it.url}}" target="_blank">{{=it.url}}</a></p>
+            <p class="notes">
+            </p>
             <div class="{{=it.type}}">{{=it.content}}</div>
           </div>
         </li>
@@ -70,7 +73,7 @@
           <textarea rows="10" cols="40" name="text" placeholder="Contenu"></textarea>
         </fieldset>
         <p>
-          <button value="Privé"  name="save">Save</button>
+          <button name="save">Save</button>
         </p>
       </form>
     </div>
@@ -138,8 +141,37 @@
         </p>
       </form>
     </div>
+    <section id="noteView" data-tile="noteView" class="hidden">
+      <form>
+        <input type="hidden" name="articleId" />
+        <input type="hidden" name="noteId" />
+        <input type="hidden" name="xpath" />
+      </form>
+      <div class="content">
+      </div>
+      <p>
+        <button name="back">Back</button>
+        <button name="delete">Delete</button>
+      </p>
+    </section>
+    <section id="noteEdit" data-tile="noteEdit" class="hidden">
+      <form>
+        <input type="hidden" name="articleId" />
+        <input type="hidden" name="noteId" />
+        <input type="hidden" name="xpath" />
+        <fieldset class="inline text">
+          <textarea rows="10" cols="40" name="text" placeholder="Note"></textarea>
+        </fieldset>
+        <p>
+          <button name="save">Save</button>
+          <button name="cancel">Cancel</button>
+        </p>
+      </form>
+    </section>
     <script type="text/javascript" src="lib/htmlparser.js"></script>
+    <!--
     <script type="text/javascript" src="lib/doT.min.js"></script>
+    -->
     <script type="text/javascript" src="lib/remotestorage.js"></script>
     <!--
     <script type="text/javascript" src="lib/remotestorage.min.js"></script>
