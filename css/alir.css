@@ -183,7 +183,9 @@ body.menu-right [data-tile] {
 }
 #list .filters a,
 #list .current .actions a {
-  padding: .8em;
+  padding: .5em;
+  position: relative;
+  top: -0.5em;
 }
 #list > li {
   border-color: #888;
@@ -192,10 +194,13 @@ body.menu-right [data-tile] {
   overflow: hidden;
   transition: transform 1s ease-in-out;
 }
-#list > li.filters {
+#list > .filters {
   margin-top: -1em;
 }
-#list.detail > li.filters {
+#list > .filters fieldset {
+  display: inline;
+}
+#list.detail > .filters {
   display: none;
 }
 #list > li h2 .hasNotes {
@@ -252,11 +257,11 @@ body.menu-right [data-tile] {
 #list > li.private {
   border-color: #FAA;
 }
-*/
 #list .text {
   margin: 40px;
   white-space: pre-wrap;
 }
+*/
 #list .content pre {
   white-space: pre-wrap;
 }

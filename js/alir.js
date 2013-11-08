@@ -65,6 +65,10 @@ var utils = {
     var params = Array.prototype.splice.call(arguments, 1);
     return (str.replace(/%s/g, function () {return params.shift(); }));
   },
+  trim: function trim(str) {
+    "use strict";
+    return str.replace(/^\s+/, '').replace(/\s+$/, '');
+  },
   log: function log() {
     "use strict";
     var level    = arguments[arguments.length - 1],
@@ -170,10 +174,23 @@ function template(sel, data) {
       xpathResult,
       i, j, elmt, name, value;
   function repl(match) {
-    var res = data;
-    match = match.substr(3, match.length - 5).split('.');
-    while (res && match.length > 0) {
-      res = res[match.shift()];
+    var res = data, tmp, expr, fct;
+    match = match.substr(3, match.length - 5);
+    tmp = match.split('|');
+    expr = utils.trim(tmp.shift()).split('.');
+    while (res && expr.length > 0) {
+      res = res[expr.shift()];
+    }
+    if (tmp.length > 0) {
+      while ((fct = tmp.shift()) !== undefined) {
+        switch (utils.trim(fct).toLowerCase()) {
+        case "tolowercase":
+          res = res.toLowerCase();
+          break;
+        default:
+          console.log("Unknown template function " + fct);
+        }
+      }
     }
     return res;
   }
@@ -302,7 +319,7 @@ function displayItem(obj) {
     obj.date = new Date().toISOString();
   } else {
     try {
-    obj.date = new Date(obj.date).toISOString();
+      obj.date = new Date(obj.date).toISOString();
     } catch (e) {
       console.log(obj.date);
     }
@@ -535,7 +552,7 @@ function initUI() {
       keyNode: target
     };
     while (ce.keyNode.id !== 'list' && typeof ce.keyNode.dataset.key === 'undefined' && ce.keyNode.parentNode) {
-      if (typeof ce.action === 'undefined' && typeof ce.keyNode.action !== 'undefined') {
+      if (typeof ce.action === 'undefined' && typeof ce.keyNode.action !== 'undefined' && typeof ce.dataset !== 'undefined') {
         ce.action       = ce.dataset.action;
         ce.actionTarget = ce.dataset.target;
       }
@@ -561,22 +578,22 @@ function initUI() {
     function switchTag(tag) {
       var tags = ce.keyNode.dataset.tags.split(',').filter(function (e) { return e !== ''; }),
           i    = tags.indexOf(tag);
-          if (i !== -1) {
-            tags.splice(i, 1);
+      if (i !== -1) {
+        tags.splice(i, 1);
         ce.keyNode.dataset.tags = ',' + tags.join(',') + ',';
-          } else {
+      } else {
         tags.splice(1, 0, tag);
         ce.keyNode.dataset.tags = ',' + tags.join(',').replace(',,,', ',,') + ',';
-          }
-          remoteStorage.get('/alir/' + ce.key).then(function (err, article, contentType, revision) {
-            if (err !== 200) {
-              window.alert(err);
-            } else {
-              article.id   = ce.key;
-              article.tags = tags.filter(function (t) {return t !== ''; });
-              remoteStorage.alir.savePrivate(article);
-            }
-          });
+      }
+      remoteStorage.get('/alir/' + ce.key).then(function (err, article, contentType, revision) {
+        if (err !== 200) {
+          window.alert(err);
+        } else {
+          article.id   = ce.key;
+          article.tags = tags.filter(function (t) {return t !== ''; });
+          remoteStorage.alir.savePrivate(article);
+        }
+      });
     }
     if (ce.action) {
       switch (ce.action) {
@@ -807,6 +824,27 @@ function initUI() {
     tiles.back();
   });
   // }}
+  // Filters {{
+  (function () {
+    var dynamicSheet = document.getElementById('dynamicCss').sheet,
+        filter = document.getElementById('listFilter');
+    function onFilterChange() {
+      // @FIXME this function is too much dependant of the view marker
+      while (dynamicSheet.cssRules[0]) {
+        dynamicSheet.deleteRule(0);
+      }
+      if (utils.trim(filter.value) !== '') {
+        dynamicSheet.insertRule("#list.list > li[data-tags] { display: none; }", 0);
+        dynamicSheet.insertRule('#list.list > li[data-tags*="' + filter.value + '"], #list.list > li[data-title*="' + filter.value + '"] { display: block; }', 1);
+      }
+    }
+    filter.addEventListener("change", onFilterChange);
+    document.querySelector("#listFilter + button").addEventListener("click", function () {
+      filter.value = '';
+      onFilterChange();
+    });
+  }());
+  // }}
   // {{ Settings
 
   $('#settings [name="done"]').addEventListener('click', function () {
@@ -936,6 +974,7 @@ window.addEventListener('load', function () {
   });
   remoteStorage.alir.private.getAll('').then(function (objects) {
     Object.keys(objects).forEach(function (key) {
+      objects[key].id = key;
       displayItem(objects[key]);
     });
   });

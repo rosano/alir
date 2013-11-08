@@ -7,12 +7,13 @@
     <link href="css/alir.css" media="all" rel="stylesheet" type="text/css" />
     <link href="css/font.css" rel="stylesheet" type="text/css">
     <link href="css/widgetCss.css" rel="stylesheet" type="text/css">
+    <link href="css/dynamic.css"   rel="stylesheet" type="text/css" id="dynamicCss">
     <link rel="shortcut icon" type="image/png" href="img/icon-32.png" />
   </head>
   <body class="online menu-left">
     <div id="templates">
       <div id="tmpl-item">
-        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags}}," data-flags=",{{=flags}}," data-date="{{=date}}">
+        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}">
           <h2><a data-action="toggle" href="#{{=key}}"><span class="icon-tags hasNotes"></span>{{=title}}</a></h2>
           <div class="actions">
             <a class="icon-chevron-left" data-action="toggle" href="#"></a>
@@ -87,9 +88,16 @@
       </form>
     </div>
     <ul id="list" class="list" class="hidden" data-tile="list">
-      <li class="filters">
+      <form class="filters">
         <a class="icon-inbox archive" data-action="filterArchive" href="#"></a>
-      </li>
+        <form>
+        <fieldset class="inline text">
+          <p>
+            <input type="text" name="listFilter" id="listFilter" placeholder="Filter" />
+            <button type="reset"><span class="icon-remove"></span></button>
+          </p>
+        </fieldset>
+      </form>
     </ul>
     <div id="settings" class="hidden" data-tile="settings">
       <form >
