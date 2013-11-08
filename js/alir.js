@@ -918,14 +918,14 @@ window.addEventListener('load', function () {
       console.log("Delete " + ev.relativePath);
       elmt = document.getElementById(ev.relativePath);
       if (elmt) {
-        elmt.remove();
+        elmt.parentNode.removeChild(elmt);
       }
     } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue !== 'undefined') {
       console.log("Update " + ev.relativePath);
       elmt = document.getElementById(ev.relativePath);
       if (elmt) {
         classes = elmt.getAttribute('class');
-        elmt.remove();
+        elmt.parentNode.removeChild(elmt);
       }
       if (typeof ev.newValue.id === 'undefined') {
         ev.newValue.id = ev.relativePath;
@@ -934,6 +934,12 @@ window.addEventListener('load', function () {
       item.setAttribute("class", classes);
     }
   });
+  remoteStorage.alir.private.getAll('').then(function (objects) {
+    Object.keys(objects).forEach(function (key) {
+      displayItem(objects[key]);
+    });
+  });
+
 /*
   if (Notification && Notification.permission !== "granted") {
     Notification.requestPermission(function (status) {
