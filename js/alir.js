@@ -36,6 +36,7 @@ config = {
     apiKey: ''
   }
 };
+var _ = document.webL10n.get;
 
 
 var utils = {
@@ -295,7 +296,7 @@ function toDom(str) {
     return sandbox.innerHTML;
   } catch (e) {
     console.log('Error sanityzing: ' + e);
-    return "Content contains errors";
+    return _('contentError');
   }
 }
 /**
@@ -462,9 +463,9 @@ function initUI() {
     },
     sync: function doSync() {
       remoteStorage.sync().then(function onSyncDone() {
-        window.alert('Synk ok');
+        window.alert(_('syncOk'));
       }, function onSynFail() {
-        window.alert('Synk ko');
+        window.alert(_('syncKo'));
       });
     },
     settings: function doMenu() {
@@ -486,7 +487,7 @@ function initUI() {
         if (remoteStorage.connected) {
           menuActions.online();
         } else {
-          window.alert('Not connected');
+          window.alert(_('notConnected'));
         }
       }
     },
@@ -607,7 +608,7 @@ function initUI() {
         toggleItem(ce.key);
         break;
       case 'delete':
-        if (window.confirm("Supprimer ???")) {
+        if (window.confirm(_('confirmDelete'))) {
           remoteStorage.alir[ce.context].remove(ce.key);
         }
         toggleItem(ce.key);
@@ -637,7 +638,7 @@ function initUI() {
         break;
       case 'addTag':
         (function () {
-          var tag = window.prompt("Tag ?");
+          var tag = window.prompt(_('tagPrompt'));
           if (tag !== null) {
             switchTag(tag);
           }
@@ -805,7 +806,7 @@ function initUI() {
     tiles.back();
   });
   $('#noteView [name="delete"]').addEventListener('click', function () {
-    if (window.confirm("Voulez vous vraiment supprimer cette note ")) {
+    if (window.confirm(_('noteConfirmDelete'))) {
       var articleId = $('#noteView [name="articleId"]').value,
           noteId    = $('#noteView [name="noteId"]').value;
 

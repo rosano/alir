@@ -9,6 +9,7 @@
     <link href="css/widgetCss.css" rel="stylesheet" type="text/css">
     <link href="css/dynamic.css"   rel="stylesheet" type="text/css" id="dynamicCss">
     <link rel="shortcut icon" type="image/png" href="img/icon-32.png" />
+    <link rel="prefetch" type="application/l10n" href="locales/locales.ini" />
   </head>
   <body class="online menu-left">
     <div id="templates">
@@ -47,10 +48,6 @@
         <p><a class="icon-refresh sync" data-action="sync"></a></p>
         <p><a class="icon-cog settings" data-action="settings"></a></p>
         <p><a class="icon-off onoff" data-action="onoff"></a></p>
-        <!--
-        <p><a class="button" data-action="offline">Off</a></p>
-        <p><a class="button hidden" data-action="online">On</a></p>
-        -->
       </div>
       <div class="slider" data-action="toggleMenu">
         <div class="scrollbar"></div>
@@ -60,30 +57,30 @@
       <form>
         <fieldset class="inline text hidden">
           <p>
-            <label for="id">Id</label>
-            <input type="text" name="id" placeholder="Identifiant" />
+            <label for="id" data-l10n-id="articleIdLabel">Id</label>
+            <input type="text" name="id" placeholder="Identifiant" data-l10n-id="articleId" />
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
         </fieldset>
         <fieldset class="inline text hidden">
           <p>
-            <label for="url">Url</label>
-            <input type="text" name="url" placeholder="URL" />
+            <label for="url" data-l10n-id="articleUrlLabel">Url</label>
+            <input type="text" name="url" placeholder="URL" data-l10n-id="articleUrl" />
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
         </fieldset>
         <fieldset class="inline text">
           <p>
-            <label for="title">Titre</label>
-            <input type="text" name="title" placeholder="Titre" />
+            <label for="title" data-l10n-id="articleTitleLabel">Title</label>
+            <input type="text" name="title" placeholder="Titre" data-l10n-id="articleTitle" />
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
         </fieldset>
         <fieldset class="inline text">
-          <textarea rows="10" cols="40" name="text" placeholder="Contenu"></textarea>
+          <textarea rows="10" cols="40" name="text" placeholder="Content" data-l10n-id="articleContent"></textarea>
         </fieldset>
         <p>
-          <button name="save">Save</button>
+          <button name="save" data-l10n-id="articleSave">Save</button>
         </p>
       </form>
     </div>
@@ -93,7 +90,7 @@
         <form>
         <fieldset class="inline text">
           <p>
-            <input type="text" name="listFilter" id="listFilter" placeholder="Filter" />
+            <input type="text" name="listFilter" id="listFilter" placeholder="Filter" data-l10n-id="listFilter" />
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
         </fieldset>
@@ -101,60 +98,58 @@
     </ul>
     <div id="settings" class="hidden" data-tile="settings">
       <form >
-        <header>
-          Préférences
-        </header>
+        <header data-l10n-id="settings">Settings</header>
         <!--
-        <button name="install">Installer</button>
+        <button name="install" data-l10n-id="settingsInstall">Install</button>
         -->
         <fieldset id="prefDropbox">
-          <legend>Dropbox</legend>
+          <legend data-l10n-id="dropbox">Dropbox</legend>
           <fieldset class="inline text">
             <p>
-              <label for="dropboxApiKey">Clé</label>
-              <input type="text" name="dropboxApiKey" id="dropboxApiKey" placeholder="Clé" />
+              <label for="dropboxApiKey" data-l10n-id="dropboxKeyLabel">Key</label>
+              <input type="text" name="dropboxApiKey" id="dropboxApiKey" placeholder="Key" data-l10n-id="dropboxKey" />
               <button type="reset"><span class="icon-remove"></span></button>
             </p>
           </fieldset>
         </fieldset>
         <fieldset id="prefDrive">
-          <legend>Google Drive</legend>
+          <legend data-l10n-id="drive">Google Drive</legend>
           <fieldset class="inline text">
             <p>
-              <label for="driveClientId">Client Id</label>
-              <input type="text" name="driveClientId" id="driveClientId" placeholder="ClientId" />
+              <label for="driveClientId" data-l10n-id="driveIdLabel">Client Id</label>
+              <input type="text" name="driveClientId" id="driveClientId" placeholder="ClientId" data-l10n-id="driveId" />
               <button type="reset"><span class="icon-remove"></span></button>
             </p>
           </fieldset>
           <fieldset class="inline text">
             <p>
-              <label for="driveApiKey">Clé</label>
-              <input type="text" name="driveApiKey" id="driveApiKey" placeholder="Clé" />
+              <label for="driveApiKey" data-l10n-id="driveKeyLabel">Key</label>
+              <input type="text" name="driveApiKey" id="driveApiKey" placeholder="Key" data-l10n-id="driveKey" />
               <button type="reset"><span class="icon-remove"></span></button>
             </p>
           </fieldset>
         </fieldset>
         <fieldset class="inline check">
           <p>
-            <label for="prefMenuLeft">Menu à gauche</label>
+            <label for="prefMenuLeft" data-l10n-id="settingsMenu">Left Menu</label>
             <input type="checkbox" name="prefMenuLeft" id="prefMenuLeft" checked>
           </p>
         </fieldset>
         <fieldset class="inline check">
           <p>
-            <label for="prefGesture">Gestes</label>
+            <label for="prefGesture" data-l10n-id="settingsGesture">Gestures</label>
             <input type="checkbox" name="prefGesture" id="prefGesture" >
           </p>
         </fieldset>
         <fieldset class="inline text">
           <p>
-            <label for="prefToken">Token</label>
+            <label for="prefToken" data-l10n-id="settingsToken">Token</label>
             <input type="text" name="prefToken" id="prefToken" disabled>
           </p>
         </fieldset>
         <p>
-          <button name="inspect">Debug</button>
-          <button name="done">Ok</button>
+          <button name="inspect" data-l10n-id="settingsDebug">Debug</button>
+          <button name="done" data-l10n-id="settingsDone">Ok</button>
         </p>
       </form>
     </div>
@@ -167,8 +162,8 @@
       <div class="content">
       </div>
       <p>
-        <button name="back">Back</button>
-        <button name="delete">Delete</button>
+        <button name="back" data-l10n-id="noteBack">Back</button>
+        <button name="delete" data-l10n-id="noteDelete">Delete</button>
       </p>
     </section>
     <section id="noteEdit" data-tile="noteEdit" class="hidden">
@@ -177,22 +172,20 @@
         <input type="hidden" name="noteId" />
         <input type="hidden" name="xpath" />
         <fieldset class="inline text">
-          <textarea rows="10" cols="40" name="text" placeholder="Note"></textarea>
+          <textarea rows="10" cols="40" name="text" placeholder="Note" data-l10n-id="noteContent"></textarea>
         </fieldset>
         <p>
-          <button name="save">Save</button>
-          <button name="cancel">Cancel</button>
+          <button name="save" data-l10n-id="noteSave">Save</button>
+          <button name="cancel" data-l10n-id="noteCancel">Cancel</button>
         </p>
       </form>
     </section>
     <script type="text/javascript" src="lib/htmlparser.js"></script>
-    <!--
-    <script type="text/javascript" src="lib/doT.min.js"></script>
-    -->
     <script type="text/javascript" src="lib/remotestorage.js"></script>
     <!--
     <script type="text/javascript" src="lib/remotestorage.min.js"></script>
     -->
+    <script type="text/javascript" src="lib/webL10n/l10n.js"></script>
     <script type="text/javascript" src="js/touch.js"></script>
     <script type="text/javascript" src="js/alir.js"></script>
   </body>
