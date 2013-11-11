@@ -34,7 +34,8 @@ config = {
   google: {
     clientId: '',
     apiKey: ''
-  }
+  },
+  lang: 'en-US'
 };
 var _ = document.webL10n.get;
 
@@ -405,6 +406,10 @@ function initUI() {
     var conf = localStorage.getItem('config');
     if (conf) {
       config = JSON.parse(conf);
+      if (typeof config.lang !== 'undefined') {
+        $('#settingsLang select').value = config.lang;
+        document.webL10n.setLanguage(config.lang);
+      }
       if (!config.dropbox) {
         config.dropbox = {
           apiKey: ''
@@ -878,6 +883,9 @@ function initUI() {
       document.body.classList.add('menu-right');
     }
   });
+  $('#settingsLang select').addEventListener('change', function () {
+    document.webL10n.setLanguage(this.value);
+  });
   /*
   $('#settings [name="install"]').addEventListener('click', function () {
     var request = window.navigator.mozApps.install("http://alir.clochix.net/manifest.webapp");
@@ -928,6 +936,9 @@ function initUI() {
     console.log(config);
     gesture.addEventListener('change', function () {
       config.gesture = gesture.checked;
+    });
+    $('#settingsLang select').addEventListener('change', function () {
+      config.lang = this.value;
     });
   }());
 

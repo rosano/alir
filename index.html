@@ -88,7 +88,7 @@
       <form class="filters">
         <a class="icon-inbox archive" data-action="filterArchive" href="#"></a>
         <form>
-        <fieldset class="inline text">
+        <fieldset class="inline text compact">
           <p>
             <input type="text" name="listFilter" id="listFilter" placeholder="Filter" data-l10n-id="listFilter" />
             <button type="reset"><span class="icon-remove"></span></button>
@@ -98,10 +98,19 @@
     </ul>
     <div id="settings" class="hidden" data-tile="settings">
       <form >
-        <header data-l10n-id="settings">Settings</header>
+        <header data-l10n-id="settings"><h2>Settings</h2></header>
         <!--
         <button name="install" data-l10n-id="settingsInstall">Install</button>
         -->
+        <fieldset id="settingsLang">
+          <legend data-l10n-id="settingsLang">Language</legend>
+          <fieldset class="inline text">
+            <select>
+              <option value="en-US" data-l10n-id="settingsLangUs">Simplified English</option>
+              <option value="fr" data-l10n-id="settingsLangFr">French</option>
+            </select>
+          </fieldset>
+        </fieldset>
         <fieldset id="prefDropbox">
           <legend data-l10n-id="dropbox">Dropbox</legend>
           <fieldset class="inline text">
