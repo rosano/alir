@@ -25,7 +25,8 @@
 
 var list = document.getElementById('list'),
     config,
-    tiles;
+    tiles,
+    tags = [];
 config = {
   gesture: false,
   dropBox: {
@@ -137,13 +138,16 @@ function Tiles(global) {
         }
       });
     },
-    go: function (name) {
-      tiles.push({name: current, y: window.scrollY});
+    go: function (name, cb) {
+      tiles.push({name: current, y: window.scrollY, cb: cb});
       this.show(name);
     },
-    back: function () {
+    back: function (res) {
       var next = tiles.pop();
       this.show(next.name);
+      if (typeof next.cb === 'function') {
+        next.cb(res);
+      }
       window.scrollTo(0, next.y);
     }
   };
@@ -300,6 +304,21 @@ function toDom(str) {
     return _('contentError');
   }
 }
+function insertInList(list, selector, item, comp) {
+  "use strict";
+  var nextNode;
+  Array.prototype.slice.call(list.querySelectorAll(selector)).some(function (e) {
+    if (comp(e)) {
+      nextNode = e;
+      return true;
+    }
+  });
+  if (typeof nextNode === 'undefined') {
+    list.appendChild(item);
+  } else {
+    list.insertBefore(item, nextNode);
+  }
+}
 /**
  * Add an item to the content list
  *
@@ -312,7 +331,6 @@ function displayItem(obj) {
   var title = obj.title || obj.id,
       data  = {},
       item,
-      nextNode,
       tagsNode;
   if (typeof obj.notes !== 'object') {
     obj.notes = {};
@@ -369,24 +387,24 @@ function displayItem(obj) {
     obj.tags.forEach(function (tag) {
       var elmt = template('#tmpl-tag', {tag: tag});
       tagsNode.appendChild(elmt);
+      if (tags.indexOf(tag) === -1) {
+        tags.push(tag);
+        (function (tag) {
+          var elmt = document.createElement('li');
+          elmt.dataset.tag = tag;
+          elmt.textContent = tag;
+          insertInList(document.getElementById('tagList'), "li", elmt, function (e) { return (e.dataset.tag > tag); });
+        })(tag);
+      }
     });
   }
   // }}
   // Sort items by date {{
   // @TODO allow multiple sorts
-  Array.prototype.slice.call(document.querySelectorAll("#list [data-key]")).some(function (e) {
-    if (e.dataset.date > obj.date) {
-      nextNode = e;
-      return true;
-    }
-  });
-  if (typeof nextNode === 'undefined') {
-    list.appendChild(item);
-  } else {
-    list.insertBefore(item, nextNode);
-  }
-  return item;
+  insertInList(list, "[data-key]", item, function (e) { return (e.dataset.date > obj.date); });
   // }}
+
+  return item;
 }
 function initUI() {
   // jshint maxstatements: 40
@@ -643,10 +661,13 @@ function initUI() {
         break;
       case 'addTag':
         (function () {
-          var tag = window.prompt(_('tagPrompt'));
+          tiles.go('tagTile', function (tag) {
+            if (typeof tag !== 'undefined') {
           if (tag !== null) {
             switchTag(tag);
           }
+            }
+          });
         })();
         break;
       case 'deleteTag':
@@ -829,6 +850,25 @@ function initUI() {
     }
     tiles.back();
   });
+  // }}
+  // Tags {{
+  (function () {
+    var input = $('#tagTile [name=tagInput]');
+    input.addEventListener('change', function () {
+      tiles.back(input.value);
+    });
+    $('#tagList').addEventListener("click", function (event) {
+      if (event.target.dataset && event.target.dataset.tag) {
+        tiles.back(event.target.dataset.tag);
+      }
+    });
+    $('#tagTile [name="save"]').addEventListener('click', function () {
+      tiles.back(input.value);
+    });
+    $('#tagTile [name="cancel"]').addEventListener('click', function () {
+      tiles.back();
+    });
+  }());
   // }}
   // Filters {{
   (function () {
