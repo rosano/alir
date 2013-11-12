@@ -4,9 +4,8 @@ html {
 }
 body {
   background-color: #FFF;
-}
-body.sync {
-  background-color: #FEE;
+  margin: 0;
+  padding: 0;
 }
 #main {
   color: #444;
@@ -28,9 +27,9 @@ body.sync {
   color: #FFF;
 }
 body.menu-left #menu {
-  width: 150px;
+  width: 10rem;
   left: 0;
-  margin: 0 0 0 -110px;
+  margin: 0 0 0 -8rem;
 }
 body.menu-right #menu {
   width: 130px;
@@ -38,20 +37,20 @@ body.menu-right #menu {
   margin: 0 -90px 0 0;
 }
 #menu .slider {
-  width: 40px;
+  width: 2rem;
   height: 100%;
   background-color: #BBB;
 }
 body.menu-left #menu .slider {
-  margin-left: calc(100% - 40px);
+  margin-left: calc(100% - 2rem);
 }
 body.menu-right #menu .slider {
-  margin-right: calc(100% - 40px);
+  margin-right: calc(100% - 2rem);
 }
 #menu .scrollbar {
   position: fixed;
   top: 0px;
-  width: 38px;
+  width: calc(2rem - 2px);
   border: 1px solid #080;
   color: #080;
   background-color: rgba(0, 255, 0, .3);
@@ -60,6 +59,17 @@ body.menu-right #menu .slider {
 }
 body.online #menu .scrollbar {
   background-color: #0F0;
+}
+body .syncInProgress {
+  position: absolute;
+  display: none;
+  top: 0.3rem;
+  left: 8.3rem;
+  z-index: 1001;
+  pointer-events: none;
+}
+body.sync .syncInProgress {
+  display: inherit;
 }
 #menu .onoff {
   color: #888;
@@ -71,7 +81,7 @@ body.menu-left #menu .scrollbar {
   left: 0;
 }
 body.menu-left #menu.show .scrollbar {
-  left: 110px;
+  left: 8rem;
 }
 body.menu-right #menu .scrollbar {
   right: 0;
@@ -136,16 +146,28 @@ body.menu-right #menu.show {
   padding-top: 2em;
   list-style-type: none;
   max-width: 72em;
+  display: none;
+}
+[data-tile] > header {
+  margin: -2rem 0 1rem -1rem;
+  padding: 0.5rem 1.5rem;
+  background: -moz-linear-gradient(top,  #1AFAA5,  #20F47A);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  color: white;
+
+}
+[data-tile] > header h2 {
+  margin: 0.5rem 0;
 }
 body.menu-left [data-tile] {
-  padding-left: 35px;
+  padding-left: 2.5rem;
   padding-right: 0;
-  width: 90%;
+  width: calc(100% - 3rem);
 }
 body.menu-right [data-tile] {
   padding-left: 0px;
-  padding-right: 35px;
-  width: 90%;
+  padding-right: 2.5rem;
+  width: calc(100% - 3rem);
 }
 #list .content,
 #list .actions {
@@ -181,11 +203,20 @@ body.menu-right [data-tile] {
 #list [data-flags*=",editable,"] .compose {
   display: inline;
 }
+#list .filters {
+  font-size: 1rem;
+}
+#list .filters fieldset {
+  width: calc(100% - 5rem);
+}
 #list .filters a,
 #list .current .actions a {
   padding: .5em;
   position: relative;
   top: -0.5em;
+}
+#list .filters a {
+  font-size: 1rem;
 }
 #list > li {
   border-color: #888;
@@ -268,17 +299,28 @@ body.menu-right [data-tile] {
 .hidden {
   display: none;
 }
-#settings {
-  padding-left: 40px;
+.shown {
+  display: inherit;
 }
 body.menu-right #input,
 body.menu-right #settings {
   margin-right: 50px;
   margin-top: 60px;
 }
-#input > form , #settings > form {
+#input > form ,
+#settings > form {
   max-width: 600px;
   margin: auto;
+}
+#tagList {
+  list-style-type: none;
+  padding: 0;
+}
+#tagList li {
+  border-color: #888;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+  padding: 1rem .5rem;
 }
 /** Fonts **/
 a[class*="icon-"] {
@@ -287,6 +329,9 @@ a[class*="icon-"] {
 }
 [class*="icon-"] {
   font-size: 1.6em;
+}
+fieldset.compact [class*="icon-"] {
+  font-size: 1em;
 }
 /** Buttons **/
 /* @media (max-width: 481px) { */
@@ -330,6 +375,23 @@ a[class*="icon-"] {
     color: #333;
     display: table-cell;
     vertical-align: middle;
+  }
+  fieldset.inline.compact > p > * {
+    display: inline;
+    margin: 0;
+    padding: 2px;
+    width: auto;
+    height: 1.2rem;
+    background: #FFF;
+    color: #333;
+    display: table-cell;
+    vertical-align: middle;
+  }
+  fieldset.inline > select {
+    width: 100%;
+    border: 1px solid #AAA;
+    border-radius: 5px;
+    padding: 0.33rem;
   }
   fieldset.inline.text label {
     border-width: 0px;

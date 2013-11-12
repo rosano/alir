@@ -50,10 +50,11 @@
         <p><a class="icon-off onoff" data-action="onoff"></a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
+        <span class="icon-exclamation-sign syncInProgress"></span>
         <div class="scrollbar"></div>
       </div>
     </div>
-    <div id="input" class="hidden" data-tile="input">
+    <div id="input" class="" data-tile="input">
       <form>
         <fieldset class="inline text hidden">
           <p>
@@ -84,7 +85,7 @@
         </p>
       </form>
     </div>
-    <ul id="list" class="list" class="hidden" data-tile="list">
+    <ul id="list" class="list" class="" data-tile="list">
       <form class="filters">
         <a class="icon-inbox archive" data-action="filterArchive" href="#"></a>
         <form>
@@ -96,9 +97,9 @@
         </fieldset>
       </form>
     </ul>
-    <div id="settings" class="hidden" data-tile="settings">
+    <div id="settings" class="" data-tile="settings">
+      <header><h2 data-l10n-id="settings">Settings</h2></header>
       <form >
-        <header data-l10n-id="settings"><h2>Settings</h2></header>
         <!--
         <button name="install" data-l10n-id="settingsInstall">Install</button>
         -->
@@ -162,7 +163,7 @@
         </p>
       </form>
     </div>
-    <section id="noteView" data-tile="noteView" class="hidden">
+    <section id="noteView" data-tile="noteView" class="">
       <form>
         <input type="hidden" name="articleId" />
         <input type="hidden" name="noteId" />
@@ -175,7 +176,7 @@
         <button name="delete" data-l10n-id="noteDelete">Delete</button>
       </p>
     </section>
-    <section id="noteEdit" data-tile="noteEdit" class="hidden">
+    <section id="noteEdit" data-tile="noteEdit" class="">
       <form>
         <input type="hidden" name="articleId" />
         <input type="hidden" name="noteId" />

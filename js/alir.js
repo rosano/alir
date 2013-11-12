@@ -130,11 +130,11 @@ function Tiles(global) {
     show: function (name) {
       Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
         if (e.dataset.tile === name) {
-          e.classList.remove('hidden');
+          e.classList.add('shown');
           window.scrollTo(0, 0);
           current = name;
         } else {
-          e.classList.add('hidden');
+          e.classList.remove('shown');
         }
       });
     },
@@ -663,9 +663,9 @@ function initUI() {
         (function () {
           tiles.go('tagTile', function (tag) {
             if (typeof tag !== 'undefined') {
-          if (tag !== null) {
-            switchTag(tag);
-          }
+              if (tag !== null) {
+                switchTag(tag);
+              }
             }
           });
         })();
