@@ -342,7 +342,7 @@ function insertInList(list, selector, item, comp) {
  *
  */
 function displayItem(obj) {
-  //jshint maxstatements: 30
+  //jshint maxstatements: 30, debug: true
   "use strict";
   var title = obj.title || obj.id,
       data  = {},
@@ -357,7 +357,7 @@ function displayItem(obj) {
     try {
       obj.date = new Date(obj.date).toISOString();
     } catch (e) {
-      console.log(obj.date);
+      console.log("Wrong date : " + obj.date);
     }
   }
   data = {
@@ -423,7 +423,7 @@ function displayItem(obj) {
   return item;
 }
 function initUI() {
-  // jshint maxstatements: 40
+  // jshint maxstatements: 50
   "use strict";
   var $  = function (sel) {return document.querySelector.call(document, sel); },
       $$ = function (sel) {return document.querySelectorAll.call(document, sel); },
@@ -547,6 +547,9 @@ function initUI() {
   remoteStorage.on("sync-done", function (e) {
     document.body.classList.remove('sync');
   });
+  //remoteStorage.on("sync-updated", function (e) {
+  //  console.log(e);
+  //});
 
   remoteStorage.on("features-loaded", function (e) {
     var features = [];
@@ -795,6 +798,7 @@ function initUI() {
           article.url   = $('#input [name="url"]').value;
           article.title = $('#input [name="title"]').value;
           article.text  = $('#input [name="text"]').value;
+          article.date  = Date.now();
           remoteStorage.alir.savePrivate(article);
           tiles.show('list');
         }
@@ -806,9 +810,11 @@ function initUI() {
         url: $('#input [name="url"]').value,
         title: $('#input [name="title"]').value,
         text: $('#input [name="text"]').value,
+        date: Date.now(),
         flags: {
           editable: true
-        }
+        },
+        tags: ['note']
       };
       remoteStorage.alir.savePrivate(obj);
       tiles.show('list');
@@ -905,6 +911,16 @@ function initUI() {
       filter.value = '';
       onFilterChange();
     });
+    filter.addEventListener('focus', function onFocus() {
+      tiles.go('tagTile', function (tag) {
+        if (typeof tag !== 'undefined') {
+          if (tag !== null) {
+            filter.value = tag;
+            onFilterChange();
+          }
+        }
+      });
+    });
   }());
   // }}
   // {{ Settings
@@ -914,9 +930,6 @@ function initUI() {
   });
   $('#settings [name="inspect"]').addEventListener('click', function () {
     remoteStorage.inspect();
-  });
-  $('#settings [name="clearLog"]').addEventListener('click', function () {
-    document.getElementById('debugLog').innerHTML =  "";
   });
   $('#dropboxApiKey').addEventListener('change', function () {
     remoteStorage.setApiKeys('dropbox', {api_key: this.value});
@@ -958,6 +971,40 @@ function initUI() {
     };
   });
   */
+  // }}
+  // Actions {{
+  (function () {
+    var actions = {
+      clearLogs: function () {
+        document.getElementById('debugLog').innerHTML =  "";
+      },
+      tileGo: function (name) {
+        tiles.go(name);
+      },
+      tileBack: function () {
+        tiles.back();
+      }
+    };
+    Array.prototype.forEach.call(document.querySelectorAll("[data-method]"), function (elmt) {
+      elmt.addEventListener('click', function (event) {
+        var params = [];
+        if (typeof this.dataset.method === "undefined") {
+          return;
+        }
+        if (typeof this.dataset.params !== "undefined") {
+          params = this.dataset.params.split(',');
+        }
+        if (typeof actions[this.dataset.method] === "undefined") {
+          utils.log("Unknown method " + this.dataset.method);
+          return;
+        }
+        actions[this.dataset.method].apply(null, params);
+      });
+    });
+
+  })();
+  $('#settings [name="clearLog"]').addEventListener('click', function () {
+  });
   // }}
   // Left menu {{
   $('#menu').addEventListener('click', function (event) {
@@ -1044,10 +1091,12 @@ window.addEventListener('load', function () {
     }
   });
   remoteStorage.alir.private.getAll('').then(function (objects) {
-    Object.keys(objects).forEach(function (key) {
-      objects[key].id = key;
-      displayItem(objects[key]);
-    });
+  //  if (objects) {
+  //    Object.keys(objects).forEach(function (key) {
+  //      objects[key].id = key;
+  //      displayItem(objects[key]);
+  //    });
+  //  }
   });
 
 /*

@@ -8,12 +8,12 @@
     <link href="css/font.css" rel="stylesheet" type="text/css">
     <link href="css/widgetCss.css" rel="stylesheet" type="text/css">
     <link href="css/dynamic.css"   rel="stylesheet" type="text/css" id="dynamicCss">
-    <link rel="shortcut icon" type="image/png" href="img/icon-32.png" />
+    <link rel="icon" type="image/png" href="/img/icon-32.png" />
     <link rel="prefetch" type="application/l10n" href="locales/locales.ini" />
   </head>
   <body class="online menu-left">
     <div id="templates">
-      <div id="tmpl-item">
+      <ul id="tmpl-item">
         <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}">
           <h2><a data-action="toggle" href="#{{=key}}"><span class="icon-tags hasNotes"></span>{{=title}}</a></h2>
           <div class="actions">
@@ -32,7 +32,7 @@
             <div class="{{=type}}">{{=content}}</div>
           </div>
         </li>
-      </div>
+      </ul>
       <div id="tmpl-tag">
         <div class="tag">
           <span class="icon-remove" data-action="deleteTag" data-target="{{=tag}}"></span>
@@ -50,7 +50,7 @@
         <p><a class="icon-off onoff" data-action="onoff"></a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
-        <span class="icon-exclamation-sign syncInProgress"></span>
+        <span class="icon-refresh syncInProgress"></span>
         <div class="scrollbar"></div>
       </div>
     </div>
@@ -58,22 +58,22 @@
       <form>
         <fieldset class="inline text hidden">
           <p>
-            <label for="id" data-l10n-id="articleIdLabel">Id</label>
-            <input type="text" name="id" placeholder="Identifiant" data-l10n-id="articleId" />
+            <label for="articleId" data-l10n-id="articleIdLabel">Id</label>
+            <input type="text" name="id" id="articleId" placeholder="Identifiant" data-l10n-id="articleId" />
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
         </fieldset>
         <fieldset class="inline text hidden">
           <p>
-            <label for="url" data-l10n-id="articleUrlLabel">Url</label>
-            <input type="text" name="url" placeholder="URL" data-l10n-id="articleUrl" />
+            <label for="articleUrl" data-l10n-id="articleUrlLabel">Url</label>
+            <input type="text" name="url" id="articleUrl" placeholder="URL" data-l10n-id="articleUrl" />
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
         </fieldset>
         <fieldset class="inline text">
           <p>
-            <label for="title" data-l10n-id="articleTitleLabel">Title</label>
-            <input type="text" name="title" placeholder="Titre" data-l10n-id="articleTitle" />
+            <label for="articleTitle" data-l10n-id="articleTitleLabel">Title</label>
+            <input type="text" name="title" id="articleTitle" placeholder="Titre" data-l10n-id="articleTitle" />
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
         </fieldset>
@@ -85,10 +85,9 @@
         </p>
       </form>
     </div>
-    <ul id="list" class="list" class="" data-tile="list">
+    <div id="main" class="list" data-tile="list">
       <form class="filters">
         <a class="icon-inbox archive" data-action="filterArchive" href="#"></a>
-        <form>
         <fieldset class="inline text compact">
           <p>
             <input type="text" name="listFilter" id="listFilter" placeholder="Filter" data-l10n-id="listFilter" />
@@ -96,7 +95,9 @@
           </p>
         </fieldset>
       </form>
-    </ul>
+      <ul id="list">
+      </ul>
+    </div>
     <div id="settings" class="" data-tile="settings">
       <header><h2 data-l10n-id="settings">Settings</h2></header>
       <form >
@@ -139,13 +140,13 @@
             </p>
           </fieldset>
         </fieldset>
-        <fieldset class="inline check">
+        <fieldset class="inline check compact">
           <p>
             <label for="prefMenuLeft" data-l10n-id="settingsMenu">Left Menu</label>
             <input type="checkbox" name="prefMenuLeft" id="prefMenuLeft" checked>
           </p>
         </fieldset>
-        <fieldset class="inline check">
+        <fieldset class="inline check compact">
           <p>
             <label for="prefGesture" data-l10n-id="settingsGesture">Gestures</label>
             <input type="checkbox" name="prefGesture" id="prefGesture" >
@@ -159,12 +160,13 @@
         </fieldset>
         <p>
           <button name="inspect" data-l10n-id="settingsDebug">Debug</button>
+          <button name="credit" data-l10n-id="settingsCredits" data-method="tileGo" data-params="credits">Credits</button>
           <button name="done" data-l10n-id="settingsDone">Ok</button>
         </p>
-        <p>
-          <button name="clearLog" data-l10n-id="settingsClearLog">Clear Log</button>
+        <section>
+          <button name="clearLog" data-l10n-id="settingsClearLog" data-method="clearLogs">Clear Log</button>
           <pre id="debugLog"></pre>
-        </p>
+        </section>
       </form>
     </div>
     <section id="noteView" data-tile="noteView" class="">
@@ -199,7 +201,7 @@
         <fieldset class="inline text">
           <p>
             <label for="tagInput" data-l10n-id="tagLabel">Tag</label>
-            <input type="text" name="tagInput" placeholder="Tag" data-l10n-id="tagInput" />
+            <input type="text" name="tagInput" id="tagInput" placeholder="Tag" data-l10n-id="tagInput" />
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
         </fieldset>
@@ -210,6 +212,34 @@
           <button name="cancel" data-l10n-id="tagCancel">Cancel</button>
         </p>
       </form>
+    </section>
+    <section id="credits" data-tile="credits" class="">
+      <section class="title">
+        <img src="img/icon-256.png" width="256" height="256" alt="Àlir icon" title="Àlir icon" />
+      </section>
+      <button data-l10n-id="back" data-method="tileBack" >Back</button>
+      <section>
+        <h3>Licence</h3>
+        <p>Àlir — Stack stuffs and read them later.</p>
+        <p>Copyright © 2014 Clochix — <a href="http://clochix.net" target="_blank">Clochix</a></p>
+        <p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
+        <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the <a href="LICENCE" target="_blank">GNU General Public License for more details.</a></p>
+      </section>
+      <section>
+        <h3>Icons</h3>
+        <p>The Chair icon is a creation of <a href="http://www.robinweatherall.eu/icons/" target="_blank">Robin Weatherall</a> distributed as freeware. I found it on <a href="http://www.iconarchive.com/show/library-icons-by-skuzigraphic/chair-icon.html" target="_blank">IconArchive</a>.</p>
+        <p>Others icons are from Font Awesome by Dave Gandy — <a href="http://fontawesome.io" target="_blank">http://fontawesome.io/</a>.</p>
+
+      </section>
+      <section>
+        <h3>Contributors</h3>
+        <ul>
+          <li>thanks Mozilla for the awesome Firefox OS and the Keon phone you offered to me;</li>
+          <li>thanks <a href="http://paul.cx/" target="_blank">Paul Adonot</a> for the advices and encouragements;</li>
+          <li>thanks <a href="http://hanblog.info/blog/" target="_blank">Antony</a> for the kick ass ;)</li>
+        </ul>
+      </section>
+      <button data-l10n-id="back" data-method="tileBack" >Back</button>
     </section>
     <script type="text/javascript" src="lib/htmlparser.js"></script>
     <script type="text/javascript" src="lib/remotestorage.js"></script>
