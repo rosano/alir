@@ -74,13 +74,29 @@ var utils = {
   },
   log: function log() {
     "use strict";
-    var level    = arguments[arguments.length - 1],
+    var args = Array.prototype.slice.call(arguments),
+        level,
+        levelNum,
+        message;
+    if (args.length > 1) {
+      level = args.pop();
+    } else {
+      level = "info";
+    }
         levelNum = utils.logLevels.indexOf(level);
     if (levelNum === -1) {
       console.log("Unknown log level " + level);
     }
     if (levelNum >= utils.logLevels.indexOf(utils.logLevel)) {
-      console.log('[' + level + '] ' + utils.format.apply(utils, arguments));
+      if (args.length === 1) {
+        message = args[0];
+        if (typeof message === 'object') {
+          message = JSON.stringify(message, null, '  ');
+        }
+      } else {
+        message = utils.format.apply(null, args);
+      }
+      document.getElementById('debugLog').innerHTML += utils.format('<span class="%s">[%s][%s]</span> %s\n', level, new Date().toISOString().substr(11, 8), level + new Array(10 - level.length).join(' '), message);
     }
   },
   createXPathFromElement: function createXPathFromElement(elm) {
@@ -898,6 +914,9 @@ function initUI() {
   });
   $('#settings [name="inspect"]').addEventListener('click', function () {
     remoteStorage.inspect();
+  });
+  $('#settings [name="clearLog"]').addEventListener('click', function () {
+    document.getElementById('debugLog').innerHTML =  "";
   });
   $('#dropboxApiKey').addEventListener('change', function () {
     remoteStorage.setApiKeys('dropbox', {api_key: this.value});
