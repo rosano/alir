@@ -4,8 +4,17 @@
   "launch_path": "/",
   "appcache_path": "/cache.manifest",
   "icons": {
+    "128": "/img/icon-128.png",
+    "120": "/img/icon-120.png",
+    "256": "/img/icon-256.png",
+    "30": "/img/icon-30.png",
+    "32": "/img/icon-32.png",
+    "48": "/img/icon-48.png",
     "60": "/img/icon-60.png",
-    "128": "/img/icon-128.png"
+    "64": "/img/icon-64.png",
+    "72": "/img/icon-72.png",
+    "90": "/img/icon-90.png",
+    "96": "/img/icon-96.png"
   },
   "developer": {
     "name": "Clochix",
@@ -17,6 +26,16 @@
     }
   },
   "default_locale": "en",
+  "locales": {
+    "en": {
+      "name": "Àlir",
+      "description": "Paper box for text to read later"
+    },
+    "fr": {
+      "name": "Àlir",
+      "description": "Banette pour textes à lire plus tard"
+    }
+  },
   "type": "web",
   "version": "0.0.1"
 }
