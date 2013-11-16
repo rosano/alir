@@ -1,0 +1,910 @@
+html {
+  font-size: 100%;
+  font-family: sans-serif;
+}
+body {
+  background-color: #FFF;
+  margin: 0;
+  padding: 0;
+}
+#templates {
+  display: none;
+}
+#menu {
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #000;
+  color: #FFF;
+}
+body.menu-left #menu {
+  width: 10rem;
+  left: 0;
+  margin: 0 0 0 -8rem;
+}
+body.menu-right #menu {
+  width: 130px;
+  right: 0;
+  margin: 0 -90px 0 0;
+}
+#menu .slider {
+  width: 2rem;
+  height: 100%;
+  background-color: #BBB;
+}
+body.menu-left #menu .slider {
+  margin-left: calc(100% - 2rem);
+}
+body.menu-right #menu .slider {
+  margin-right: calc(100% - 2rem);
+}
+#menu .scrollbar {
+  position: fixed;
+  top: 0px;
+  width: calc(2rem - 2px);
+  border: 1px solid #080;
+  color: #080;
+  background-color: rgba(0, 255, 0, .3);
+  z-index: 1000;
+  pointer-events: none;
+}
+body.online #menu .scrollbar {
+  background-color: #0F0;
+}
+body .syncInProgress {
+  position: absolute;
+  display: none;
+  top: 0.3rem;
+  left: 8.3rem;
+  z-index: 1001;
+  pointer-events: none;
+}
+body.sync .syncInProgress {
+  display: inherit;
+  animation: rotation 2s infinite linear;
+}
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+#menu .onoff {
+  color: #888;
+}
+body.online #menu .onoff {
+  color: #0F0;
+}
+body.menu-left #menu .scrollbar {
+  left: 0;
+}
+body.menu-left #menu.show .scrollbar {
+  left: 8rem;
+}
+body.menu-right #menu .scrollbar {
+  right: 0;
+}
+body.menu-right #menu.show .scrollbar {
+  right: 90px;
+}
+#menu .content {
+  float: right;
+  width: 75px;
+  line-height: 3em;
+}
+body.menu-left #menu .content {
+  margin: 10px 70px 10px 10px;
+}
+body.menu-right #menu .content {
+  margin: 10px 10px 10px 70px;
+}
+body.menu-left #menu.show {
+  margin-left: 0;
+}
+body.menu-right #menu.show {
+  margin-right: 0;
+}
+#menu .content > p {
+  text-align: center;
+}
+#menu a.button {
+  padding: 20px 20px;
+}
+#menu .content .inspect {
+  color: #FFFFFF;
+  text-decoration: none;
+}
+#menu.detail .content .back,
+#menu.detail .content .top
+{
+  display: inline;
+}
+#menu.list .content .back,
+#menu.list .content .top
+{
+  display: none;
+}
+#menu.detail .content .sync,
+#menu.detail .content .settings,
+#menu.detail .content .new
+{
+  display: none;
+}
+#menu.list .content .sync,
+#menu.list .content .settings,
+#menu.list .content .new
+{
+  display: inline;
+}
+#menu .content label.onoff {
+  margin-left: -10px;
+}
+[data-tile]
+{
+  padding-top: 2em;
+  list-style-type: none;
+  max-width: 72em;
+  display: none;
+}
+[data-tile] > header {
+  margin: -2rem 0 1rem -1rem;
+  padding: 0.5rem 1.5rem;
+  background: linear-gradient(to bottom,  #1AFAA5,  #20F47A);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  color: white;
+
+}
+[data-tile] > header h2 {
+  margin: 0.5rem 0;
+}
+body.menu-left [data-tile] {
+  padding-left: 2.5rem;
+  padding-right: 0;
+  width: calc(100% - 3rem);
+}
+body.menu-right [data-tile] {
+  padding-left: 0px;
+  padding-right: 2.5rem;
+  width: calc(100% - 3rem);
+}
+#list {
+  margin: 0;
+  padding: 0;
+}
+#list .content,
+#list .actions {
+  display: none;
+}
+#list .current .content,
+#list .current .actions {
+  display: block;
+}
+#list .current .content .note {
+  padding: 10px;
+  display: block;
+  float: left;
+}
+#list .current .content .tags {
+  display: table-row;
+  vertical-align: middle;
+}
+#list .current .content .tags * {
+  padding: 2px;
+  vertical-align: middle;
+}
+#list .current .content .tags .tag {
+  display: table-cell;
+  background-color: #F84;
+  border: 1px solid #444;
+  border-radius: 0 1.5em 1.5em 0 / 0 50% 50% 0;
+  margin: 0px 5px;
+}
+#list .actions .compose {
+  display: none;
+}
+#list [data-flags*=",editable,"] .compose {
+  display: inline;
+}
+#list .filters {
+  font-size: 1rem;
+}
+#main .filters fieldset {
+  width: calc(100% - 5rem);
+}
+#main .filters a,
+#main .current .actions a {
+  padding: .5em;
+  position: relative;
+  top: -0.5em;
+}
+#main .filters a {
+  font-size: 1rem;
+}
+#list > li {
+  border-color: #888;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+  overflow: hidden;
+  transition: transform 1s ease-in-out;
+}
+#main > .filters {
+  margin-top: -1em;
+}
+#main > .filters fieldset {
+  display: inline;
+}
+#list.detail > .filters {
+  display: none;
+}
+#list > li h2 .hasNotes {
+  display: none;
+}
+#list.list > li.hasNotes h2 .hasNotes {
+  display: inline;
+  font-size: 1rem;
+  padding: 0 0.5rem;
+}
+#list.list > li[data-tags*=",archive,"] {
+  display: none;
+}
+#list.list.archives .filters .archive,
+#list.detail > li[data-tags*=",archive,"] .archive {
+  color: #ff6347;
+}
+#list.list.archives > li[data-tags*=",archive,"] {
+  display: block;
+}
+#list.list > li > h2 {
+  margin: 0.66rem 0;
+  font-size: 1.2rem;
+}
+#list > li > h2 > a {
+  padding: 1rem 0;
+  color: inherit;
+  text-decoration: none;
+}
+#list > li img {
+  max-width: 100%;
+}
+#list > li.hideLeft,
+#list > li.showLeft {
+  transform: translateX(-100%);
+}
+#list > li.hideRight,
+#list > li.showRight {
+  transform: translateX(100%);
+}
+#list a.action-icon:before {
+  background-color: #000000;
+  border-radius: 5px;
+  margin: -7px 0 0 -40px;
+}
+#list a.action-icon {
+  margin: 20px;
+  padding: 0 20px;
+}
+/*
+#list > li.public {
+  border-color: #AFA;
+}
+#list > li.private {
+  border-color: #FAA;
+}
+#list .text {
+  margin: 40px;
+  white-space: pre-wrap;
+}
+*/
+#list .content pre {
+  white-space: pre-wrap;
+}
+.hidden {
+  display: none;
+}
+.shown {
+  display: inherit;
+}
+body.menu-right #input,
+body.menu-right #settings {
+  margin-right: 50px;
+  margin-top: 60px;
+}
+#input > form ,
+#settings > form {
+  max-width: 600px;
+  margin: auto;
+}
+#tagList {
+  list-style-type: none;
+  padding: 0;
+}
+#tagList li {
+  border-color: #888;
+  border-width: 0 0 1px 0;
+  border-style: solid;
+  padding: 1rem .5rem;
+}
+/** Settings {{ **/
+/** Credits {{ **/
+#credits .title {
+  text-align: center;
+}
+#credits .title img {
+  border-radius: 50%;
+  background-color: #0F0;
+}
+/** Credits }} **/
+/** Console {{ **/
+#debugLog {
+  border: 1px solid #888;
+  border-radius: 2px;
+}
+#debugLog .debug   { background-color: transparent; color: black; font-weight: bold;}
+#debugLog .info    { background-color: green; color: white; font-weight: bold;}
+#debugLog .warning { background-color: orange; color: white; font-weight: bold;}
+#debugLog .error   { background-color: red; color: white; font-weight: bold;}
+/** Console }} **/
+/** Settings }} **/
+/** Fonts **/
+a[class*="icon-"] {
+  color: inherit;
+  text-decoration: none;
+}
+[class*="icon-"] {
+  font-size: 1.6em;
+}
+fieldset.compact [class*="icon-"] {
+  font-size: 1em;
+}
+/** Buttons **/
+/* @media (max-width: 481px) { */
+  button {
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+    padding: 7px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #444;
+    border: 1px solid #888;
+    border-radius: 2px;
+  }
+  fieldset {
+    border: 1px solid #888;
+    border-radius: 3px;
+  }
+  fieldset.inline {
+    border-width: 0;
+    padding: 0px;
+  }
+  fieldset.inline > p {
+    margin: 5px 0;
+    border: 1px solid #888;
+    border-radius: 2px;
+    display: table;
+    width: 100%;
+  }
+  fieldset.inline > p:hover {
+    border-color: #0F0;
+    box-shadow: 0 0 5px #0F0;
+  }
+  fieldset.inline > p > * {
+    display: inline;
+    margin: 0;
+    padding: 5px;
+    width: auto;
+    height: 2rem;
+    background: #FFF;
+    color: #333;
+    display: table-cell;
+    vertical-align: middle;
+  }
+  fieldset.inline.compact > p > * {
+    padding: 2px;
+    height: 1.2rem;
+    background: #FFF;
+  }
+  fieldset.inline > select {
+    width: 100%;
+    border: 1px solid #AAA;
+    border-radius: 5px;
+    padding: 0.33rem;
+  }
+  fieldset.inline.text label {
+    border-width: 0px;
+    background-color: #EEE;
+    width: 3rem;
+    max-width: 3rem;
+    overflow: auto;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  fieldset.inline.check label,
+  fieldset.inline.text input {
+    border-width: 0px;
+    width: calc(100% - 3.5em);
+  }
+  fieldset.inline input:focus + button {
+    color: #888;
+  }
+  fieldset.inline input[type="checkbox"],
+  fieldset.inline input[type="radio"] {
+    margin: 15px
+  }
+  fieldset.inline button {
+    padding: 5px 0;
+    border-width: 0px;
+    color: transparent;
+  }
+  fieldset.inline > textarea {
+    border: 1px solid #888;
+    border-radius: 2px;
+    width: 100%;
+  }
+/* } */
+@font-face {
+	font-family: 'icomoon';
+	src:url('fonts/icomoon.eot');
+	src:url('fonts/icomoon.eot?#iefix') format('embedded-opentype'),
+		url('fonts/icomoon.ttf') format('truetype'),
+		url('fonts/icomoon.woff') format('woff'),
+		url('fonts/icomoon.svg#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+[class*="icon-"] {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-search:before {
+	content: "\e600";
+}
+.icon-star:before {
+	content: "\e601";
+}
+.icon-star-empty:before {
+	content: "\e602";
+}
+.icon-ok:before {
+	content: "\e603";
+}
+.icon-remove:before {
+	content: "\e604";
+}
+.icon-zoom-in:before {
+	content: "\e605";
+}
+.icon-zoom-out:before {
+	content: "\e606";
+}
+.icon-cog:before {
+	content: "\e607";
+}
+.icon-home:before {
+	content: "\e608";
+}
+.icon-tag:before {
+	content: "\e609";
+}
+.icon-tags:before {
+	content: "\e60a";
+}
+.icon-pencil:before {
+	content: "\e60b";
+}
+.icon-chevron-left:before {
+	content: "\e60c";
+}
+.icon-chevron-right:before {
+	content: "\e60d";
+}
+.icon-chevron-up:before {
+	content: "\e60e";
+}
+.icon-chevron-down:before {
+	content: "\e60f";
+}
+.icon-info-sign:before {
+	content: "\e610";
+}
+.icon-question-sign:before {
+	content: "\e611";
+}
+.icon-plus:before {
+	content: "\e612";
+}
+.icon-minus:before {
+	content: "\e613";
+}
+.icon-exclamation-sign:before {
+	content: "\e614";
+}
+.icon-reorder:before {
+	content: "\e615";
+}
+.icon-trash:before {
+	content: "\e616";
+}
+.icon-off:before {
+	content: "\e617";
+}
+.icon-repeat:before {
+	content: "\e618";
+}
+.icon-refresh:before {
+	content: "\e619";
+}
+.icon-magic:before {
+	content: "\e61a";
+}
+.icon-fullscreen:before {
+	content: "\e61b";
+}
+.icon-cut:before {
+	content: "\e61c";
+}
+.icon-eraser:before {
+	content: "\e61d";
+}
+.icon-inbox:before {
+	content: "\e61e";
+}
+/** encoding:utf-8 **/
+
+/* RESET */
+#remotestorage-widget {
+    text-align: left;
+}
+#remotestorage-widget input,
+#remotestorage-widget button {
+    font-size: 11px;
+}
+#remotestorage-widget form input[type=email] {
+    margin-bottom: 0;  /* HTML5 Boilerplate */
+}
+#remotestorage-widget form input[type=submit] {
+    margin-top: 0;  /* HTML5 Boilerplate */
+}
+/* /RESET */
+
+#remotestorage-widget, #remotestorage-widget * {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#remotestorage-widget {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font: normal 16px/100% sans-serif !important;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: -moz-none;
+    cursor: default;
+    z-index: 10000;
+}
+
+#remotestorage-widget .rs-bubble {
+    background: rgba(80, 80, 80, .7);
+    border-radius: 5px 15px 5px 5px;
+    color: white;
+    font-size: 0.8em;
+    padding: 5px;
+    position: absolute;
+    right: 3px;
+    top: 9px;
+    min-height: 24px;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+#remotestorage-widget .rs-bubble-text {
+    padding-right: 105px;
+    /* make sure the bubble doesn't "jump" when initially opening. */
+    min-width: 182px;
+}
+
+#remotestorage-widget .rs-action {
+    cursor: pointer;
+}
+
+/* less obtrusive cube when connected */
+#remotestorage-widget.remotestorage-state-connected .rs-cube,
+#remotestorage-widget.remotestorage-state-busy .rs-cube {
+	opacity:.3;
+	-webkit-transition: opacity .3s ease;
+	-moz-transition: opacity .3s ease;
+	-ms-transition: opacity .3s ease;
+	-o-transition: opacity .3s ease;
+	transition: opacity .3s ease;
+}
+#remotestorage-widget.remotestorage-state-connected:hover .rs-cube,
+#remotestorage-widget.remotestorage-state-busy:hover .rs-cube,
+#remotestorage-widget.remotestorage-state-connected .rs-bubble:not(.rs-hidden) + .rs-cube {
+	opacity:1 !important;
+}
+
+#remotestorage-widget .rs-backends {
+    position: relative;
+    top: 5px;
+    right: 0;
+}
+
+#remotestorage-widget .rs-cube {
+    position: relative;
+    top: 5px;
+    right: 0;
+}
+
+/* pulsing animation for cube when loading */
+#remotestorage-widget .rs-cube.remotestorage-loading {
+    -webkit-animation:remotestorage-loading .5s ease-in-out infinite alternate;
+    -moz-animation:remotestorage-loading .5s ease-in-out infinite alternate;
+    -o-animation:remotestorage-loading .5s ease-in-out infinite alternate;
+    -ms-animation:remotestorage-loading .5s ease-in-out infinite alternate;
+    animation:remotestorage-loading .5s ease-in-out infinite alternate;
+}
+@-webkit-keyframes remotestorage-loading { to{opacity:.7} }
+@-moz-keyframes remotestorage-loading { to{opacity:.7} }
+@-o-keyframes remotestorage-loading { to{opacity:.7} }
+@-ms-keyframes remotestorage-loading { to{opacity:.7} }
+@keyframes remotestorage-loading { to{opacity:.7} }
+
+
+#remotestorage-widget a {
+    text-decoration: underline;
+    color: inherit;
+}
+
+#remotestorage-widget form {
+    margin-top: .7em;
+    position: relative;
+}
+
+#remotestorage-widget form input {
+    display: table-cell;
+    vertical-align: top;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    color: white;
+    outline: none;
+    line-height: 1.5em;
+    height: 2em;
+}
+#remotestorage-widget form input:disabled {
+    color: #999;
+    background: #444 !important;
+    cursor: default !important;
+}
+
+#remotestorage-widget form input[type=email]:focus {
+    background: #223;
+}
+#remotestorage-widget form input[type=email] {
+    background: #000;
+    width: 100%;
+    height: 26px;
+    padding: 0 30px 0 5px;
+    border-top: 1px solid #111;
+    border-bottom: 1px solid #999;
+}
+#remotestorage-widget button:focus,
+#remotestorage-widget input:focus {
+    box-shadow: 0 0 4px #ccc;
+}
+
+#remotestorage-widget form input[type=email]::-webkit-input-placeholder {
+    color: #999;
+}
+#remotestorage-widget form input[type=email]:-moz-placeholder {
+    color: #999;
+}
+#remotestorage-widget form input[type=email]::-moz-placeholder {
+    color: #999;
+}
+#remotestorage-widget form input[type=email]:-ms-input-placeholder {
+    color: #999;
+}
+
+#remotestorage-widget form input[type=submit] {
+    background: #000;
+    cursor: pointer;
+    padding: 0 5px;
+}
+#remotestorage-widget form input[type=submit]:hover {
+    background: #333;
+}
+
+#remotestorage-widget .rs-info-msg {
+    font-size: 10px;
+    color: #eee;
+    margin-top: 0.7em;
+    white-space: normal;
+}
+
+#remotestorage-widget .rs-info-msg.last-synced-message {
+    display: inline;
+    white-space: nowrap;
+    margin-bottom: .7em
+}
+
+#remotestorage-widget .rs-info-msg a:hover,
+#remotestorage-widget .rs-info-msg a:active {
+    color: #fff;
+}
+
+#remotestorage-widget button img {
+    vertical-align: baseline;
+}
+#remotestorage-widget button {
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    color: white;
+    outline: none;
+    line-height: 1.5em;
+    height: 26px;
+    width: 26px;
+    background: #000;
+    cursor: pointer;
+    margin: 0;
+    padding: 5px;
+}
+#remotestorage-widget button:hover {
+    background: #333;
+}
+
+#remotestorage-widget .rs-bubble button.connect {
+    display: block;
+    background: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    opacity: 1;
+    /* increase clickable area of connect button */
+    margin: -5px;
+    padding: 10px;
+    width: 36px;
+    height: 36px;
+}
+#remotestorage-widget .rs-bubble button.connect:not([disabled]):hover {
+    background: rgba(150,150,150,.5);
+}
+#remotestorage-widget .rs-bubble button.connect[disabled] {
+    opacity: .5;
+    cursor: default !important;
+}
+#remotestorage-widget .rs-bubble button.rs-sync {
+    position: relative;
+    left: -5px;
+    bottom: -5px;
+    padding: 4px 4px 0 4px;
+    background: #555;
+}
+#remotestorage-widget .rs-bubble button.rs-sync:hover {
+    background: #444;
+}
+#remotestorage-widget .rs-bubble button.rs-disconnect {
+    background: #721;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 4px 4px 0 4px;
+}
+#remotestorage-widget .rs-bubble button.rs-disconnect:hover {
+    background: #921;
+}
+
+#remotestorage-widget .remotestorage-error-info {
+    color: #f92;
+}
+#remotestorage-widget .remotestorage-reset {
+    width: 100%;
+    background: #721;
+}
+#remotestorage-widget .remotestorage-reset:hover {
+    background: #921;
+}
+
+#remotestorage-widget .rs-bubble .content {
+    margin-top: 7px;
+}
+
+#remotestorage-widget pre {
+    user-select: initial;
+    -webkit-user-select: initial;
+    -moz-user-select: text;
+    max-width: 27em;
+    margin-top: 1em;
+    overflow: auto;
+}
+#remotestorage-widget .rs-centered-text{
+    text-align: center;
+}
+#remotestorage-widget .rs-bubble.rs-hidden {
+    padding-bottom: 2px;
+    border-radius: 5px 15px 15px 5px;
+}
+
+#remotestorage-widget .rs-error-msg{
+    min-height: 5em;
+}
+
+.rs-bubble.rs-hidden .rs-bubble-expandable {
+    display: none;
+}
+.remotestorage-state-connected .rs-bubble.rs-hidden{
+    display: none;
+}
+
+.remotestorage-connected {
+    display: none;
+}
+.remotestorage-state-connected .remotestorage-connected {
+    display: block;
+}
+.remotestorage-initial {
+    display: none;
+}
+.remotestorage-state-initial .remotestorage-initial {
+    display: block;
+}
+.remotestorage-error {
+    display: none;
+}
+.remotestorage-state-error .remotestorage-error {
+    display: block;
+}
+.remotestorage-state-authing .remotestorage-authing {
+    display: block;
+}
+.remotestorage-state-offline .remotestorage-connected,
+.remotestorage-state-offline .remotestorage-offline{
+    display: block;
+}
+.remotestorage-unauthorized {
+    display: none;
+}
+.remotestorage-state-unauthorized .rs-bubble.rs-hidden{
+    display: none;
+}
+.remotestorage-state-unauthorized .remotestorage-connected,
+.remotestorage-state-unauthorized .remotestorage-unauthorized {
+    display: block;
+}
+.remotestorage-state-unauthorized .rs-sync{
+    display: none;
+}
+
+.remotestorage-state-busy .rs-bubble.rs-hidden{
+   display: none;
+}
+.remotestorage-state-busy .rs-bubble{
+    display: block;
+}
+.remotestorage-state-busy .remotestorage-connected{
+  display: block;
+}
+.remotestorage-state-authing .rs-bubble-expandable{
+    display: none;
+}
+
+
+
+
