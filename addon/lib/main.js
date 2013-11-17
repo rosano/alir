@@ -41,7 +41,7 @@ var notify = (function () {
   };
 })();
 
-//require("sdk/preferences/service").set("extensions.sdk.console.logLevel", "all");
+require("sdk/preferences/service").set("extensions.sdk.console.logLevel", "all");
 
 // Listen for HTTP response and analyze headers to extract Location:
 var listener = (function () {
@@ -72,7 +72,7 @@ var listener = (function () {
             tabs.activeTab.close();
             loc = decodeURIComponent(loc);
             if (loc.indexOf('#') !== -1) {
-              params = require('querystring').parse(loc.split('#')[1]);
+              params = require('sdk/querystring').parse(loc.split('#')[1]);
             } else {
               console.error("Enable to extract auth token from " + loc);
               notify.error("Enable to extract auth token from " + loc);
@@ -222,12 +222,18 @@ function putContent(url, token, content) {
 
 // Create panel and widget
 panel = require("sdk/panel").Panel({
+  width: 400,
+  height: 300,
   contentURL: data.url("panel.html"),
   contentScriptFile: data.url("panel.js")
 });
 
-panel.port.on("discover", function (address) {
+panel.port.on("discover", function () {
   "use strict";
+  var address = require('sdk/simple-prefs').prefs.rsAddress;
+  if (typeof address !== "string" || address === "") {
+    notify.error("Set your account address in addon pref");
+  }
   console.debug("discovering " + address);
   ss.storage.params.rs.address = address;
   discover(address, function onDiscover(href, storageApi, authURL) {
@@ -354,12 +360,15 @@ panel.port.on('putToDropbox', function () {
   worker.port.emit('getBody');
 });
 
-if (ss.storage.params.dropbox.token) {
-  panel.port.emit('dropbox.connected');
-}
-if (ss.storage.params.rs.token) {
-  panel.port.emit('rs.connected');
-}
+panel.port.on("show", function () {
+  "use strict";
+  if (ss.storage.params.dropbox.token) {
+    panel.port.emit('dropbox.connected');
+  }
+  if (ss.storage.params.rs.token) {
+    panel.port.emit('rs.connected');
+  }
+});
 
 require("sdk/widget").Widget({
   label: "alir",

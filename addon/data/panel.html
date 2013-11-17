@@ -1,27 +1,64 @@
 <html>
   <head>
+  <meta charset="utf-8" />
   <style>
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: #333;
+  color: #CCC;
+  margin: 0;
+  padding: 0;
+  font-family: Serif;
+  overflow: hidden;
+}
 .hidden {
   display: none;
+}
+h1 {
+  margin: 0.5em;
+  color: #FFF;
+}
+button {
+  display: block;
+  width: 80%;
+  height: 2em;
+  margin: 0.5em auto;
+  line-height: 2em;
+  box-shadow: inset 0px 1px 0px 0px #f5978e;
+  background: linear-gradient( to top, #A00, #C00 );
+  border-radius: 5px;
+  border:1px solid #d02718;
+  color: #ffffff;
+  font-size: 1em;
+  font-weight: bold;
+  font-family: Serif;
+  text-align: center;
+  text-shadow: 1px 1px 0px #888;
+}
+input.text {
+  border: 1px solid #888;
+  display: block;
+  width: 80%;
+  margin: 0.5em;
 }
   </style>
   </head>
   <body>
-    <form>
-      <button id="readaSax">Readability SAX</button>
-      <button id="selectContent">Select Content</button>
-    </form>
+    <h1>Àlir</h1>
+    <p>
+      <button id="selectContent">Tools</button>
+      <button id="readaSax">Cleanup</button>
+    </p>
     <p>
       <button id="putToRemote" class="hidden">Put to RemoteStorage</button>
       <button id="putToDropbox" class="hidden">Put to Dropbox</button>
     </p>
-    <p id="rsLogin"> Connect Remote Storage
-      <input type="texte" id="address"></input>
-      <button id="connectRs">Connect</button>
+    <p id="rsLogin">
+      <button id="connectRs">Connect remoteStorage</button>
     </p>
     <p id="dropboxLogin">
-      Connect Dropbox
-      <button id="connectDropbox">Connect</button>
+      <button id="connectDropbox">Connect Dropbox</button>
     </p>
   </body>
 </html>

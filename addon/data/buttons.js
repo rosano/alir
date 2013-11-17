@@ -13,17 +13,24 @@ self.port.on("getBody", function getBody() {
 
 self.port.on("readaSax", function readaSax() {
   "use strict";
-  var readable = new unsafeWindow.Readability(),
-      article;
-  readable.setSkipLevel(3);
-  unsafeWindow.saxParser(document.childNodes[document.childNodes.length - 1], readable);
-  article = readable.getArticle();
-  document.body.innerHTML = "<h1>" + article.title + "</h1>" + article.html;
-  document.body.style.maxWidth = "600px";
-  document.body.style.margin = "auto";
+  function doReada() {
+    var readable = new unsafeWindow.Readability(),
+        article;
+    readable.setSkipLevel(3);
+    unsafeWindow.saxParser(document.childNodes[document.childNodes.length - 1], readable);
+    article = readable.getArticle();
+    document.body.innerHTML = "<h1>" + article.title + "</h1>" + article.html;
+    document.body.style.maxWidth = "600px";
+    document.body.style.margin = "auto";
+  }
+  if (typeof unsafeWindow.Readability === 'function') {
+    doReada();
+  } else {
+    setTimeout(doReada, 2000);
+  }
 });
 
-self.port.on("selectContent", function readaSax() {
+self.port.on("selectContent", function selectContent() {
   "use strict";
   var hover,
       toolbar,

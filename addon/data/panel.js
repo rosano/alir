@@ -23,7 +23,7 @@ $('#putToDropbox').addEventListener('click', function () {
 });
 $('#connectRs').addEventListener('click', function () {
   "use strict";
-  self.port.emit('discover', $('#address').value);
+  self.port.emit('discover');
 });
 $('#connectDropbox').addEventListener('click', function () {
   "use strict";

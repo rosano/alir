@@ -5,9 +5,16 @@
   "description": "Alir add-on",
   "author": "Clochix (http://clochix.net)",
   "license": "GPLv3",
-  "version": "0.1",
+  "version": "20131117231000",
   "homepage": "https://github.com/clochix/alir/",
+  "icon": "data/alir.png",
   "preferences": [
+    {
+      "name": "rsAddress",
+      "title": "remoteStorage Address",
+      "description": "Address of remoteStorage account",
+      "type": "string"
+    },
     {
       "name": "dropboxApiKey",
       "title": "Dropbox: API key",
