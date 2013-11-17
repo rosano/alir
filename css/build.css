@@ -237,28 +237,28 @@ body.menu-right [data-tile] {
 #main > .filters fieldset {
   display: inline;
 }
-#list.detail > .filters {
+#main.detail > .filters {
   display: none;
 }
 #list > li h2 .hasNotes {
   display: none;
 }
-#list.list > li.hasNotes h2 .hasNotes {
+#main.list #list > li.hasNotes h2 .hasNotes {
   display: inline;
   font-size: 1rem;
   padding: 0 0.5rem;
 }
-#list.list > li[data-tags*=",archive,"] {
+#main.list #list > li[data-tags*=",archive,"] {
   display: none;
 }
-#list.list.archives .filters .archive,
+#main.list #list.archives .filters .archive,
 #list.detail > li[data-tags*=",archive,"] .archive {
   color: #ff6347;
 }
-#list.list.archives > li[data-tags*=",archive,"] {
+#main.list #list.archives > li[data-tags*=",archive,"] {
   display: block;
 }
-#list.list > li > h2 {
+#main.list #list > li > h2 {
   margin: 0.66rem 0;
   font-size: 1.2rem;
 }

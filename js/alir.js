@@ -23,10 +23,10 @@
  * https://developer.mozilla.org/en-US/docs/WebAPI/Using_Web_Notifications
  */
 
-var list = document.getElementById('list'),
-    config,
+var config,
     tiles,
-    tags = [];
+    tags = [],
+    bookmarks = {};
 config = {
   gesture: false,
   dropBox: {
@@ -347,7 +347,13 @@ function displayItem(obj) {
   var title = obj.title || obj.id,
       data  = {},
       item,
-      tagsNode;
+      tagsNode,
+      classes = '';
+  item = document.getElementById(obj.id);
+  if (item) {
+    classes = item.getAttribute('class');
+    item.parentNode.removeChild(item);
+  }
   if (typeof obj.notes !== 'object') {
     obj.notes = {};
   }
@@ -417,9 +423,13 @@ function displayItem(obj) {
   // }}
   // Sort items by date {{
   // @TODO allow multiple sorts
-  insertInList(list, "[data-key]", item, function (e) { return (e.dataset.date > obj.date); });
+  insertInList(document.getElementById('list'), "[data-key]", item, function (e) { return (e.dataset.date > obj.date); });
   // }}
 
+  if (classes !== '') {
+    //@FIXME merge classes
+    item.setAttribute("class", classes);
+  }
   return item;
 }
 function initUI() {
@@ -433,6 +443,7 @@ function initUI() {
   UI = {
     input: $('#input'),
     list: $('#list'),
+    main: $('#main'),
     menu: {}
   };
   // reload configuration
@@ -484,7 +495,11 @@ function initUI() {
       tiles.show('input');
     },
     toggleContent: function doToggle() {
-      var cl = $('#menu').classList;
+      var cl      = $('#menu').classList,
+          current = $('#list > .current');
+      if (current && current.id) {
+        bookmarks[current.id] = window.scrollY / document.body.clientHeight;
+      }
       cl.toggle("detail");
       cl.toggle("list");
       cl = $('#list').classList;
@@ -585,6 +600,11 @@ function initUI() {
     clItem.toggle('hidden');
     clItem.toggle('current');
     $('#menu .content .top').href = '#' + key;
+    if (bookmarks[key] && clItem.contains('current')) {
+      window.setTimeout(function () {
+        window.scrollTo(0, bookmarks[key] * document.body.clientHeight);
+      }, 100);
+    }
   }
   function onContentEvent(event) {
     var target = event.target,
@@ -594,7 +614,7 @@ function initUI() {
       actionTarget: target.dataset.target,
       keyNode: target
     };
-    while (ce.keyNode.id !== 'list' && typeof ce.keyNode.dataset.key === 'undefined' && ce.keyNode.parentNode) {
+    while (ce.keyNode.id !== 'main' && typeof ce.keyNode.dataset.key === 'undefined' && ce.keyNode.parentNode) {
       if (typeof ce.action === 'undefined' && typeof ce.keyNode.action !== 'undefined' && typeof ce.dataset !== 'undefined') {
         ce.action       = ce.dataset.action;
         ce.actionTarget = ce.dataset.target;
@@ -605,7 +625,7 @@ function initUI() {
       ce.key = ce.keyNode.dataset.key;
     }
     parent = target;
-    while (parent.id !== 'list' && typeof parent.dataset.context === 'undefined' && parent.parentNode) {
+    while (parent.id !== 'main' && (typeof parent.dataset === 'undefined' || typeof parent.dataset.context === 'undefined') && parent.parentNode) {
       parent = parent.parentNode;
     }
     ce.context = parent.dataset.context;
@@ -615,7 +635,7 @@ function initUI() {
     }
     return ce;
   }
-  UI.list.addEventListener('click', function onClick(event) {
+  UI.main.addEventListener('click', function onClick(event) {
     //jshint maxcomplexity: 12
     var ce = onContentEvent(event);
     function switchTag(tag) {
@@ -1039,7 +1059,6 @@ function initUI() {
   (function () {
     var gesture = document.getElementById('prefGesture');
     gesture.checked = config.gesture;
-    console.log(config);
     gesture.addEventListener('change', function () {
       config.gesture = gesture.checked;
     });
@@ -1062,8 +1081,7 @@ window.addEventListener('load', function () {
   //remoteStorage.caching.enable('/public/alir/');
   remoteStorage.displayWidget();
   remoteStorage.alir.private.on('change', function onChange(ev) {
-    var elmt, classes, item;
-    console.log(ev);
+    var elmt, item;
     if (typeof ev.oldValue === 'undefined' && typeof ev.newValue !== 'undefined') {
       console.log("Create " + ev.relativePath);
       if (typeof ev.newValue.id === 'undefined') {
@@ -1078,25 +1096,19 @@ window.addEventListener('load', function () {
       }
     } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue !== 'undefined') {
       console.log("Update " + ev.relativePath);
-      elmt = document.getElementById(ev.relativePath);
-      if (elmt) {
-        classes = elmt.getAttribute('class');
-        elmt.parentNode.removeChild(elmt);
-      }
       if (typeof ev.newValue.id === 'undefined') {
         ev.newValue.id = ev.relativePath;
       }
       item = displayItem(ev.newValue);
-      item.setAttribute("class", classes);
     }
   });
   remoteStorage.alir.private.getAll('').then(function (objects) {
-  //  if (objects) {
-  //    Object.keys(objects).forEach(function (key) {
-  //      objects[key].id = key;
-  //      displayItem(objects[key]);
-  //    });
-  //  }
+    if (objects) {
+      Object.keys(objects).forEach(function (key) {
+        objects[key].id = key;
+        displayItem(objects[key]);
+      });
+    }
   });
 
 /*
