@@ -83,7 +83,7 @@ var utils = {
     } else {
       level = "info";
     }
-        levelNum = utils.logLevels.indexOf(level);
+    levelNum = utils.logLevels.indexOf(level);
     if (levelNum === -1) {
       console.log("Unknown log level " + level);
     }
@@ -502,7 +502,7 @@ function initUI() {
       }
       cl.toggle("detail");
       cl.toggle("list");
-      cl = $('#list').classList;
+      cl = $('#main').classList;
       cl.toggle("detail");
       cl.toggle("list");
       forElement('#list li[data-key]', function (e) {
@@ -589,7 +589,7 @@ function initUI() {
   function toggleItem(key) {
     var clItem = $('[data-key="' + key + '"]').classList,
         clMenu = $('#menu').classList,
-        clList = $('#list').classList;
+        clList = $('#main').classList;
     clMenu.toggle("detail");
     clMenu.toggle("list");
     clList.toggle("detail");
@@ -664,7 +664,7 @@ function initUI() {
         switchTag('archive');
         break;
       case 'filterArchive':
-        $('#list').classList.toggle('archives');
+        $('#main').classList.toggle('archives');
         break;
       case 'toggle':
         toggleItem(ce.key);
@@ -908,7 +908,7 @@ function initUI() {
       tiles.back(input.value);
     });
     $('#tagTile [name="cancel"]').addEventListener('click', function () {
-      tiles.back();
+      tiles.back('');
     });
   }());
   // }}
@@ -922,8 +922,8 @@ function initUI() {
         dynamicSheet.deleteRule(0);
       }
       if (utils.trim(filter.value) !== '') {
-        dynamicSheet.insertRule("#list.list > li[data-tags] { display: none; }", 0);
-        dynamicSheet.insertRule('#list.list > li[data-tags*="' + filter.value + '"], #list.list > li[data-title*="' + filter.value + '"] { display: block; }', 1);
+        dynamicSheet.insertRule("#main.list li[data-tags] { display: none; }", 0);
+        dynamicSheet.insertRule('#main.list li[data-tags*="' + filter.value + '"], #main.list li[data-title*="' + filter.value + '"] { display: block; }', 1);
       }
     }
     filter.addEventListener("change", onFilterChange);

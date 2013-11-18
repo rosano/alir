@@ -251,11 +251,11 @@ body.menu-right [data-tile] {
 #main.list #list > li[data-tags*=",archive,"] {
   display: none;
 }
-#main.list #list.archives .filters .archive,
-#list.detail > li[data-tags*=",archive,"] .archive {
+#main.list.archives .filters .archive,
+#main.detail #list > li[data-tags*=",archive,"] .archive {
   color: #ff6347;
 }
-#main.list #list.archives > li[data-tags*=",archive,"] {
+#main.list.archives #list > li[data-tags*=",archive,"] {
   display: block;
 }
 #main.list #list > li > h2 {
