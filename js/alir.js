@@ -43,42 +43,42 @@ var _ = document.webL10n.get;
 tiles = new Tiles();
 
 function createXPathFromElement(elm) {
-    // source: http://stackoverflow.com/a/5178132
-    //jshint maxcomplexity: 10
-    "use strict";
-    var allNodes = document.getElementsByTagName('*'),
-        uniqueIdCount,
-        i, n,
-        sib, segs;
-    for (segs = []; elm && elm.nodeType === 1; elm = elm.parentNode) {
-      if (elm.hasAttribute('id')) {
-        uniqueIdCount = 0;
-        for (n = 0;n < allNodes.length;n++) {
-          if (allNodes[n].hasAttribute('id') && allNodes[n].id === elm.id) {
-            uniqueIdCount++;
-          }
-          if (uniqueIdCount > 1) {
-            break;
-          }
+  // source: http://stackoverflow.com/a/5178132
+  //jshint maxcomplexity: 10
+  "use strict";
+  var allNodes = document.getElementsByTagName('*'),
+  uniqueIdCount,
+  i, n,
+  sib, segs;
+  for (segs = []; elm && elm.nodeType === 1; elm = elm.parentNode) {
+    if (elm.hasAttribute('id')) {
+      uniqueIdCount = 0;
+      for (n = 0; n < allNodes.length; n++) {
+        if (allNodes[n].hasAttribute('id') && allNodes[n].id === elm.id) {
+          uniqueIdCount++;
         }
-        if (uniqueIdCount === 1) {
-          segs.unshift('id("' + elm.getAttribute('id') + '")');
-          return segs.join('/');
-        } else {
-          segs.unshift(elm.localName.toLowerCase() + '[@id="' + elm.getAttribute('id') + '"]');
+        if (uniqueIdCount > 1) {
+          break;
         }
-      } else if (elm.hasAttribute('class')) {
-        segs.unshift(elm.localName.toLowerCase() + '[@class="' + elm.getAttribute('class') + '"]');
-      } else {
-        for (i = 1, sib = elm.previousSibling; sib; sib = sib.previousSibling) {
-          if (sib.localName === elm.localName) {
-            i++;
-          }
-        }
-        segs.unshift(elm.localName.toLowerCase() + '[' + i + ']');
       }
+      if (uniqueIdCount === 1) {
+        segs.unshift('//*[@id="' + elm.getAttribute('id') + '"]');
+        return segs.join('/');
+      } else {
+        segs.unshift(elm.localName.toLowerCase() + '[@id="' + elm.getAttribute('id') + '"]');
+      }
+    } else if (elm.hasAttribute('class')) {
+      segs.unshift(elm.localName.toLowerCase() + '[@class="' + elm.getAttribute('class') + '"]');
+    } else {
+      for (i = 1, sib = elm.previousSibling; sib; sib = sib.previousSibling) {
+        if (sib.localName === elm.localName) {
+          i++;
+        }
+      }
+      segs.unshift(elm.localName.toLowerCase() + '[' + i + ']');
     }
-    return segs.length ? '/' + segs.join('/') : null;
+  }
+  return segs.length ? '/' + segs.join('/') : null;
 }
 /*
 (function () {
@@ -200,7 +200,7 @@ function insertInList(list, selector, item, comp) {
  *
  */
 function displayItem(obj) {
-  //jshint maxstatements: 30, debug: true
+  //jshint maxstatements: 30, debug: true, maxcomplexity: 12
   "use strict";
   var title = obj.title || obj.id,
       data  = {},
@@ -235,6 +235,9 @@ function displayItem(obj) {
     notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
     flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
   };
+  if (utils.trim(data.title) === '') {
+    data.title = _("noTitle");
+  }
   if (obj.html) {
     data.type = 'html';
     data.content = toDom(obj.html);
@@ -246,9 +249,17 @@ function displayItem(obj) {
   // Notes {{
   if (typeof obj.notes === 'object') {
     Object.keys(obj.notes).forEach(function (noteId, i) {
-      var note   = obj.notes[noteId],
-          target = document.evaluate(note.xpath, item, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
+      var note = obj.notes[noteId],
+          target,
+          container,
           a;
+      container = document.createElement('div');
+      container.appendChild(item);
+      try {
+        target = document.evaluate(note.xpath, container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      } catch (e) {
+        console.log("Unable to evaluate XPath " + note.xpath + ' : ' + e);
+      }
       if (target) {
         a = document.createElement('a');
         a.setAttribute('class', 'note icon-tag');
@@ -256,7 +267,7 @@ function displayItem(obj) {
         a.setAttribute('href', '#' + obj.id + '/' + noteId);
         target.insertBefore(a, target.firstChild);
       } else {
-        console.log("Unable to evaluate xpath " + note.xpath);
+        console.log("Unable to evaluate XPath " + note.xpath);
       }
     });
   }
@@ -579,7 +590,7 @@ function initUI() {
     var ce = onContentEvent(event);
     if (ce.key) {
       $('#noteEdit [name="articleId"]').value = ce.key;
-      $('#noteEdit [name="xpath"]').value = utils.createXPathFromElement(event.originalTarget);
+      $('#noteEdit [name="xpath"]').value = createXPathFromElement(event.target);
       $('#noteEdit [name="text"]').value = '';
       tiles.go('noteEdit');
     }
