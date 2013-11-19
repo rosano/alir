@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true */
+/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -40,135 +40,46 @@ config = {
 };
 var _ = document.webL10n.get;
 
-
-var utils = {
-  device: {
-    type: '',
-    orientation: ''
-  },
-  logLevel: 'debug',
-  logLevels: ['debug', 'info', 'warning', 'error'],
-  // @src http://blog.snowfinch.net/post/3254029029/uuid-v4-js
-  // @licence Public domain
-  uuid : function uuid() {
-    /*jshint bitwise: false */
-    "use strict";
-    var id = "", i, random;
-    for (i = 0; i < 32; i++) {
-      random = Math.random() * 16 | 0;
-      if (i === 8 || i === 12 || i === 16 || i === 20) {
-        id += "-";
-      }
-      id += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random)).toString(16);
-    }
-    return id;
-  },
-  format:  function format(str) {
-    "use strict";
-    var params = Array.prototype.splice.call(arguments, 1);
-    return (str.replace(/%s/g, function () {return params.shift(); }));
-  },
-  trim: function trim(str) {
-    "use strict";
-    return str.replace(/^\s+/, '').replace(/\s+$/, '');
-  },
-  log: function log() {
-    "use strict";
-    var args = Array.prototype.slice.call(arguments),
-        level,
-        levelNum,
-        message;
-    if (args.length > 1) {
-      level = args.pop();
-    } else {
-      level = "info";
-    }
-    levelNum = utils.logLevels.indexOf(level);
-    if (levelNum === -1) {
-      console.log("Unknown log level " + level);
-    }
-    if (levelNum >= utils.logLevels.indexOf(utils.logLevel)) {
-      if (args.length === 1) {
-        message = args[0];
-        if (typeof message === 'object') {
-          message = JSON.stringify(message, null, '  ');
-        }
-      } else {
-        message = utils.format.apply(null, args);
-      }
-      document.getElementById('debugLog').innerHTML += utils.format('<span class="%s">[%s][%s]</span> %s\n', level, new Date().toISOString().substr(11, 8), level + new Array(10 - level.length).join(' '), message);
-    }
-  },
-  createXPathFromElement: function createXPathFromElement(elm) {
-    // source: http://stackoverflow.com/a/5178132
-    //jshint maxcomplexity: 10
-    "use strict";
-    var allNodes = document.getElementsByTagName('*'),
-        uniqueIdCount,
-        i, n,
-        sib, segs;
-    for (segs = []; elm && elm.nodeType === 1; elm = elm.parentNode) {
-      if (elm.hasAttribute('id')) {
-        uniqueIdCount = 0;
-        for (n = 0;n < allNodes.length;n++) {
-          if (allNodes[n].hasAttribute('id') && allNodes[n].id === elm.id) {
-            uniqueIdCount++;
-          }
-          if (uniqueIdCount > 1) {
-            break;
-          }
-        }
-        if (uniqueIdCount === 1) {
-          segs.unshift('id("' + elm.getAttribute('id') + '")');
-          return segs.join('/');
-        } else {
-          segs.unshift(elm.localName.toLowerCase() + '[@id="' + elm.getAttribute('id') + '"]');
-        }
-      } else if (elm.hasAttribute('class')) {
-        segs.unshift(elm.localName.toLowerCase() + '[@class="' + elm.getAttribute('class') + '"]');
-      } else {
-        for (i = 1, sib = elm.previousSibling; sib; sib = sib.previousSibling) {
-          if (sib.localName === elm.localName) {
-            i++;
-          }
-        }
-        segs.unshift(elm.localName.toLowerCase() + '[' + i + ']');
-      }
-    }
-    return segs.length ? '/' + segs.join('/') : null;
-  }
-};
-function Tiles(global) {
-  "use strict";
-  var current,
-      tiles = [];
-  return {
-    show: function (name) {
-      Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
-        if (e.dataset.tile === name) {
-          e.classList.add('shown');
-          window.scrollTo(0, 0);
-          current = name;
-        } else {
-          e.classList.remove('shown');
-        }
-      });
-    },
-    go: function (name, cb) {
-      tiles.push({name: current, y: window.scrollY, cb: cb});
-      this.show(name);
-    },
-    back: function (res) {
-      var next = tiles.pop();
-      this.show(next.name);
-      if (typeof next.cb === 'function') {
-        next.cb(res);
-      }
-      window.scrollTo(0, next.y);
-    }
-  };
-}
 tiles = new Tiles();
+
+function createXPathFromElement(elm) {
+  // source: http://stackoverflow.com/a/5178132
+  //jshint maxcomplexity: 10
+  "use strict";
+  var allNodes = document.getElementsByTagName('*'),
+  uniqueIdCount,
+  i, n,
+  sib, segs;
+  for (segs = []; elm && elm.nodeType === 1; elm = elm.parentNode) {
+    if (elm.hasAttribute('id')) {
+      uniqueIdCount = 0;
+      for (n = 0; n < allNodes.length; n++) {
+        if (allNodes[n].hasAttribute('id') && allNodes[n].id === elm.id) {
+          uniqueIdCount++;
+        }
+        if (uniqueIdCount > 1) {
+          break;
+        }
+      }
+      if (uniqueIdCount === 1) {
+        segs.unshift('//*[@id="' + elm.getAttribute('id') + '"]');
+        return segs.join('/');
+      } else {
+        segs.unshift(elm.localName.toLowerCase() + '[@id="' + elm.getAttribute('id') + '"]');
+      }
+    } else if (elm.hasAttribute('class')) {
+      segs.unshift(elm.localName.toLowerCase() + '[@class="' + elm.getAttribute('class') + '"]');
+    } else {
+      for (i = 1, sib = elm.previousSibling; sib; sib = sib.previousSibling) {
+        if (sib.localName === elm.localName) {
+          i++;
+        }
+      }
+      segs.unshift(elm.localName.toLowerCase() + '[' + i + ']');
+    }
+  }
+  return segs.length ? '/' + segs.join('/') : null;
+}
 /*
 (function () {
   "use strict";
@@ -181,59 +92,6 @@ tiles = new Tiles();
   };
 })();
 */
-/**
- * My own mini-templating system
- *
- * @param {String} sel  selector of the template
- * @param {Object} data data to populate the template
- *
- * @return {DOMDocumentFragment}
- */
-function template(sel, data) {
-  "use strict";
-  var re  = new RegExp("{{(=.*?)}}", 'g'),
-      frag,
-      xpathResult,
-      i, j, elmt, name, value;
-  function repl(match) {
-    var res = data, tmp, expr, fct;
-    match = match.substr(3, match.length - 5);
-    tmp = match.split('|');
-    expr = utils.trim(tmp.shift()).split('.');
-    while (res && expr.length > 0) {
-      res = res[expr.shift()];
-    }
-    if (tmp.length > 0) {
-      while ((fct = tmp.shift()) !== undefined) {
-        switch (utils.trim(fct).toLowerCase()) {
-        case "tolowercase":
-          res = res.toLowerCase();
-          break;
-        default:
-          console.log("Unknown template function " + fct);
-        }
-      }
-    }
-    return res;
-  }
-  frag = document.querySelector(sel).cloneNode(true);
-  xpathResult = document.evaluate('//*[contains(@*, "{{=")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-  for (i = 0; i < xpathResult.snapshotLength; i++) {
-    elmt = xpathResult.snapshotItem(i);
-    for (j = 0; j < elmt.attributes.length; j++) {
-      name  = elmt.attributes[j].name;
-      value = elmt.attributes[j].value;
-      elmt.attributes[name].value = value.replace(re, repl);
-    }
-  }
-  xpathResult = document.evaluate('//*[contains(., "{{=")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-  for (i = 0; i < xpathResult.snapshotLength; i++) {
-    elmt = xpathResult.snapshotItem(i);
-    elmt.innerHTML = elmt.innerHTML.replace(re, repl);
-  }
-  return frag.children[0];
-}
-
 
 RemoteStorage.defineModule('alir', function module(privateClient, publicClient) {
   "use strict";
@@ -342,7 +200,7 @@ function insertInList(list, selector, item, comp) {
  *
  */
 function displayItem(obj) {
-  //jshint maxstatements: 30, debug: true
+  //jshint maxstatements: 30, debug: true, maxcomplexity: 12
   "use strict";
   var title = obj.title || obj.id,
       data  = {},
@@ -377,6 +235,9 @@ function displayItem(obj) {
     notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
     flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
   };
+  if (utils.trim(data.title) === '') {
+    data.title = _("noTitle");
+  }
   if (obj.html) {
     data.type = 'html';
     data.content = toDom(obj.html);
@@ -388,9 +249,17 @@ function displayItem(obj) {
   // Notes {{
   if (typeof obj.notes === 'object') {
     Object.keys(obj.notes).forEach(function (noteId, i) {
-      var note   = obj.notes[noteId],
-          target = document.evaluate(note.xpath, item, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue,
+      var note = obj.notes[noteId],
+          target,
+          container,
           a;
+      container = document.createElement('div');
+      container.appendChild(item);
+      try {
+        target = document.evaluate(note.xpath, container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+      } catch (e) {
+        console.log("Unable to evaluate XPath " + note.xpath + ' : ' + e);
+      }
       if (target) {
         a = document.createElement('a');
         a.setAttribute('class', 'note icon-tag');
@@ -398,7 +267,7 @@ function displayItem(obj) {
         a.setAttribute('href', '#' + obj.id + '/' + noteId);
         target.insertBefore(a, target.firstChild);
       } else {
-        console.log("Unable to evaluate xpath " + note.xpath);
+        console.log("Unable to evaluate XPath " + note.xpath);
       }
     });
   }
@@ -502,7 +371,7 @@ function initUI() {
       }
       cl.toggle("detail");
       cl.toggle("list");
-      cl = $('#list').classList;
+      cl = $('#main').classList;
       cl.toggle("detail");
       cl.toggle("list");
       forElement('#list li[data-key]', function (e) {
@@ -589,7 +458,7 @@ function initUI() {
   function toggleItem(key) {
     var clItem = $('[data-key="' + key + '"]').classList,
         clMenu = $('#menu').classList,
-        clList = $('#list').classList;
+        clList = $('#main').classList;
     clMenu.toggle("detail");
     clMenu.toggle("list");
     clList.toggle("detail");
@@ -664,7 +533,7 @@ function initUI() {
         switchTag('archive');
         break;
       case 'filterArchive':
-        $('#list').classList.toggle('archives');
+        $('#main').classList.toggle('archives');
         break;
       case 'toggle':
         toggleItem(ce.key);
@@ -721,7 +590,7 @@ function initUI() {
     var ce = onContentEvent(event);
     if (ce.key) {
       $('#noteEdit [name="articleId"]').value = ce.key;
-      $('#noteEdit [name="xpath"]').value = utils.createXPathFromElement(event.originalTarget);
+      $('#noteEdit [name="xpath"]').value = createXPathFromElement(event.target);
       $('#noteEdit [name="text"]').value = '';
       tiles.go('noteEdit');
     }
@@ -908,7 +777,7 @@ function initUI() {
       tiles.back(input.value);
     });
     $('#tagTile [name="cancel"]').addEventListener('click', function () {
-      tiles.back();
+      tiles.back('');
     });
   }());
   // }}
@@ -922,8 +791,8 @@ function initUI() {
         dynamicSheet.deleteRule(0);
       }
       if (utils.trim(filter.value) !== '') {
-        dynamicSheet.insertRule("#list.list > li[data-tags] { display: none; }", 0);
-        dynamicSheet.insertRule('#list.list > li[data-tags*="' + filter.value + '"], #list.list > li[data-title*="' + filter.value + '"] { display: block; }', 1);
+        dynamicSheet.insertRule("#main.list li[data-tags] { display: none; }", 0);
+        dynamicSheet.insertRule('#main.list li[data-tags*="' + filter.value + '"], #main.list li[data-title*="' + filter.value + '"] { display: block; }', 1);
       }
     }
     filter.addEventListener("change", onFilterChange);
