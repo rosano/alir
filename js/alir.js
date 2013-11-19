@@ -83,7 +83,7 @@ var utils = {
     } else {
       level = "info";
     }
-        levelNum = utils.logLevels.indexOf(level);
+    levelNum = utils.logLevels.indexOf(level);
     if (levelNum === -1) {
       console.log("Unknown log level " + level);
     }
@@ -978,9 +978,8 @@ function initUI() {
   $('#settingsLang select').addEventListener('change', function () {
     document.webL10n.setLanguage(this.value);
   });
-  /*
   $('#settings [name="install"]').addEventListener('click', function () {
-    var request = window.navigator.mozApps.install("http://alir.clochix.net/manifest.webapp");
+    var request = window.navigator.mozApps.install("https://alir.clochix.net/manifest.webapp");
     request.onerror = function () {
       window.alert("Error");
       console.log(this.error, 'error');
@@ -990,7 +989,6 @@ function initUI() {
       tiles.show('list');
     };
   });
-  */
   // }}
   // Actions {{
   (function () {

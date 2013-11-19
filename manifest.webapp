@@ -2,7 +2,6 @@
   "name": "Alir",
   "description": "Store articles to read offline",
   "launch_path": "/",
-  "appcache_path": "/cache.manifest",
   "icons": {
     "128": "/img/icon-128.png",
     "120": "/img/icon-120.png",
