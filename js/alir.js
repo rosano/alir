@@ -369,16 +369,17 @@ function initUI() {
       if (current && current.id) {
         bookmarks[current.id] = window.scrollY / document.body.clientHeight;
       }
-      cl.toggle("detail");
-      cl.toggle("list");
+      cl.remove("detail");
+      cl.add("list");
+      cl.remove('show');
       cl = $('#main').classList;
-      cl.toggle("detail");
-      cl.toggle("list");
+      cl.remove("detail");
+      cl.add("list");
       forElement('#list li[data-key]', function (e) {
         e.classList.remove('hidden');
         e.classList.remove('current');
       });
-      menuActions.toggleMenu();
+      document.body.classList.remove("menu");
     },
     toggleMenu: function doToggleMenu() {
       $('#menu').classList.toggle("show");
@@ -454,7 +455,6 @@ function initUI() {
     }
 
   });
-  //remoteStorage.on("ready", function (e) { });
   function toggleItem(key) {
     var clItem = $('[data-key="' + key + '"]').classList,
         clMenu = $('#menu').classList,
@@ -934,6 +934,14 @@ function initUI() {
     });
   }());
 
+  window.addEventListener("hashchange", function () {
+    if (window.location.hash === '' && document.getElementById('menu').classList.contains('detail')) {
+      menuActions.toggleContent();
+    }
+    if (window.location.hash !== '' && document.getElementById('menu').classList.contains('list')) {
+      toggleItem(window.location.hash.substr(1));
+    }
+  }, false);
 
   tiles.show('list');
 }
