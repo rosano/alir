@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Alir by clochix</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Alir</h1>
+          <h2>A wastebasket where stacking stuff to read when you are offline</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/clochix/alir/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/clochix/alir/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/clochix/alir" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a name="%C3%80lir" class="anchor" href="#%C3%80lir"><span class="octicon octicon-link"></span></a>Àlir</h1>
+
+<p>WIP — WIP — Experiment with remoteStorage — WIP — WIP</p>
+
+<p>Àlir is just the application I use on my FirefoxPhone to store articles and read them in the tube. I store articles on a remote storage with curl or a Firefox addon, and the HTML5 application sync the storage thanks to <a href="http://remotestorage.io/">remoteStorage</a>. </p>
+
+<h2>
+<a name="choose-a-backend" class="anchor" href="#choose-a-backend"><span class="octicon octicon-link"></span></a>Choose a backend</h2>
+
+<p>In order to use <em>Àlir</em>, you need a remote storage. To respect the decentralized spirit of the Internet, I encourage you to <a href="http://remotestorage.io/get/">host your own remoteStorage server</a>. Unfortunately, most servers seems outdated. You can try <a href="https://github.com/clochix/restore">my fork of restore</a>, with minor fixes to work with the latest version of remoteStorage.js. Alternatively, the client library is working on an experimental support of Dropbox and Google Drive. So, if you have a Dropbox account, you can try to use it as remote storage.</p>
+
+<h3>
+<a name="connecting-alir-to-dropbox" class="anchor" href="#connecting-alir-to-dropbox"><span class="octicon octicon-link"></span></a>Connecting Alir to Dropbox</h3>
+
+<ul>
+<li>log in to <a href="https://www.dropbox.com/login">https://www.dropbox.com/login</a>;</li>
+<li>go to <a href="https://www.dropbox.com/developers/apps">the App Console</a> and click the blue button to create an application;</li>
+<li>create a <em>Dropbox API app</em> application with access to <em>Files and datastores</em>. The application only needs access to files it creates. Choose a unique name for your app;</li>
+<li>the last thing to do is to add 2 OAuth redirect URIs on next screen:
+
+<ul>
+<li>
+<code>chrome://alir</code> for the addon;</li>
+<li>the URL where your instance of the application is hosted (for example <code>http://toto.org/alir</code>);</li>
+</ul>
+</li>
+<li>don’t forget to write somewhere the <em>App key</em>, you will need it to connect;</li>
+</ul><h4>
+<a name="connect-the-addon" class="anchor" href="#connect-the-addon"><span class="octicon octicon-link"></span></a>Connect the addon</h4>
+
+<p>You can build the addon from source with the JetPack SDK, or <a href="https://github.com/clochix/alir/blob/master/addon/alir.xpi">download it</a>. But you should never install an untrusted addon ;)</p>
+
+<p>Once the addon is installed, go to it’s preference page and set the Dropbox App key. Then click on the addon icon in addon bar and connect to Dropbox. It should open a new page where you need to allow the addon to connect. If the connection is successful, a button on addon panel should allow you to put the content of current page to your dropbox storage.</p>
+
+<h4>
+<a name="connect-the-application" class="anchor" href="#connect-the-application"><span class="octicon octicon-link"></span></a>Connect the application</h4>
+
+<p>Lets assume your have installed the application on <a href="http://toto.org/alir">http://toto.org/alir</a></p>
+
+<p>Click on the left margin, then on option icon, set the API key, reload page (yes, not very friendly). A dropbox icon should appear on top right corner. Click on the icon, allow the application, and tadam, you may be able to see the contents you put with the addon.</p>
+
+<h2>
+<a name="cli-client" class="anchor" href="#cli-client"><span class="octicon octicon-link"></span></a>CLI Client</h2>
+
+<p>To put an URL into remote storage, use the cli client:
+    put.js --url=http://…</p>
+
+<h3>
+<a name="interactive-mode" class="anchor" href="#interactive-mode"><span class="octicon octicon-link"></span></a>Interactive mode</h3>
+
+<p>Extract URLs from file toto and ask what to do:</p>
+
+<pre><code>put.js -i -f toto
+</code></pre>
+
+<p>Extract URLs from file on STDIN and ask whet to do:</p>
+
+<pre><code>cat &lt;file&gt; | put.sh
+</code></pre>
+
+<h3>
+<a name="config-file" class="anchor" href="#config-file"><span class="octicon octicon-link"></span></a>Config file</h3>
+
+<p>The <code>put.js</code> client needs a <code>config.json</code> file with the server path and a auth token:</p>
+
+<pre><code>{
+  "hostname": "toto.org",
+  "path": "/storage/toto/alir/",
+  "port": "443",
+  "token": "xxxxxx"
+}
+</code></pre>
+        </section>
+
+        <footer>
+          Alir is maintained by <a href="https://github.com/clochix">clochix</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
