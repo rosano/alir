@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true */
+/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true, Showdown: true */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -686,7 +686,7 @@ function initUI() {
           article.id    = id;
           article.url   = $('#input [name="url"]').value;
           article.title = $('#input [name="title"]').value;
-          article.text  = $('#input [name="text"]').value;
+          article.text  = new Showdown.converter().makeHtml($('#input [name="text"]').value);
           article.date  = Date.now();
           remoteStorage.alir.savePrivate(article);
           tiles.show('list');
@@ -698,7 +698,7 @@ function initUI() {
         id: utils.uuid(),
         url: $('#input [name="url"]').value,
         title: $('#input [name="title"]').value,
-        text: $('#input [name="text"]').value,
+        text: new Showdown.converter().makeHtml($('#input [name="text"]').value),
         date: Date.now(),
         flags: {
           editable: true
