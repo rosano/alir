@@ -633,12 +633,11 @@ function initUI() {
           }
           return [previous, current, next];
         }
-        console.log(e.detail.dir);
         switch (e.detail.dir) {
         case 'E':
           items = getItems();
           if (items) {
-            window.scroll(0, 0);
+            bookmarks[items[1].dataset.key] = window.scrollY / document.body.clientHeight;
             items[1].classList.add('hideRight');
             items[2].classList.add('showLeft');
             window.setTimeout(function () {
@@ -648,13 +647,18 @@ function initUI() {
               items[2].classList.remove('hidden');
               items[2].classList.remove('showLeft');
               items[2].classList.add('current');
+              if (typeof bookmarks[items[2].dataset.key] !== 'undefined') {
+                window.scrollTo(0, bookmarks[items[2].dataset.key] * document.body.clientHeight);
+              } else {
+                window.scroll(0, 0);
+              }
             }, 500);
           }
           break;
         case 'W':
           items = getItems();
           if (items) {
-            window.scroll(0, 0);
+            bookmarks[items[1].dataset.key] = window.scrollY / document.body.clientHeight;
             items[1].classList.add('hideLeft');
             items[0].classList.add('showRight');
             window.setTimeout(function () {
@@ -664,6 +668,11 @@ function initUI() {
               items[0].classList.remove('hidden');
               items[0].classList.remove('showRight');
               items[0].classList.add('current');
+              if (typeof bookmarks[items[0].dataset.key] !== 'undefined') {
+                window.scrollTo(0, bookmarks[items[0].dataset.key] * document.body.clientHeight);
+              } else {
+                window.scroll(0, 0);
+              }
             }, 500);
           }
           break;
