@@ -597,8 +597,10 @@ function initUI() {
   }
   UI.list.addEventListener('contextmenu', doNote);
   UI.list.addEventListener('dblclick', doNote);
-  if (config.gesture) {
-    Gesture.attach(UI.list, {
+  // Gestures {{
+  (function () {
+    var checkbox, gestureEvents;
+    gestureEvents = {
       gesture: function (e) {
         var items;
         function getItems() {
@@ -678,8 +680,19 @@ function initUI() {
           break;
         }
       }
+    };
+    if (config.gesture) {
+      Gesture.attach(UI.list, gestureEvents);
+    }
+    checkbox = document.getElementById('prefGesture');
+    checkbox.addEventListener('change', function () {
+      if (checkbox.checked) {
+        Gesture.attach(UI.list, gestureEvents);
+      } else {
+        Gesture.detach(UI.list, gestureEvents);
+      }
     });
-  }
+  }());
   // input {{
   $('#input [name="save"]').addEventListener('click', function () {
     var id = $('#input [name="id"]').value,

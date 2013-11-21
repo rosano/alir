@@ -75,6 +75,17 @@ var Gesture = (function () {
     });
     listeners.push(element);
   }
+
+  function detach(element, events) {
+    var names = Object.keys(events),
+    remaining = names.filter(function (e) { return allowedEvent.indexOf(e) === -1; });
+    if (remaining.length > 0) {
+      throw "Wrong event names: " + remaining.join(', ');
+    }
+    names.forEach(function (ev) {
+      element.removeEventListener(ev, events[ev]);
+    });
+  }
   window.addEventListener('mousedown', onTouchStart);
   window.addEventListener('touchstart', onTouchStart);
   window.addEventListener('mouseup', onTouchEnd);
@@ -83,7 +94,8 @@ var Gesture = (function () {
   window.addEventListener('touchmove', onTouchMove);
 
   return {
-    attach: attach
+    attach: attach,
+    detach: detach
   };
 
 })();
