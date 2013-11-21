@@ -809,7 +809,7 @@ function initUI() {
       filter.value = '';
       onFilterChange();
     });
-    filter.addEventListener('focus', function onFocus() {
+    document.querySelector("#main .filters [data-action=addTag]").addEventListener("click", function () {
       tiles.go('tagTile', function (tag) {
         if (typeof tag !== 'undefined') {
           if (tag !== null) {
