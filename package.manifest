@@ -2,6 +2,8 @@
   "name": "Alir",
   "description": "Store articles to read offline",
   "launch_path": "/index.html",
+  "package_path": "https://alir.5apps.com/alir.zip",
+  "size": 227851,
   "icons": {
     "128": "/img/icon-128.png",
     "120": "/img/icon-120.png",
@@ -36,7 +38,7 @@
       "disposition": "window",
       "href": "/index.html",
       "returnValue": true
-    }
+    },
   },
   "permissions": {
     "systemXHR":{}
@@ -53,6 +55,6 @@
     }
   },
   "type": "privileged",
-  "version": "0.1.61"
+  "version": "0.1.60"
 }
 

@@ -848,7 +848,7 @@ function initUI() {
     document.webL10n.setLanguage(this.value);
   });
   $('#settings [name="install"]').addEventListener('click', function () {
-    var request = window.navigator.mozApps.install("https://alir.clochix.net/manifest.webapp");
+    var request = window.navigator.mozApps.installPackage("https://alir.5apps.com/package.manifest");
     request.onerror = function () {
       window.alert("Error");
       console.log(this.error, 'error');
@@ -890,8 +890,6 @@ function initUI() {
     });
 
   })();
-  $('#settings [name="clearLog"]').addEventListener('click', function () {
-  });
   // }}
   // Left menu {{
   $('#menu').addEventListener('click', function (event) {

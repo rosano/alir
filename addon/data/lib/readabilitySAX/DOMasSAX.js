@@ -4,7 +4,8 @@
 		use the document root to initialise it
 */
 
-unsafeWindow.saxParser = function saxParser(elem, callbacks){
+;(function(global){
+global.saxParser = function saxParser(elem, callbacks){
 	if(typeof callbacks !== 'object')
 		throw 'please provide callbacks!';
 
@@ -38,3 +39,4 @@ unsafeWindow.saxParser = function saxParser(elem, callbacks){
 
 	parse(elem);
 }
+})(typeof unsafeWindow === "object" ? unsafeWindow : this);
