@@ -26,7 +26,8 @@
 var config,
     tiles,
     tags = [],
-    bookmarks = {};
+    config,
+    _;
 config = {
   gesture: false,
   dropBox: {
@@ -38,7 +39,6 @@ config = {
   },
   lang: 'en-US'
 };
-var _ = document.webL10n.get;
 
 tiles = new Tiles();
 
@@ -307,6 +307,7 @@ function initUI() {
   var $  = function (sel) {return document.querySelector.call(document, sel); },
       $$ = function (sel) {return document.querySelectorAll.call(document, sel); },
       forElement = function (sel, fct) {Array.prototype.forEach.call(document.querySelectorAll(sel), fct); },
+      forEvent = function (sel, event, fct) {Array.prototype.forEach.call(document.querySelectorAll(sel), function (elmt) { elmt.addEventListener(event, fct); }); },
       UI = {},
       menuActions = {};
   UI = {
@@ -694,7 +695,7 @@ function initUI() {
     });
   }());
   // input {{
-  $('#input [name="save"]').addEventListener('click', function () {
+  forEvent('#input [data-action="articleSave"]', 'click', function () {
     var id = $('#input [name="id"]').value,
         obj;
 
@@ -708,9 +709,11 @@ function initUI() {
           article.id    = id;
           article.url   = $('#input [name="url"]').value;
           article.title = $('#input [name="title"]').value;
-          article.text  = new Showdown.converter().makeHtml($('#input [name="text"]').value);
+          article.text  = $('#input [name="text"]').value;
+          article.html  = new Showdown.converter().makeHtml(article.text);
           article.date  = Date.now();
           remoteStorage.alir.savePrivate(article);
+          displayItem(article);
           tiles.show('list');
         }
       });
@@ -720,7 +723,8 @@ function initUI() {
         id: utils.uuid(),
         url: $('#input [name="url"]').value,
         title: $('#input [name="title"]').value,
-        text: new Showdown.converter().makeHtml($('#input [name="text"]').value),
+        text:  $('#input [name="text"]').value,
+        html:  new Showdown.converter().makeHtml($('#input [name="text"]').value),
         date: Date.now(),
         flags: {
           editable: true
@@ -728,8 +732,12 @@ function initUI() {
         tags: ['note']
       };
       remoteStorage.alir.savePrivate(obj);
+      displayItem(obj);
       tiles.show('list');
     }
+  });
+  forEvent('#input [data-action="articleCancel"]', 'click', function () {
+    tiles.show('list');
   });
   // }}
   // Notes {{
@@ -969,6 +977,7 @@ function initUI() {
 
 window.addEventListener('load', function () {
   "use strict";
+  _ = document.webL10n.get;
   initUI();
   remoteStorage.enableLog();
   remoteStorage.access.claim('alir', 'rw');
