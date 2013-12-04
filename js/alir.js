@@ -153,32 +153,39 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
  *
  * @TODO Improve sanitizing
  */
-function toDom(str) {
+function toDom(str, domain) {
   /*jshint newcap: false*/
   "use strict";
-  var sandbox = document.createElement('div');
+  var fragment = document.createDocumentFragment(),
+      sandbox  = document.createElement('div');
+  fragment.appendChild(sandbox);
   try {
     sandbox.innerHTML = HTMLtoXML(str);
-    Array.prototype.forEach.call(sandbox.querySelectorAll('script, style'), function (e) {
-      e.parentNode.removeChild(e);
-    });
-    Array.prototype.forEach.call(sandbox.querySelectorAll('* [id]'), function (e) {
-      e.removeAttribute('id');
-    });
-    Array.prototype.forEach.call(sandbox.querySelectorAll('* [class]'), function (e) {
-      e.removeAttribute('class');
-    });
-    Array.prototype.forEach.call(sandbox.querySelectorAll('* [style]'), function (e) {
-      e.removeAttribute('style');
-    });
-    Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]'), function (e) {
-      e.setAttribute('target', '_blank');
-    });
-    return sandbox.innerHTML;
   } catch (e) {
-    console.log('Error sanityzing: ' + e);
-    return _('contentError');
+    console.log('Error sanityzing: ', e);
+    //@FIXME Unsecure !
+    sandbox.innerHTML = str;
+    //return _('contentError');
   }
+  Array.prototype.forEach.call(sandbox.querySelectorAll('script, style'), function (e) {
+    e.parentNode.removeChild(e);
+  });
+  Array.prototype.forEach.call(sandbox.querySelectorAll('* [id]'), function (e) {
+    e.removeAttribute('id');
+  });
+  Array.prototype.forEach.call(sandbox.querySelectorAll('* [class]'), function (e) {
+    e.removeAttribute('class');
+  });
+  Array.prototype.forEach.call(sandbox.querySelectorAll('* [style]'), function (e) {
+    e.removeAttribute('style');
+  });
+  Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]'), function (e) {
+    e.setAttribute('target', '_blank');
+  });
+  Array.prototype.forEach.call(sandbox.querySelectorAll('* img:not([src^=http])'), function (e) {
+    e.setAttribute('src', domain + e.getAttribute('src'));
+  });
+  return sandbox.innerHTML;
 }
 function insertInList(list, selector, item, comp) {
   "use strict";
@@ -202,13 +209,14 @@ function insertInList(list, selector, item, comp) {
  *
  */
 function displayItem(obj) {
-  //jshint maxstatements: 30, debug: true, maxcomplexity: 12
+  //jshint maxstatements: 35, debug: true, maxcomplexity: 12
   "use strict";
   var title = obj.title || obj.id,
       data  = {},
       item,
       tagsNode,
-      classes = '';
+      classes = '',
+      domain;
   item = document.getElementById(obj.id);
   if (item) {
     classes = item.getAttribute('class');
@@ -240,9 +248,15 @@ function displayItem(obj) {
   if (utils.trim(data.title) === '') {
     data.title = _("noTitle");
   }
+  domain = new RegExp("^.+//[^/]+").exec(obj.url);
+  if (domain !== null) {
+    domain = domain[0];
+  } else {
+    domain = '';
+  }
   if (obj.html) {
     data.type = 'html';
-    data.content = toDom(obj.html);
+    data.content = toDom(obj.html, domain);
   } else {
     data.type = 'text';
     data.content = obj.text;
@@ -294,7 +308,7 @@ function displayItem(obj) {
   // }}
   // Sort items by date {{
   // @TODO allow multiple sorts
-  insertInList(document.getElementById('list'), "[data-key]", item, function (e) { return (e.dataset.date > obj.date); });
+  insertInList(document.getElementById('list'), "[data-key]", item, function (e) { return (e.dataset.date < obj.date); });
   // }}
 
   if (classes !== '') {
@@ -609,6 +623,7 @@ function initUI() {
       tiles.go('noteEdit');
     }
   }
+  // @fixme should use contextmenu only on touch screens
   UI.list.addEventListener('contextmenu', doNote);
   UI.list.addEventListener('dblclick', doNote);
   // Gestures {{
@@ -734,11 +749,11 @@ function initUI() {
       // create
       obj = {
         id: utils.uuid(),
-        url: $('#input [name="url"]').value,
+        url:   $('#input [name="url"]').value,
         title: $('#input [name="title"]').value,
         text:  $('#input [name="text"]').value,
         html:  new Showdown.converter().makeHtml($('#input [name="text"]').value),
-        date: Date.now(),
+        date:  Date.now(),
         flags: {
           editable: true
         },
@@ -754,7 +769,7 @@ function initUI() {
   });
   // }}
   // Notes {{
-  $('#noteEdit [name="save"]').addEventListener('click', function () {
+  forEvent('#noteEdit [name="save"]', 'click', function () {
     var articleId = $('#noteEdit [name="articleId"]').value,
         noteId    = $('#noteEdit [name="noteId"]').value;
 
@@ -779,13 +794,13 @@ function initUI() {
       }
     });
   });
-  $('#noteEdit [name="cancel"]').addEventListener('click', function () {
+  forEvent('#noteEdit [name="cancel"]', 'click', function () {
     tiles.back();
   });
-  $('#noteView [name="back"]').addEventListener('click', function () {
+  forEvent('#noteView [name="back"]', 'click', function () {
     tiles.back();
   });
-  $('#noteView [name="delete"]').addEventListener('click', function () {
+  forEvent('#noteView [name="delete"]', 'click', function () {
     if (window.confirm(_('noteConfirmDelete'))) {
       var articleId = $('#noteView [name="articleId"]').value,
           noteId    = $('#noteView [name="noteId"]').value;
@@ -882,9 +897,11 @@ function initUI() {
     if (this.checked) {
       document.body.classList.remove('menu-right');
       document.body.classList.add('menu-left');
+      config.menu = true;
     } else {
       document.body.classList.remove('menu-left');
       document.body.classList.add('menu-right');
+      config.menu = false;
     }
   });
   $('#settingsLang select').addEventListener('change', function () {

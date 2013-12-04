@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/build.css" media="all" rel="stylesheet" type="text/css" />
     <!--
-    <link href="css/alir.css" media="all" rel="stylesheet" type="text/css" />
+    <link href="css/alir.css" rel="stylesheet" type="text/css" />
     <link href="css/font.css" rel="stylesheet" type="text/css">
     <link href="css/widgetCss.css" rel="stylesheet" type="text/css">
     -->
@@ -48,6 +48,7 @@
         <p><a class="icon-plus new" data-action="create"></a></p>
         <p><a class="icon-chevron-up top" href="#list"></a></p>
         <p><a class="icon-chevron-left back" data-action="toggleContent"></a></p>
+        <p><a class="icon-chevron-right back" data-action="toggleContent" href="#"></a></p>
         <p><a class="icon-refresh sync" data-action="sync"></a></p>
         <p><a class="icon-cog settings" data-action="settings"></a></p>
         <p><a class="icon-off onoff" data-action="onoff"></a></p>
@@ -200,7 +201,7 @@
         <fieldset class="inline text">
           <textarea rows="10" cols="40" name="text" placeholder="Note" data-l10n-id="noteContent"></textarea>
         </fieldset>
-        <p>
+        <p class="col2">
           <button name="save" data-l10n-id="noteSave">Save</button>
           <button name="cancel" data-l10n-id="noteCancel">Cancel</button>
         </p>
@@ -218,7 +219,7 @@
         </fieldset>
         <ul id="tagList">
         </ul>
-        <p>
+        <p class="col2">
           <button name="save" data-l10n-id="tagSave">Save</button>
           <button name="cancel" data-l10n-id="tagCancel">Cancel</button>
         </p>

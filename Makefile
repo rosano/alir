@@ -2,8 +2,9 @@ default: help
 
 help:
 	@echo "help   - display this text"
-	@echo "all    - merge js libraries"
+	@echo "build  - merge js libraries"
 	@echo "zip    - create packaged app"
+	@echo "all    - build + zip"
 	@echo "test   - run tests"
 
 all: build zip

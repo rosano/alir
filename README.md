@@ -1,6 +1,6 @@
 # Àlir
 
-![A chair](img/icon-256.png)
+![A chair](https://raw.github.com/clochix/alir/master/img/icon-256.png)
 
 This is a chair. A good offline place to sit down and read. Àlir’s goal is to provide a similar pleasant feeling.
 

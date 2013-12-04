@@ -20,14 +20,14 @@ body {
   color: #FFF;
 }
 body.menu-left #menu {
-  width: 10rem;
+  width: 4.5rem;
   left: 0;
   margin: 0 0 0 -8rem;
 }
 body.menu-right #menu {
-  width: 130px;
+  width: 4.5;
   right: 0;
-  margin: 0 -90px 0 0;
+  margin: 0 -8rem 0 0;
 }
 #menu .slider {
   width: 2rem;
@@ -35,10 +35,16 @@ body.menu-right #menu {
   background-color: #BBB;
 }
 body.menu-left #menu .slider {
-  margin-left: calc(100% - 2rem);
+  margin-left: 8rem;
+}
+body.menu-left #menu.show .slider {
+  margin-left: 2.5rem;
 }
 body.menu-right #menu .slider {
-  margin-right: calc(100% - 2rem);
+  margin-right: 8rem;
+}
+body.menu-right #menu.show .slider {
+  margin-right: 2.5rem;
 }
 #menu .scrollbar {
   position: fixed;
@@ -57,7 +63,7 @@ body .syncInProgress {
   position: absolute;
   display: none;
   top: 0.3rem;
-  left: 8.3rem;
+  margin: 0 0.3rem;
   z-index: 1001;
   pointer-events: none;
 }
@@ -83,24 +89,22 @@ body.menu-left #menu .scrollbar {
   left: 0;
 }
 body.menu-left #menu.show .scrollbar {
-  left: 8rem;
+  left: 2.5rem;
 }
 body.menu-right #menu .scrollbar {
   right: 0;
 }
 body.menu-right #menu.show .scrollbar {
-  right: 90px;
+  right: 2.5rem;
 }
 #menu .content {
   float: right;
-  width: 75px;
+  width: 1.5rem;
   line-height: 3em;
-}
-body.menu-left #menu .content {
-  margin: 10px 70px 10px 10px;
+  margin: 0.66rem 2.5rem;
 }
 body.menu-right #menu .content {
-  margin: 10px 10px 10px 70px;
+  margin: 0.66rem 0.5rem;
 }
 body.menu-left #menu.show {
   margin-left: 0;
@@ -128,6 +132,10 @@ body.menu-right #menu.show {
 {
   display: none;
 }
+body.menu-left #menu .content .icon-chevron-right,
+body.menu-right #menu .content .icon-chevron-left {
+  display: none;
+}
 #menu.detail .content .sync,
 #menu.detail .content .settings,
 #menu.detail .content .new
@@ -150,7 +158,7 @@ body.menu-right #menu.show {
   display: none;
 }
 [data-tile] > header {
-  margin: -2rem 0 1rem -1rem;
+  margin: -2rem -0.5rem 1rem -1rem;
   padding: 0.5rem 1.5rem;
   background: linear-gradient(to bottom,  #1AFAA5,  #20F47A);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
@@ -162,10 +170,10 @@ body.menu-right #menu.show {
 }
 body.menu-left [data-tile] {
   padding-left: 2.5rem;
-  padding-right: 0;
+  padding-right: 0.5rem;
 }
 body.menu-right [data-tile] {
-  padding-left: 0px;
+  padding-left: 0.5rem;
   padding-right: 2.5rem;
 }
 #list {
@@ -306,11 +314,6 @@ body.menu-right [data-tile] {
 .shown {
   display: inherit;
 }
-body.menu-right #input,
-body.menu-right #settings {
-  margin-right: 50px;
-  margin-top: 60px;
-}
 #input > form ,
 #settings > form {
   max-width: 600px;
@@ -369,6 +372,10 @@ button {
   color: #444;
   border: 1px solid #888;
   border-radius: 2px;
+}
+p.col2 button {
+  width: 49%;
+  display: inline;
 }
 fieldset {
   border: 1px solid #888;
