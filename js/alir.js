@@ -37,7 +37,9 @@ config = {
     clientId: '',
     apiKey: ''
   },
-  lang: 'en-US'
+  lang: 'en-US',
+  menu: true,
+  bookmarks: {}
 };
 
 tiles = new Tiles();
@@ -345,6 +347,16 @@ function initUI() {
         $('#driveApiKey').value   = config.google.apiKey;
         remoteStorage.setApiKeys('googledrive', {client_id: config.google.clientId, api_key: config.google.apiKey});
       }
+      if (config.menu) {
+        document.body.classList.remove('menu-right');
+        document.body.classList.add('menu-left');
+      } else {
+        document.body.classList.remove('menu-left');
+        document.body.classList.add('menu-right');
+      }
+      if (typeof config.bookmarks === 'undefined') {
+        config.bookmarks = {};
+      }
     }
   }());
 
@@ -368,7 +380,7 @@ function initUI() {
       var cl      = $('#menu').classList,
           current = $('#list > .current');
       if (current && current.id) {
-        bookmarks[current.id] = window.scrollY / document.body.clientHeight;
+        config.bookmarks[current.id] = window.scrollY / document.body.clientHeight;
       }
       cl.remove("detail");
       cl.add("list");
@@ -470,9 +482,9 @@ function initUI() {
     clItem.toggle('hidden');
     clItem.toggle('current');
     $('#menu .content .top').href = '#' + key;
-    if (bookmarks[key] && clItem.contains('current')) {
+    if (config.bookmarks[key] && clItem.contains('current')) {
       window.setTimeout(function () {
-        window.scrollTo(0, bookmarks[key] * document.body.clientHeight);
+        window.scrollTo(0, config.bookmarks[key] * document.body.clientHeight);
       }, 100);
     }
   }
@@ -542,6 +554,7 @@ function initUI() {
       case 'delete':
         if (window.confirm(_('confirmDelete'))) {
           remoteStorage.alir[ce.context].remove(ce.key);
+          delete config.bookmarks[ce.key];
         }
         toggleItem(ce.key);
         break;
@@ -640,7 +653,7 @@ function initUI() {
         case 'E':
           items = getItems();
           if (items) {
-            bookmarks[items[1].dataset.key] = window.scrollY / document.body.clientHeight;
+            config.bookmarks[items[1].dataset.key] = window.scrollY / document.body.clientHeight;
             items[1].classList.add('hideRight');
             items[2].classList.add('showLeft');
             window.setTimeout(function () {
@@ -650,8 +663,8 @@ function initUI() {
               items[2].classList.remove('hidden');
               items[2].classList.remove('showLeft');
               items[2].classList.add('current');
-              if (typeof bookmarks[items[2].dataset.key] !== 'undefined') {
-                window.scrollTo(0, bookmarks[items[2].dataset.key] * document.body.clientHeight);
+              if (typeof config.bookmarks[items[2].dataset.key] !== 'undefined') {
+                window.scrollTo(0, config.bookmarks[items[2].dataset.key] * document.body.clientHeight);
               } else {
                 window.scroll(0, 0);
               }
@@ -661,7 +674,7 @@ function initUI() {
         case 'W':
           items = getItems();
           if (items) {
-            bookmarks[items[1].dataset.key] = window.scrollY / document.body.clientHeight;
+            config.bookmarks[items[1].dataset.key] = window.scrollY / document.body.clientHeight;
             items[1].classList.add('hideLeft');
             items[0].classList.add('showRight');
             window.setTimeout(function () {
@@ -671,8 +684,8 @@ function initUI() {
               items[0].classList.remove('hidden');
               items[0].classList.remove('showRight');
               items[0].classList.add('current');
-              if (typeof bookmarks[items[0].dataset.key] !== 'undefined') {
-                window.scrollTo(0, bookmarks[items[0].dataset.key] * document.body.clientHeight);
+              if (typeof config.bookmarks[items[0].dataset.key] !== 'undefined') {
+                window.scrollTo(0, config.bookmarks[items[0].dataset.key] * document.body.clientHeight);
               } else {
                 window.scroll(0, 0);
               }
@@ -998,6 +1011,7 @@ window.addEventListener('load', function () {
       if (elmt) {
         elmt.parentNode.removeChild(elmt);
       }
+      delete config.bookmarks[ev.relativePath];
     } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue !== 'undefined') {
       console.log("Update " + ev.relativePath);
       if (typeof ev.newValue.id === 'undefined') {
