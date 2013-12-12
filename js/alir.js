@@ -354,41 +354,38 @@ function initUI() {
   (function () {
     var conf = localStorage.getItem('config');
     if (conf) {
-      config = JSON.parse(conf);
-      if (typeof config.lang !== 'undefined') {
-        $('#settingsLang select').value = config.lang;
-        document.webL10n.setLanguage(config.lang);
+      conf = JSON.parse(conf);
+      utils.merge(config, conf);
+      if (typeof conf.lang !== 'undefined') {
+        $('#settingsLang select').value = conf.lang;
+        document.webL10n.setLanguage(conf.lang);
       }
-      if (!config.dropbox) {
-        config.dropbox = {
-          apiKey: ''
-        };
+
+      if (conf.rs.login) {
+        $('rsLogin').value = conf.rs.login;
+        remoteStorage.widget.view.form.userAddress.value = conf.rs.login;
       }
-      if (config.dropbox.apiKey) {
-        $('#dropboxApiKey').value = config.dropbox.apiKey;
-        remoteStorage.setApiKeys('dropbox', {api_key: config.dropbox.apiKey});
+      if (conf.dropBox.apiKey) {
+        $('#dropboxApiKey').value = conf.dropBox.apiKey;
+        remoteStorage.setApiKeys('dropbox', {api_key: conf.dropBox.apiKey});
       }
-      if (!config.google) {
-        config.google = {
-          clientId: '',
-          apiKey: ''
-        };
+      if (conf.google.apiKey && conf.google.clientId) {
+        $('#driveClientId').value = conf.goole.clientId;
+        $('#driveApiKey').value   = conf.google.apiKey;
+        remoteStorage.setApiKeys('googledrive', {client_id: conf.google.clientId, api_key: conf.google.apiKey});
       }
-      if (config.google.apiKey && config.google.clientId) {
-        $('#driveClientId').value = config.goole.clientId;
-        $('#driveApiKey').value   = config.google.apiKey;
-        remoteStorage.setApiKeys('googledrive', {client_id: config.google.clientId, api_key: config.google.apiKey});
-      }
-      if (config.menu) {
+      if (conf.menu) {
         document.body.classList.remove('menu-right');
         document.body.classList.add('menu-left');
       } else {
         document.body.classList.remove('menu-left');
         document.body.classList.add('menu-right');
       }
-      if (typeof config.bookmarks === 'undefined') {
-        config.bookmarks = {};
+      if (typeof conf.bookmarks === 'undefined') {
+        conf.bookmarks = {};
       }
+
+      config = conf;
     }
   }());
 
@@ -899,7 +896,7 @@ function initUI() {
   $('#dropboxApiKey').addEventListener('change', function () {
     remoteStorage.setApiKeys('dropbox', {api_key: this.value});
     //remoteStorage.widget.view.reload();
-    config.dropbox.apiKey = this.value;
+    config.dropBox.apiKey = this.value;
   });
   $('#driveClientId').addEventListener('change', function () {
     remoteStorage.setApiKeys('googledrive', {client_id: this.value, api_key: $('#driveApiKey').value});
@@ -1026,12 +1023,12 @@ function initUI() {
 window.addEventListener('load', function () {
   "use strict";
   _ = document.webL10n.get;
-  initUI();
   remoteStorage.enableLog();
   remoteStorage.access.claim('alir', 'rw');
   remoteStorage.caching.enable('/alir/');
   //remoteStorage.caching.enable('/public/alir/');
   remoteStorage.displayWidget();
+  initUI();
   remoteStorage.alir.private.on('change', function onChange(ev) {
     var elmt, item;
     if (typeof ev.oldValue === 'undefined' && typeof ev.newValue !== 'undefined') {

@@ -58,6 +58,19 @@ var utils = {
       document.getElementById('debugLog').innerHTML += utils.format('<span class="%s">[%s][%s]</span> %s\n', level, new Date().toISOString().substr(11, 8), level + new Array(10 - level.length).join(' '), message);
       console.log(utils.format('=====> [%s][%s] %s\n', new Date().toISOString().substr(11, 8), level + new Array(10 - level.length).join(' '), message));
     }
+  },
+  merge: function (a, b) {
+    "use strict";
+    Object.keys(a).forEach(function (keyA) {
+      if (typeof b[keyA] === 'undefined') {
+        b[keyA] = a[keyA];
+      } else {
+        if (typeof a[keyA] === 'object') {
+          b[keyA] = utils.merge(a[keyA], b[keyA]);
+        }
+      }
+    });
+    return a;
   }
 };
 function Tiles(global) {
