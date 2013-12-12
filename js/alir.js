@@ -153,11 +153,21 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
  *
  * @TODO Improve sanitizing
  */
-function toDom(str, domain) {
+function toDom(str, fullUrl) {
   /*jshint newcap: false*/
   "use strict";
   var fragment = document.createDocumentFragment(),
-      sandbox  = document.createElement('div');
+      sandbox  = document.createElement('div'),
+      domain   = new RegExp("((http.?//[^/]+).*/)(.*)").exec(fullUrl),
+      domainUrl, baseUrl;
+  console.log(domain);
+  if (domain !== null) {
+    domainUrl = domain[2];
+    baseUrl   = domain[1];
+  } else {
+    domainUrl = '';
+    baseUrl   = '';
+  }
   fragment.appendChild(sandbox);
   try {
     sandbox.innerHTML = HTMLtoXML(str);
@@ -183,7 +193,22 @@ function toDom(str, domain) {
     e.setAttribute('target', '_blank');
   });
   Array.prototype.forEach.call(sandbox.querySelectorAll('* img:not([src^=http])'), function (e) {
-    e.setAttribute('src', domain + e.getAttribute('src'));
+    var src = e.getAttribute('src');
+    if (src.substr(0, 1) === '/') {
+      e.setAttribute('src', domainUrl + src);
+    } else {
+      e.setAttribute('src', baseUrl + src);
+    }
+  });
+  Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]:not([href^=http])'), function (e) {
+    var src = e.getAttribute('href');
+    if (src) {
+      if (src.substr(0, 1) === '/') {
+        e.setAttribute('href', domainUrl + src);
+      } else {
+        e.setAttribute('href', baseUrl + src);
+      }
+    }
   });
   return sandbox.innerHTML;
 }
@@ -215,8 +240,7 @@ function displayItem(obj) {
       data  = {},
       item,
       tagsNode,
-      classes = '',
-      domain;
+      classes = '';
   item = document.getElementById(obj.id);
   if (item) {
     classes = item.getAttribute('class');
@@ -248,15 +272,9 @@ function displayItem(obj) {
   if (utils.trim(data.title) === '') {
     data.title = _("noTitle");
   }
-  domain = new RegExp("^.+//[^/]+").exec(obj.url);
-  if (domain !== null) {
-    domain = domain[0];
-  } else {
-    domain = '';
-  }
   if (obj.html) {
     data.type = 'html';
-    data.content = toDom(obj.html, domain);
+    data.content = toDom(obj.html, obj.url);
   } else {
     data.type = 'text';
     data.content = obj.text;
