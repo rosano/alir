@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true, Showdown: true */
+/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true, Showdown: true, scrap: true, saveScraped: true */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -27,6 +27,7 @@ var config,
     tiles,
     tags = [],
     config,
+    isInstalled,
     _;
 config = {
   gesture: false,
@@ -768,6 +769,41 @@ function initUI() {
     tiles.show('list');
   });
   // }}
+  // Links {{
+  forEvent('#link [data-action="linkScrap"]', 'click', function () {
+    var href = document.getElementById('linkRef').textContent;
+    try {
+      utils.log("Scraping " + href);
+      scrap(href, function (err, res) {
+        if (err) {
+          utils.log('' + err, 'error');
+          window.alert(err);
+        } else {
+          saveScraped(res);
+        }
+      });
+    } catch (e) {
+      utils.log("" + e, "error");
+      window.alert(e);
+    }
+    tiles.back();
+  });
+  forEvent('#link [data-action="linkOpen"]', 'click', function () {
+    var href = document.getElementById('linkRef').textContent,
+        openURL;
+    openURL = new window.MozActivity({
+      name: "view",
+      data: {
+        type: "url",
+        url: href
+      }
+    });
+    tiles.back();
+  });
+  forEvent('#link [data-action="linkCancel"]', 'click', function () {
+    tiles.back();
+  });
+  // }}
   // Notes {{
   forEvent('#noteEdit [name="save"]', 'click', function () {
     var articleId = $('#noteEdit [name="articleId"]').value,
@@ -1042,9 +1078,35 @@ function initUI() {
 }
 // }}
 
+function initLinks() {
+  "use strict";
+  document.querySelector("#list").addEventListener('click', function (ev) {
+    if (ev.target.target && ev.target.target === '_blank' && ev.target.href) {
+      ev.preventDefault();
+      document.getElementById("linkRef").textContent = ev.target.href;
+      tiles.go('link');
+    }
+  });
+}
+
 window.addEventListener('load', function () {
   "use strict";
   _ = document.webL10n.get;
+  // Check if application is installed
+  if (window.navigator.mozApps) {
+    (function () {
+      var request = window.navigator.mozApps.getSelf();
+      request.onsuccess = function () {
+        if (request.result) {
+          isInstalled = true;
+          initLinks();
+        }
+      };
+      request.onerror = function () {
+        alert("Error: " + request.error.name);
+      };
+    }());
+  }
   initUI();
   remoteStorage.enableLog();
   remoteStorage.access.claim('alir', 'rw');
