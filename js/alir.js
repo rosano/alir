@@ -46,7 +46,7 @@ tiles = new Tiles();
 
 function createXPathFromElement(elm) {
   // source: http://stackoverflow.com/a/5178132
-  //jshint maxcomplexity: 10
+  //jshint maxcomplexity: 11
   "use strict";
   var allNodes = document.getElementsByTagName('*'),
   uniqueIdCount,
@@ -209,7 +209,7 @@ function insertInList(list, selector, item, comp) {
  *
  */
 function displayItem(obj) {
-  //jshint maxstatements: 35, debug: true, maxcomplexity: 12
+  //jshint maxstatements: 35, debug: true, maxcomplexity: 18
   "use strict";
   var title = obj.title || obj.id,
       data  = {},
@@ -1002,6 +1002,43 @@ function initUI() {
   }, false);
 
   tiles.show('list');
+  if (typeof document.getElementById("authFrame").setVisible === "function") {
+    // the application is installed, override auth methods
+    (function () {
+      var frame = document.getElementById("authFrame");
+      frame.setVisible(false);
+      function onLocationChange(e) {
+        if (e.detail !== frame.getAttribute("src")) {
+          frame.setAttribute("src", e.detail);
+          RemoteStorage.Authorize._rs_init(remoteStorage);
+          remoteStorage._emit("features-loaded");
+          frame.removeEventListener('mozbrowserlocationchange', onLocationChange);
+          tiles.back();
+          frame.setVisible(false);
+        }
+      }
+      remoteStorage.on('authing', function () {
+        tiles.go("auth");
+        frame.setVisible(true);
+      });
+      RemoteStorage.Authorize.getLocation = function () {
+        var location = frame.getAttribute("src");
+        if (location === null) {
+          location = "http://localhost/";
+        }
+        return {
+          href: location,
+          toString: function () {
+            return location;
+          }
+        };
+      };
+      RemoteStorage.Authorize.setLocation = function (location) {
+        frame.setAttribute("src", location);
+        frame.addEventListener('mozbrowserlocationchange', onLocationChange);
+      };
+    }());
+  }
 }
 // }}
 
