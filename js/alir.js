@@ -395,7 +395,7 @@ function initUI() {
       var cl      = $('#menu').classList,
           current = $('#list > .current');
       if (current && current.id) {
-        config.bookmarks[current.id] = window.scrollY / document.body.clientHeight;
+        config.bookmarks[current.id] = window.scrollY / UI.list.clientHeight;
       }
       cl.remove("detail");
       cl.add("list");
@@ -499,7 +499,7 @@ function initUI() {
     $('#menu .content .top').href = '#' + key;
     if (config.bookmarks[key] && clItem.contains('current')) {
       window.setTimeout(function () {
-        window.scrollTo(0, config.bookmarks[key] * document.body.clientHeight);
+        window.scrollTo(0, config.bookmarks[key] * UI.list.clientHeight);
       }, 100);
     }
   }
@@ -669,7 +669,7 @@ function initUI() {
         case 'E':
           items = getItems();
           if (items) {
-            config.bookmarks[items[1].dataset.key] = window.scrollY / document.body.clientHeight;
+            config.bookmarks[items[1].dataset.key] = window.scrollY / UI.list.clientHeight;
             items[1].classList.add('hideRight');
             items[2].classList.add('showLeft');
             window.setTimeout(function () {
@@ -680,7 +680,7 @@ function initUI() {
               items[2].classList.remove('showLeft');
               items[2].classList.add('current');
               if (typeof config.bookmarks[items[2].dataset.key] !== 'undefined') {
-                window.scrollTo(0, config.bookmarks[items[2].dataset.key] * document.body.clientHeight);
+                window.scrollTo(0, config.bookmarks[items[2].dataset.key] * UI.list.clientHeight);
               } else {
                 window.scroll(0, 0);
               }
@@ -690,7 +690,7 @@ function initUI() {
         case 'W':
           items = getItems();
           if (items) {
-            config.bookmarks[items[1].dataset.key] = window.scrollY / document.body.clientHeight;
+            config.bookmarks[items[1].dataset.key] = window.scrollY / UI.list.clientHeight;
             items[1].classList.add('hideLeft');
             items[0].classList.add('showRight');
             window.setTimeout(function () {
@@ -701,7 +701,7 @@ function initUI() {
               items[0].classList.remove('showRight');
               items[0].classList.add('current');
               if (typeof config.bookmarks[items[0].dataset.key] !== 'undefined') {
-                window.scrollTo(0, config.bookmarks[items[0].dataset.key] * document.body.clientHeight);
+                window.scrollTo(0, config.bookmarks[items[0].dataset.key] * UI.list.clientHeight);
               } else {
                 window.scroll(0, 0);
               }
@@ -1000,19 +1000,19 @@ function initUI() {
 
   // Manage scroll
   (function () {
-    var height = document.body.clientHeight,
+    var height = UI.list.clientHeight,
         scroll = $("#menu .scrollbar");
-    scroll.style.height = (window.innerHeight / document.body.clientHeight * 100) + '%';
+    scroll.style.height = (window.innerHeight / UI.list.clientHeight * 100) + '%';
     setInterval(function checkSize() {
-      var h = document.body.clientHeight;
+      var h = UI.list.clientHeight;
       if (h !== height) {
         height = h;
-        scroll.style.height = (window.innerHeight / document.body.clientHeight * 100) + '%';
-        scroll.style.top = (window.scrollY / document.body.clientHeight * 100) + '%';
+        scroll.style.height = (window.innerHeight / UI.list.clientHeight * 100) + '%';
+        scroll.style.top = (window.scrollY / UI.list.clientHeight * 100) + '%';
       }
     }, 250);
     window.onscroll = function () {
-      scroll.style.top = (window.scrollY / document.body.clientHeight * 100) + '%';
+      scroll.style.top = (window.scrollY / UI.list.clientHeight * 100) + '%';
     };
   })();
 

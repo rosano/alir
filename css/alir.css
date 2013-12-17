@@ -20,11 +20,12 @@ body {
   height: 100%;
   background-color: #000;
   color: #FFF;
+  transition: margin .5s ease-in-out;
 }
 body.menu-left #menu {
   width: 4.5rem;
   left: 0;
-  margin: 0 0 0 -8rem;
+  margin: 0 0 0 -2.5rem;
 }
 body.menu-right #menu {
   width: 4.5rem;
@@ -37,15 +38,10 @@ body.menu-right #menu {
   background-color: #BBB;
 }
 body.menu-left #menu .slider {
-  margin-left: 8rem;
-}
-body.menu-left #menu.show .slider {
   margin-left: 2.5rem;
+  transition: margin .5s ease-in-out;
 }
 body.menu-right #menu .slider {
-  margin-right: 8rem;
-}
-body.menu-right #menu.show .slider {
   margin-right: 2.5rem;
 }
 #menu .scrollbar {
@@ -89,12 +85,14 @@ body.online #menu .onoff {
 }
 body.menu-left #menu .scrollbar {
   left: 0;
+  transition: left .5s ease-in-out;
 }
 body.menu-left #menu.show .scrollbar {
   left: 2.5rem;
 }
 body.menu-right #menu .scrollbar {
   right: 0;
+  transition: right .5s ease-in-out;
 }
 body.menu-right #menu.show .scrollbar {
   right: 2.5rem;
