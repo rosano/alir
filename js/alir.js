@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true, Showdown: true */
+/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true, Showdown: true, Event: true */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -30,6 +30,9 @@ var config,
     _;
 config = {
   gesture: false,
+  rs: {
+    login: ''
+  },
   dropBox: {
     apiKey: ''
   },
@@ -362,7 +365,7 @@ function initUI() {
       }
 
       if (conf.rs.login) {
-        $('rsLogin').value = conf.rs.login;
+        $('#rsLogin').value = conf.rs.login;
         remoteStorage.widget.view.form.userAddress.value = conf.rs.login;
       }
       if (conf.dropBox.apiKey) {
@@ -441,6 +444,7 @@ function initUI() {
     offline: function doOffline() {
       remoteStorage.alir.goOffline();
       document.body.classList.remove('online');
+      document.body.classList.remove('sync');
     },
     online: function doOnline() {
       remoteStorage.alir.goOnline();
@@ -453,7 +457,11 @@ function initUI() {
         if (remoteStorage.connected) {
           menuActions.online();
         } else {
-          window.alert(_('notConnected'));
+          if ($('#rsLogin').value !== '') {
+            remoteStorage.widget.view.events.connect(new Event(""));
+          } else {
+            window.alert(_('notConnected'));
+          }
         }
       }
     },
@@ -893,6 +901,60 @@ function initUI() {
   $('#settings [name="inspect"]').addEventListener('click', function () {
     remoteStorage.inspect();
   });
+  $('#rsLogin').addEventListener('change', function () {
+    config.rs.login = this.value;
+    remoteStorage.widget.view.form.userAddress.value = this.value;
+  });
+  $('#prefRS').addEventListener('click', function (event) {
+    if (event.target.dataset && event.target.dataset.action) {
+      switch (event.target.dataset.action) {
+      case "connect":
+        remoteStorage.widget.view.form.userAddress.value = $('#rsLogin').value;
+        remoteStorage.widget.view.events.connect(new Event(""));
+        break;
+      case "sync":
+        remoteStorage.widget.view.events.sync(new Event(""));
+        break;
+      case "reset":
+        remoteStorage.widget.view.events.reset(new Event(""));
+        break;
+      case "disconnect":
+        remoteStorage.widget.view.events.disconnect(new Event(""));
+        break;
+      }
+    }
+  });
+  function setState(state) {
+    var actions = {
+      "connect": $("#prefRS [data-action=connect]").classList,
+      "disconnect": $("#prefRS [data-action=disconnect]").classList,
+      "sync": $("#prefRS [data-action=sync]").classList,
+      "reset": $("#prefRS [data-action=reset]").classList
+    };
+    switch (state) {
+    case "initial":
+      actions.connect.remove("hidden");
+      actions.disconnect.add("hidden");
+      actions.sync.add("hidden");
+      actions.reset.add("hidden");
+      break;
+    case "connected":
+      actions.connect.add("hidden");
+      actions.disconnect.remove("hidden");
+      actions.sync.remove("hidden");
+      actions.reset.remove("hidden");
+      break;
+    default:
+      console.log("unknown state " + state);
+    }
+  }
+  remoteStorage.on('ready', function () {
+    setState('connected');
+  });
+  remoteStorage.on('disconnected', function () {
+    setState('initial');
+  });
+  setState('initial');
   $('#dropboxApiKey').addEventListener('change', function () {
     remoteStorage.setApiKeys('dropbox', {api_key: this.value});
     //remoteStorage.widget.view.reload();
@@ -1027,7 +1089,7 @@ window.addEventListener('load', function () {
   remoteStorage.access.claim('alir', 'rw');
   remoteStorage.caching.enable('/alir/');
   //remoteStorage.caching.enable('/public/alir/');
-  remoteStorage.displayWidget();
+  remoteStorage.displayWidget("rsWidget");
   initUI();
   remoteStorage.alir.private.on('change', function onChange(ev) {
     var elmt, item;

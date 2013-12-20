@@ -43,6 +43,7 @@
         </div>
       </div>
     </div>
+    <div id="rsWidget" class="hidden"></div>
     <div id="menu" class="list">
       <div class="content">
         <p><a class="icon-plus new" data-action="create"></a></p>
@@ -119,6 +120,26 @@
               <option value="en-US" data-l10n-id="settingsLangUs">Simplified English</option>
               <option value="fr" data-l10n-id="settingsLangFr">French</option>
             </select>
+          </fieldset>
+        </fieldset>
+        <fieldset id="prefRS">
+          <legend data-l10n-id="remoteStorage">remoteStorage</legend>
+          <fieldset class="inline text">
+            <p>
+              <label for="rsLogin" data-l10n-id="rsLoginLabel">Login</label>
+              <input type="email" name="rsLogin" id="rsLogin" placeholder="user@host" data-l10n-id="rsLogin" />
+              <button type="reset"><span class="icon-remove"></span></button>
+            </p>
+          </fieldset>
+          <fieldset>
+            <p>
+              <button data-l10n-id="rsConnect" data-action="connect"></button>
+              <button data-l10n-id="rsDisconnect" data-action="disconnect"></button>
+            <p>
+            <p class="col2">
+              <button data-l10n-id="rsSync"  data-action="sync">Synchronize</button>
+              <button data-l10n-id="rsReset" data-action="reset">Reset</button>
+            <p>
           </fieldset>
         </fieldset>
         <fieldset id="prefDropbox">
