@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true, Showdown: true, Event: true */
+/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true, Showdown: true, Event: true, scrap: true, saveScraped: true */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -27,6 +27,7 @@ var config,
     tiles,
     tags = [],
     config,
+    isInstalled,
     _;
 config = {
   gesture: false,
@@ -236,7 +237,7 @@ function insertInList(list, selector, item, comp) {
  *
  */
 function displayItem(obj) {
-  //jshint maxstatements: 35, debug: true, maxcomplexity: 15
+  //jshint maxstatements: 35, debug: true, maxcomplexity: 18
   "use strict";
   var title = obj.title || obj.id,
       data  = {},
@@ -338,7 +339,7 @@ function displayItem(obj) {
   return item;
 }
 function initUI() {
-  // jshint maxstatements: 50
+  // jshint maxstatements: 60
   "use strict";
   var $  = function (sel, root) {root = root || document; return root.querySelector(sel); },
       $$ = function (sel, root) {root = root || document; return [].slice.call(root.querySelectorAll(sel)); },
@@ -456,7 +457,7 @@ function initUI() {
       var cl      = $('#menu').classList,
           current = $('#list > .current');
       if (current && current.id) {
-        config.bookmarks[current.id] = window.scrollY / document.body.clientHeight;
+        config.bookmarks[current.id] = window.scrollY / UI.list.clientHeight;
       }
       cl.remove("detail");
       cl.add("list");
@@ -565,7 +566,7 @@ function initUI() {
     $('#menu .content .top').href = '#' + key;
     if (config.bookmarks[key] && clItem.contains('current')) {
       window.setTimeout(function () {
-        window.scrollTo(0, config.bookmarks[key] * document.body.clientHeight);
+        window.scrollTo(0, config.bookmarks[key] * UI.list.clientHeight);
       }, 100);
     }
   }
@@ -735,7 +736,7 @@ function initUI() {
         case 'E':
           items = getItems();
           if (items) {
-            config.bookmarks[items[1].dataset.key] = window.scrollY / document.body.clientHeight;
+            config.bookmarks[items[1].dataset.key] = window.scrollY / UI.list.clientHeight;
             items[1].classList.add('hideRight');
             items[2].classList.add('showLeft');
             window.setTimeout(function () {
@@ -746,7 +747,7 @@ function initUI() {
               items[2].classList.remove('showLeft');
               items[2].classList.add('current');
               if (typeof config.bookmarks[items[2].dataset.key] !== 'undefined') {
-                window.scrollTo(0, config.bookmarks[items[2].dataset.key] * document.body.clientHeight);
+                window.scrollTo(0, config.bookmarks[items[2].dataset.key] * UI.list.clientHeight);
               } else {
                 window.scroll(0, 0);
               }
@@ -756,7 +757,7 @@ function initUI() {
         case 'W':
           items = getItems();
           if (items) {
-            config.bookmarks[items[1].dataset.key] = window.scrollY / document.body.clientHeight;
+            config.bookmarks[items[1].dataset.key] = window.scrollY / UI.list.clientHeight;
             items[1].classList.add('hideLeft');
             items[0].classList.add('showRight');
             window.setTimeout(function () {
@@ -767,7 +768,7 @@ function initUI() {
               items[0].classList.remove('showRight');
               items[0].classList.add('current');
               if (typeof config.bookmarks[items[0].dataset.key] !== 'undefined') {
-                window.scrollTo(0, config.bookmarks[items[0].dataset.key] * document.body.clientHeight);
+                window.scrollTo(0, config.bookmarks[items[0].dataset.key] * UI.list.clientHeight);
               } else {
                 window.scroll(0, 0);
               }
@@ -833,6 +834,41 @@ function initUI() {
   });
   forEvent('#input [data-action="articleCancel"]', 'click', function () {
     tiles.show('list');
+  });
+  // }}
+  // Links {{
+  forEvent('#link [data-action="linkScrap"]', 'click', function () {
+    var href = document.getElementById('linkRef').textContent;
+    try {
+      utils.log("Scraping " + href);
+      scrap(href, function (err, res) {
+        if (err) {
+          utils.log('' + err, 'error');
+          window.alert(err);
+        } else {
+          saveScraped(res);
+        }
+      });
+    } catch (e) {
+      utils.log("" + e, "error");
+      window.alert(e);
+    }
+    tiles.back();
+  });
+  forEvent('#link [data-action="linkOpen"]', 'click', function () {
+    var href = document.getElementById('linkRef').textContent,
+        openURL;
+    openURL = new window.MozActivity({
+      name: "view",
+      data: {
+        type: "url",
+        url: href
+      }
+    });
+    tiles.back();
+  });
+  forEvent('#link [data-action="linkCancel"]', 'click', function () {
+    tiles.back();
   });
   // }}
   // Notes {{
@@ -942,9 +978,11 @@ function initUI() {
   $('#settings [name="done"]').addEventListener('click', function () {
     tiles.show('list');
   });
+  /*
   $('#settings [name="inspect"]').addEventListener('click', function () {
     remoteStorage.inspect();
   });
+  */
   $('#rsLogin').addEventListener('change', function () {
     config.rs.login = this.value;
     remoteStorage.widget.view.form.userAddress.value = this.value;
@@ -1055,19 +1093,19 @@ function initUI() {
 
   // Manage scroll
   (function () {
-    var height = document.body.clientHeight,
+    var height = UI.list.clientHeight,
         scroll = $("#menu .scrollbar");
-    scroll.style.height = (window.innerHeight / document.body.clientHeight * 100) + '%';
+    scroll.style.height = (window.innerHeight / UI.list.clientHeight * 100) + '%';
     setInterval(function checkSize() {
-      var h = document.body.clientHeight;
+      var h = UI.list.clientHeight;
       if (h !== height) {
         height = h;
-        scroll.style.height = (window.innerHeight / document.body.clientHeight * 100) + '%';
-        scroll.style.top = (window.scrollY / document.body.clientHeight * 100) + '%';
+        scroll.style.height = (window.innerHeight / UI.list.clientHeight * 100) + '%';
+        scroll.style.top = (window.scrollY / UI.list.clientHeight * 100) + '%';
       }
     }, 250);
     window.onscroll = function () {
-      scroll.style.top = (window.scrollY / document.body.clientHeight * 100) + '%';
+      scroll.style.top = (window.scrollY / UI.list.clientHeight * 100) + '%';
     };
   })();
 
@@ -1093,12 +1131,76 @@ function initUI() {
   }, false);
 
   tiles.show('list');
+  if (typeof document.getElementById("authFrame").setVisible === "function") {
+    // the application is installed, override auth methods
+    (function () {
+      var frame = document.getElementById("authFrame");
+      frame.setVisible(false);
+      function onLocationChange(e) {
+        if (e.detail !== frame.getAttribute("src")) {
+          frame.setAttribute("src", e.detail);
+          RemoteStorage.Authorize._rs_init(remoteStorage);
+          remoteStorage._emit("features-loaded");
+          frame.removeEventListener('mozbrowserlocationchange', onLocationChange);
+          tiles.back();
+          frame.setVisible(false);
+        }
+      }
+      remoteStorage.on('authing', function () {
+        tiles.go("auth");
+        frame.setVisible(true);
+      });
+      RemoteStorage.Authorize.getLocation = function () {
+        var location = frame.getAttribute("src");
+        if (location === null) {
+          location = "http://localhost/";
+        }
+        return {
+          href: location,
+          toString: function () {
+            return location;
+          }
+        };
+      };
+      RemoteStorage.Authorize.setLocation = function (location) {
+        frame.setAttribute("src", location);
+        frame.addEventListener('mozbrowserlocationchange', onLocationChange);
+      };
+    }());
+  }
 }
 // }}
+
+function initLinks() {
+  "use strict";
+  document.querySelector("#list").addEventListener('click', function (ev) {
+    if (ev.target.target && ev.target.target === '_blank' && ev.target.href) {
+      ev.preventDefault();
+      document.getElementById("linkRef").textContent = ev.target.href;
+      tiles.go('link');
+    }
+  });
+}
 
 window.addEventListener('load', function () {
   "use strict";
   _ = document.webL10n.get;
+  // Check if application is installed
+  if (window.navigator.mozApps) {
+    (function () {
+      var request = window.navigator.mozApps.getSelf();
+      request.onsuccess = function () {
+        if (request.result) {
+          isInstalled = true;
+          initLinks();
+        }
+      };
+      request.onerror = function () {
+        alert("Error: " + request.error.name);
+      };
+    }());
+  }
+  initUI();
   //remoteStorage.enableLog();
   remoteStorage.access.claim('alir', 'rw');
   remoteStorage.caching.enable('/alir/');

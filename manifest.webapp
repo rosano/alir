@@ -33,13 +33,14 @@
           "regexp":"/^https?:/"
         }
       },
-      "disposition": "window",
+      "disposition": "inline",
       "href": "/index.html",
       "returnValue": true
     }
   },
   "permissions": {
-    "systemXHR":{}
+    "systemXHR":{},
+    "browser": {}
   },
   "default_locale": "en",
   "locales": {
@@ -53,6 +54,6 @@
     }
   },
   "type": "privileged",
-  "version": "0.1.61"
+  "version": "0.1.69"
 }
 

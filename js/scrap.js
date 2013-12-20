@@ -1,5 +1,5 @@
 //jshint browser: true
-/* global utils: true, remoteStorage: true, tiles: true */
+/* global utils: true, remoteStorage: true */
 function scrap(url, cb) {
   "use strict";
   var options, xhr;
@@ -60,7 +60,6 @@ function saveScraped(article) {
     };
     remoteStorage.alir.savePrivate(obj);
     window.alert(article.title);
-    tiles.show('list');
     utils.log('Created : ' + article.title);
   } catch (e) {
     utils.log(utils.format("Error saving %s : %s", article.title, e), 'error');
