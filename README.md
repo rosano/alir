@@ -86,6 +86,11 @@ Once the addon is installed, go to it’s preference page and set the Dropbox Ap
 Click on the left margin, then on option icon, set the API key, reload page (yes, not very friendly). A dropbox icon should appear on top right corner. Click on the icon, allow the application, and you may be able to see the contents you put with the addon.
 
 
+## Using Google Drive
+
+You need to give Google your phone number to add a third party application to Google Drive, so I haven’t be able to test it :(
+
+
 ## Firefox OS Client
 
 If you have a phone running Firefox OS, you can also install the application. This will allow to put content into it from the browser of the phone. To do so, click on the bookmark icon (the star at the bottom), then choose to add the page to the home screen. A list of apps able to handle the bookmark will show up. Select Àlir and if everything works, it will fetch the page content, clean it up using [readabilitySAX](https://github.com/fb55/readabilitysax) and add it to your list of items to read.

@@ -1,5 +1,10 @@
 //jshint browser: true
 /* exported Tiles template */
+var matchesSelector = document.documentElement.matchesSelector ||
+  document.documentElement.webkitMatchesSelector ||
+  document.documentElement.mozMatchesSelector ||
+  document.documentElement.oMatchesSelector ||
+  document.documentElement.msMatchesSelector;
 var utils = {
   device: {
     type: '',
@@ -70,9 +75,15 @@ var utils = {
         }
       }
     });
-    return a;
+    return b;
+  },
+  match: function (elmt, sel) {
+    "use strict";
+    sel = sel + ', ' + sel + ' *';
+    return matchesSelector.call(elmt, sel);
   }
 };
+
 function Tiles(global) {
   "use strict";
   var current,

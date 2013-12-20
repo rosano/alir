@@ -49,7 +49,7 @@ tiles = new Tiles();
 
 function createXPathFromElement(elm) {
   // source: http://stackoverflow.com/a/5178132
-  //jshint maxcomplexity: 10
+  //jshint maxcomplexity: 12
   "use strict";
   var allNodes = document.getElementsByTagName('*'),
   uniqueIdCount,
@@ -161,9 +161,8 @@ function toDom(str, fullUrl) {
   "use strict";
   var fragment = document.createDocumentFragment(),
       sandbox  = document.createElement('div'),
-      domain   = new RegExp("((http.?//[^/]+).*/)(.*)").exec(fullUrl),
+      domain   = new RegExp("((http.?://[^/]+).*/)([^?]*).?(.*$)").exec(fullUrl),
       domainUrl, baseUrl;
-  console.log(domain);
   if (domain !== null) {
     domainUrl = domain[2];
     baseUrl   = domain[1];
@@ -237,7 +236,7 @@ function insertInList(list, selector, item, comp) {
  *
  */
 function displayItem(obj) {
-  //jshint maxstatements: 35, debug: true, maxcomplexity: 12
+  //jshint maxstatements: 35, debug: true, maxcomplexity: 15
   "use strict";
   var title = obj.title || obj.id,
       data  = {},
@@ -341,9 +340,8 @@ function displayItem(obj) {
 function initUI() {
   // jshint maxstatements: 50
   "use strict";
-  var $  = function (sel) {return document.querySelector.call(document, sel); },
-      $$ = function (sel) {return document.querySelectorAll.call(document, sel); },
-      forElement = function (sel, fct) {Array.prototype.forEach.call(document.querySelectorAll(sel), fct); },
+  var $  = function (sel, root) {root = root || document; return root.querySelector(sel); },
+      $$ = function (sel, root) {root = root || document; return [].slice.call(root.querySelectorAll(sel)); },
       forEvent = function (sel, event, fct) {Array.prototype.forEach.call(document.querySelectorAll(sel), function (elmt) { elmt.addEventListener(event, fct); }); },
       UI = {},
       menuActions = {};
@@ -392,12 +390,58 @@ function initUI() {
     }
   }());
 
-  forElement('form', function (form) {
+  $$('form').forEach(function (form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       return false;
     });
   });
+
+  // Actions {{
+  (function () {
+    var actions = {
+      clearLogs: function () {
+        document.getElementById('debugLog').innerHTML =  "";
+      },
+      tileGo: function (name) {
+        tiles.go(name);
+      },
+      tileBack: function () {
+        tiles.back();
+      },
+      widgetShow: function () {
+        $('#rsWidget').classList.toggle("hidden");
+      }
+    };
+
+    // Generic event Listener
+    document.body.addEventListener('click', function (ev) {
+      //jshint curly: false
+      var parent = ev.target.parentNode,
+          params = [];
+      if (utils.match(ev.target, "button[type=reset]")) {
+        ev.preventDefault();
+        while (parent.tagName !== 'FIELDSET' && (parent = parent.parentNode)) ;
+        if (parent !== null) {
+          $$("input", parent).forEach(function (elmt) {
+            elmt.value = '';
+          });
+        }
+      }
+      if (ev.target.dataset && ev.target.dataset.method) {
+        if (typeof ev.target.dataset.params !== "undefined") {
+          params = ev.target.dataset.params.split(',');
+        }
+        if (typeof actions[ev.target.dataset.method] === "undefined") {
+          utils.log("Unknown method " + ev.target.dataset.method);
+        } else {
+          actions[ev.target.dataset.method].apply(null, params);
+        }
+      }
+    });
+  })();
+  // }}
+
   // left menu actions
   menuActions = {
     create: function doCreate() {
@@ -420,7 +464,7 @@ function initUI() {
       cl = $('#main').classList;
       cl.remove("detail");
       cl.add("list");
-      forElement('#list li[data-key]', function (e) {
+      $$('#list li[data-key]').forEach(function (e) {
         e.classList.remove('hidden');
         e.classList.remove('current');
       });
@@ -466,7 +510,7 @@ function initUI() {
       }
     },
   };
-  forElement('#menu .content [data-action]', function () {
+  $$('#menu .content [data-action]').forEach(function () {
     var elmt = arguments[0];
     UI.menu[elmt.dataset.action] = elmt;
   });
@@ -513,7 +557,7 @@ function initUI() {
     clMenu.toggle("list");
     clList.toggle("detail");
     clList.toggle("list");
-    Array.prototype.forEach.call($$('li[data-key]'), function (e) {
+    $$('li[data-key]').forEach(function (e) {
       e.classList.toggle('hidden');
     });
     clItem.toggle('hidden');
@@ -659,7 +703,7 @@ function initUI() {
           var current  = $("#list > .current"),
               previous,
               next,
-              items = [].slice.call($$("#list > li")),
+              items = $$("#list > li"),
               currentIndex;
           if (current === null) {
             return false;
@@ -984,6 +1028,7 @@ function initUI() {
   $('#settingsLang select').addEventListener('change', function () {
     document.webL10n.setLanguage(this.value);
   });
+  /*
   $('#settings [name="install"]').addEventListener('click', function () {
     var request = window.navigator.mozApps.installPackage("https://alir.5apps.com/package.manifest");
     request.onerror = function () {
@@ -995,38 +1040,7 @@ function initUI() {
       tiles.show('list');
     };
   });
-  // }}
-  // Actions {{
-  (function () {
-    var actions = {
-      clearLogs: function () {
-        document.getElementById('debugLog').innerHTML =  "";
-      },
-      tileGo: function (name) {
-        tiles.go(name);
-      },
-      tileBack: function () {
-        tiles.back();
-      }
-    };
-    Array.prototype.forEach.call(document.querySelectorAll("[data-method]"), function (elmt) {
-      elmt.addEventListener('click', function (event) {
-        var params = [];
-        if (typeof this.dataset.method === "undefined") {
-          return;
-        }
-        if (typeof this.dataset.params !== "undefined") {
-          params = this.dataset.params.split(',');
-        }
-        if (typeof actions[this.dataset.method] === "undefined") {
-          utils.log("Unknown method " + this.dataset.method);
-          return;
-        }
-        actions[this.dataset.method].apply(null, params);
-      });
-    });
-
-  })();
+  */
   // }}
   // Left menu {{
   $('#menu').addEventListener('click', function (event) {
@@ -1085,7 +1099,7 @@ function initUI() {
 window.addEventListener('load', function () {
   "use strict";
   _ = document.webL10n.get;
-  remoteStorage.enableLog();
+  //remoteStorage.enableLog();
   remoteStorage.access.claim('alir', 'rw');
   remoteStorage.caching.enable('/alir/');
   //remoteStorage.caching.enable('/public/alir/');
