@@ -1200,7 +1200,6 @@ window.addEventListener('load', function () {
       };
     }());
   }
-  initUI();
   //remoteStorage.enableLog();
   remoteStorage.access.claim('alir', 'rw');
   remoteStorage.caching.enable('/alir/');
