@@ -92,14 +92,14 @@
         </fieldset>
         <p class="col2">
           <button data-action="articleSave" data-l10n-id="articleSave">Save</button>
-          <button data-action="articleCancel" data-l10n-id="cancel">Cancel</button>
+          <button data-method="tileShow" data-params="list" data-l10n-id="cancel">Cancel</button>
         </p>
         <fieldset class="inline text">
           <textarea rows="10" cols="40" name="text" placeholder="Content" data-l10n-id="articleContent"></textarea>
         </fieldset>
         <p class="col2">
           <button data-action="articleSave" data-l10n-id="articleSave">Save</button>
-          <button data-action="articleCancel" data-l10n-id="cancel">Cancel</button>
+          <button data-method="tileShow" data-params="list" data-l10n-id="cancel">Cancel</button>
         </p>
       </form>
     </div>
@@ -195,19 +195,24 @@
           </p>
         </fieldset>
         <p>
-          <button name="credit" data-l10n-id="settingsCredits" data-method="tileGo" data-params="credits">Credits</button>
-          <!--
-          <button name="inspect" data-l10n-id="settingsDebug">Debug</button>
-          <button name="install" data-l10n-id="settingsInstall">Install</button>
-          <button data-method="widgetShow">Show widget</button>
-          -->
-          <button name="done" data-l10n-id="settingsDone">Ok</button>
+          <button data-method="tileGo"   data-params="credits"  data-l10n-id="settingsCredits">Credits</button>
+          <button data-method="tileGo"   data-params="advanced" data-l10n-id="settingsAdvanced" data-method="tileGo">Advanced</button>
+          <button data-method="tileShow" data-params="list"     data-l10n-id="settingsDone">Ok</button>
         </p>
         <section>
           <button name="clearLog" data-l10n-id="settingsClearLog" data-method="clearLogs">Clear Log</button>
           <pre id="debugLog"></pre>
         </section>
       </form>
+    </div>
+    <div data-tile="advanced">
+          <button data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
+          <!--
+          <button data-method="install" data-l10n-id="settingsInstall">Install</button>
+          -->
+          <button data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
+          <button data-method="getAll" data-l10n-id="settingsReload">Reload</button>
+          <button data-l10n-id="back" data-method="tileBack" >Back</button>
     </div>
     <section id="noteView" data-tile="noteView" class="">
       <header><h2 data-l10n-id="noteViewHeader">View note</h2></header>
@@ -219,7 +224,7 @@
       <div class="content">
       </div>
       <p>
-        <button name="back" data-l10n-id="noteBack">Back</button>
+        <button name="back" data-l10n-id="noteBack" data-method="tileBack">Back</button>
         <button name="delete" data-l10n-id="noteDelete">Delete</button>
       </p>
     </section>
@@ -234,7 +239,7 @@
         </fieldset>
         <p class="col2">
           <button name="save" data-l10n-id="noteSave">Save</button>
-          <button name="cancel" data-l10n-id="noteCancel">Cancel</button>
+          <button name="cancel" data-l10n-id="noteCancel" data-method="tileBack">Cancel</button>
         </p>
       </form>
     </section>
@@ -252,7 +257,7 @@
         </ul>
         <p class="col2">
           <button name="save" data-l10n-id="tagSave">Save</button>
-          <button name="cancel" data-l10n-id="tagCancel">Cancel</button>
+          <button name="cancel" data-l10n-id="tagCancel" data-method="tileBack">Cancel</button>
         </p>
       </form>
     </section>
@@ -293,7 +298,7 @@
       <p id="linkRef"></p>
       <button data-action="linkScrap" data-l10n-id="linkScrap">Scrap</button>
       <button data-action="linkOpen" data-l10n-id="linkOpen">Open</button>
-      <button data-action="linkCancel" data-l10n-id="linkCancel">Return</button>
+      <button data-action="linkCancel" data-l10n-id="linkCancel" data-method="tileBack">Return</button>
     </section>
     <script type="text/javascript" src="lib/build.js"></script>
     <!--

@@ -183,14 +183,10 @@ function toDom(str, fullUrl) {
   Array.prototype.forEach.call(sandbox.querySelectorAll('script, style'), function (e) {
     e.parentNode.removeChild(e);
   });
-  Array.prototype.forEach.call(sandbox.querySelectorAll('* [id]'), function (e) {
-    e.removeAttribute('id');
-  });
-  Array.prototype.forEach.call(sandbox.querySelectorAll('* [class]'), function (e) {
-    e.removeAttribute('class');
-  });
-  Array.prototype.forEach.call(sandbox.querySelectorAll('* [style]'), function (e) {
-    e.removeAttribute('style');
+  ['class', 'id', 'style', 'onclick', 'onload'].forEach(function (attr) {
+    Array.prototype.forEach.call(sandbox.querySelectorAll('* [' + attr + ']'), function (e) {
+      e.removeAttribute(attr);
+    });
   });
   Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]'), function (e) {
     e.setAttribute('target', '_blank');
@@ -344,6 +340,17 @@ function displayItem(obj) {
 
   return item;
 }
+function getAll() {
+  "use strict";
+  remoteStorage.alir.private.getAll('').then(function (objects) {
+    if (objects) {
+      Object.keys(objects).forEach(function (key) {
+        objects[key].id = key;
+        displayItem(objects[key]);
+      });
+    }
+  });
+}
 function initUI() {
   // jshint maxstatements: 60
   "use strict";
@@ -410,11 +417,22 @@ function initUI() {
       clearLogs: function () {
         document.getElementById('debugLog').innerHTML =  "";
       },
-      tileGo: function (name) {
-        tiles.go(name);
+      getAll: function () {
+        getAll();
+      },
+      inspect: function () {
+        remoteStorage.inspect();
+      },
+      install: function () {
       },
       tileBack: function () {
         tiles.back();
+      },
+      tileGo: function (name) {
+        tiles.go(name);
+      },
+      tileShow: function (name) {
+        tiles.show(name);
       },
       widgetShow: function () {
         $('#rsWidget').classList.toggle("hidden");
@@ -697,8 +715,9 @@ function initUI() {
       tiles.go('noteEdit');
     }
   }
-  // @fixme should use contextmenu only on touch screens
-  UI.list.addEventListener('contextmenu', doNote);
+  if ("ontouchstart" in window) {
+    UI.list.addEventListener('contextmenu', doNote);
+  }
   UI.list.addEventListener('dblclick', doNote);
   // Gestures {{
   (function () {
@@ -838,9 +857,6 @@ function initUI() {
       tiles.show('list');
     }
   });
-  forEvent('#input [data-action="articleCancel"]', 'click', function () {
-    tiles.show('list');
-  });
   // }}
   // Links {{
   forEvent('#link [data-action="linkScrap"]', 'click', function () {
@@ -873,9 +889,6 @@ function initUI() {
     });
     tiles.back();
   });
-  forEvent('#link [data-action="linkCancel"]', 'click', function () {
-    tiles.back();
-  });
   // }}
   // Notes {{
   forEvent('#noteEdit [name="save"]', 'click', function () {
@@ -902,12 +915,6 @@ function initUI() {
         tiles.back();
       }
     });
-  });
-  forEvent('#noteEdit [name="cancel"]', 'click', function () {
-    tiles.back();
-  });
-  forEvent('#noteView [name="back"]', 'click', function () {
-    tiles.back();
   });
   forEvent('#noteView [name="delete"]', 'click', function () {
     if (window.confirm(_('noteConfirmDelete'))) {
@@ -943,9 +950,6 @@ function initUI() {
     $('#tagTile [name="save"]').addEventListener('click', function () {
       tiles.back(input.value);
     });
-    $('#tagTile [name="cancel"]').addEventListener('click', function () {
-      tiles.back('');
-    });
   }());
   // }}
   // Filters {{
@@ -953,7 +957,6 @@ function initUI() {
     var dynamicSheet = document.getElementById('dynamicCss').sheet,
         filter = document.getElementById('listFilter');
     function onFilterChange() {
-      // @FIXME this function is too much dependant of the view marker
       while (dynamicSheet.cssRules[0]) {
         dynamicSheet.deleteRule(0);
       }
@@ -962,6 +965,7 @@ function initUI() {
         dynamicSheet.insertRule('#main.list li[data-tags*="' + filter.value + '"], #main.list li[data-title*="' + filter.value + '"] { display: block; }', 1);
       }
     }
+    filter.addEventListener("keyup", onFilterChange);
     filter.addEventListener("change", onFilterChange);
     document.querySelector("#listFilter + button").addEventListener("click", function () {
       filter.value = '';
@@ -981,14 +985,6 @@ function initUI() {
   // }}
   // {{ Settings
 
-  $('#settings [name="done"]').addEventListener('click', function () {
-    tiles.show('list');
-  });
-  /*
-  $('#settings [name="inspect"]').addEventListener('click', function () {
-    remoteStorage.inspect();
-  });
-  */
   $('#rsLogin').addEventListener('change', function () {
     config.rs.login = this.value;
     remoteStorage.widget.view.form.userAddress.value = this.value;
@@ -1206,7 +1202,6 @@ window.addEventListener('load', function () {
       };
     }());
   }
-  initUI();
   //remoteStorage.enableLog();
   remoteStorage.access.claim('alir', 'rw');
   remoteStorage.caching.enable('/alir/');
@@ -1236,14 +1231,7 @@ window.addEventListener('load', function () {
       item = displayItem(ev.newValue);
     }
   });
-  remoteStorage.alir.private.getAll('').then(function (objects) {
-    if (objects) {
-      Object.keys(objects).forEach(function (key) {
-        objects[key].id = key;
-        displayItem(objects[key]);
-      });
-    }
-  });
+  getAll();
 
 /*
   if (Notification && Notification.permission !== "granted") {

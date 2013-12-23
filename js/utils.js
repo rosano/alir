@@ -106,11 +106,13 @@ function Tiles(global) {
     },
     back: function (res) {
       var next = tiles.pop();
-      this.show(next.name);
-      if (typeof next.cb === 'function') {
-        next.cb(res);
+      if (typeof next === 'object') {
+        this.show(next.name);
+        if (typeof next.cb === 'function') {
+          next.cb(res);
+        }
+        window.scrollTo(0, next.y);
       }
-      window.scrollTo(0, next.y);
     }
   };
 }

@@ -188,6 +188,9 @@ body.menu-right [data-tile] {
 #list .current .actions {
   display: block;
 }
+#list .content + .actions {
+  margin-top: 2rem;
+}
 #list .current .content .note {
   padding: 10px;
   display: block;
