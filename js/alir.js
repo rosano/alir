@@ -243,10 +243,10 @@ function displayItem(obj) {
       data  = {},
       item,
       tagsNode,
-      classes = '';
+      classes = [];
   item = document.getElementById(obj.id);
   if (item) {
-    classes = item.getAttribute('class');
+    classes = [].slice.call(item.classList);
     item.parentNode.removeChild(item);
   }
   if (typeof obj.notes !== 'object') {
@@ -332,10 +332,16 @@ function displayItem(obj) {
   insertInList(document.getElementById('list'), "[data-key]", item, function (e) { return (e.dataset.date < obj.date); });
   // }}
 
-  if (classes !== '') {
-    //@FIXME merge classes
-    item.setAttribute("class", classes);
+  if (classes.length !== 0) {
+    classes.forEach(function (cl) {
+      item.classList.add(cl);
+    });
   }
+
+  if (document.getElementById('main').classList.contains('detail')) {
+    item.classList.add('hidden');
+  }
+
   return item;
 }
 function initUI() {
