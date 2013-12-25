@@ -176,6 +176,25 @@ body.menu-right [data-tile] {
   padding-left: 0.5rem;
   padding-right: 2.5rem;
 }
+body.popup .shown {
+  opacity: 0.3;
+}
+.popup[data-tile] {
+  position: absolute;
+  top: 12%;
+  left: 25%;
+  width: 50%;
+  overflow: auto;
+  border: 2px solid white;
+  border-radius: 0.5rem;
+  background-color: #FFF;
+  opacity: 1;
+  display: block;
+  box-shadow: 0 0 1rem #000;
+}
+body.hosted .ifInstalled, body.installed .ifHosted {
+  display: none;
+}
 #list {
   margin: 0;
   padding: 0;

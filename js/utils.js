@@ -1,10 +1,11 @@
 //jshint browser: true
 /* exported Tiles template */
-var matchesSelector = document.documentElement.matchesSelector ||
-  document.documentElement.webkitMatchesSelector ||
-  document.documentElement.mozMatchesSelector ||
-  document.documentElement.oMatchesSelector ||
-  document.documentElement.msMatchesSelector;
+var matchesSelector = document.documentElement.matches ||
+                      document.documentElement.matchesSelector ||
+                      document.documentElement.webkitMatchesSelector ||
+                      document.documentElement.mozMatchesSelector ||
+                      document.documentElement.oMatchesSelector ||
+                      document.documentElement.msMatchesSelector;
 var utils = {
   device: {
     type: '',
@@ -87,7 +88,8 @@ var utils = {
 function Tiles(global) {
   "use strict";
   var current,
-      tiles = [];
+      tiles = [],
+      popup = (window.matchMedia("(min-width: 37rem) and (min-height: 37rem)").matches);
   return {
     show: function (name) {
       Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
@@ -102,16 +104,36 @@ function Tiles(global) {
     },
     go: function (name, cb) {
       tiles.push({name: current, y: window.scrollY, cb: cb});
-      this.show(name);
+      if (popup) {
+        document.body.classList.add("popup");
+        Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
+          if (e.dataset.tile === name) {
+            e.classList.add('popup');
+            window.scrollTo(0, 0);
+            current = name;
+          }
+        });
+      } else {
+        this.show(name);
+      }
     },
     back: function (res) {
-      var next = tiles.pop();
-      if (typeof next === 'object') {
-        this.show(next.name);
-        if (typeof next.cb === 'function') {
-          next.cb(res);
+      var current, next;
+      if (popup) {
+        current = document.querySelector(".popup[data-tile]");
+        if (current) {
+          current.classList.remove('popup');
         }
-        window.scrollTo(0, next.y);
+        document.body.classList.remove('popup');
+      } else {
+        next = tiles.pop();
+        if (typeof next === 'object') {
+          this.show(next.name);
+          if (typeof next.cb === 'function') {
+            next.cb(res);
+          }
+          window.scrollTo(0, next.y);
+        }
       }
     }
   };
