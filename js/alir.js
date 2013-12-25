@@ -722,6 +722,20 @@ function initUI() {
           tiles.show('input');
         });
         break;
+      case 'share':
+        (function () {
+          var request = new window.MozActivity({
+            name: "share",
+            data: {
+              type: "url",
+              url: ce.keyNode.dataset.url
+            }
+          });
+          request.onerror = function () {
+            window.alert("Error sharing : " + request.error.name);
+          };
+        }());
+        break;
       case 'note':
         remoteStorage.get('/alir/' + ce.key).then(function (err, article, contentType, revision) {
           if (err !== 200) {

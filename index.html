@@ -17,7 +17,7 @@
   <body class="online menu-left hosted">
     <div id="templates">
       <ul id="tmpl-item">
-        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}">
+        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
           <h2><a data-action="toggle" href="#{{=key}}"><span class="icon-tags hasNotes"></span>{{=title}}</a></h2>
           <div class="actions">
             <a class="icon-chevron-left" data-action="toggle" href="#"></a>
@@ -25,6 +25,7 @@
             <a class="icon-trash" data-action="delete" href="#"></a>
             <a class="icon-tags" data-action="addTag" href="#"></a>
             <a class="icon-pencil compose" data-action="compose" href="#"></a>
+            <a class="icon-magic isInstalled" data-action="share" href="#"></a>
           </div>
           <div class="content">
             <p><a class="url" href="{{=url}}" target="_blank">{{=url}}</a></p>
@@ -40,6 +41,7 @@
             <a class="icon-trash" data-action="delete" href="#"></a>
             <a class="icon-tags" data-action="addTag" href="#"></a>
             <a class="icon-pencil compose" data-action="compose" href="#"></a>
+            <a class="icon-magic" data-action="share" href="#"></a>
           </div>
         </li>
       </ul>
