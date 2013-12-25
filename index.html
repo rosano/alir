@@ -14,7 +14,7 @@
     <link rel="icon" type="image/png" href="/img/icon-32.png" />
     <link rel="prefetch" type="application/l10n" href="locales/locales.ini" />
   </head>
-  <body class="online menu-left">
+  <body class="online menu-left hosted">
     <div id="templates">
       <ul id="tmpl-item">
         <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}">
@@ -207,9 +207,8 @@
     </div>
     <div data-tile="advanced">
           <button data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
-          <!--
-          <button data-method="install" data-l10n-id="settingsInstall">Install</button>
-          -->
+          <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
+          <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
           <button data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
           <button data-method="getAll" data-l10n-id="settingsReload">Reload</button>
           <button data-l10n-id="back" data-method="tileBack" >Back</button>

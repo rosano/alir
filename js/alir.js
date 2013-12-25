@@ -1,5 +1,6 @@
 /*jshint browser: true, devel: true */
 /*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true, Showdown: true, Event: true, scrap: true, saveScraped: true */
+/*exported: alir */
 /**
     Alir
     Copyright (C) {2013}  {Clochix}
@@ -47,6 +48,39 @@ config = {
 };
 
 tiles = new Tiles();
+
+window.alir = {
+  install: function () {
+    "use strict";
+    (function () {
+      var request = window.navigator.mozApps.installPackage("https://alir.5apps.com/package.manifest");
+      request.onerror = function () {
+        window.alert("Install Error : " + this.error.name);
+        console.log(this.error, 'error');
+      };
+      request.onsuccess = function () {
+        window.alert("Install successful");
+        tiles.show('list');
+      };
+    }());
+  },
+  update: function () {
+    "use strict";
+    (function () {
+      var request = window.navigator.mozApps.getSelf();
+      request.onsuccess = function () {
+        if (request.result) {
+          request.result.checkForUpdate();
+        } else {
+          alert("Called from outside of an app");
+        }
+      };
+      request.onerror = function () {
+        alert("Error: " + request.error.name);
+      };
+    }());
+  }
+};
 
 function createXPathFromElement(elm) {
   // source: http://stackoverflow.com/a/5178132
@@ -423,8 +457,6 @@ function initUI() {
       inspect: function () {
         remoteStorage.inspect();
       },
-      install: function () {
-      },
       tileBack: function () {
         tiles.back();
       },
@@ -443,7 +475,9 @@ function initUI() {
     document.body.addEventListener('click', function (ev) {
       //jshint curly: false
       var parent = ev.target.parentNode,
-          params = [];
+          params = [],
+          dataset = ev.target.dataset;
+      // Reset buttons {
       if (utils.match(ev.target, "button[type=reset]")) {
         ev.preventDefault();
         while (parent.tagName !== 'FIELDSET' && (parent = parent.parentNode)) ;
@@ -453,14 +487,26 @@ function initUI() {
           });
         }
       }
-      if (ev.target.dataset && ev.target.dataset.method) {
-        if (typeof ev.target.dataset.params !== "undefined") {
-          params = ev.target.dataset.params.split(',');
+      // }
+      // Links inside content {
+      if (utils.match(ev.target, "#list .content a[href][target]")) {
+        ev.preventDefault();
+        document.getElementById("linkRef").textContent = ev.target.href;
+        tiles.go('link');
+      }
+      // }
+      if (dataset && dataset.method) {
+        if (typeof dataset.params !== "undefined") {
+          params = dataset.params.split(',');
         }
-        if (typeof actions[ev.target.dataset.method] === "undefined") {
-          utils.log("Unknown method " + ev.target.dataset.method);
+        if (typeof dataset.object !== 'undefined' && typeof window[dataset.object] !== 'undefined' && typeof window[dataset.object][dataset.method] === 'function') {
+          window[dataset.object][dataset.method]();
         } else {
-          actions[ev.target.dataset.method].apply(null, params);
+          if (typeof actions[dataset.method] === "undefined") {
+            utils.log("Unknown method " + dataset.method);
+          } else {
+            actions[dataset.method].apply(null, params);
+          }
         }
       }
     });
@@ -493,6 +539,9 @@ function initUI() {
         e.classList.remove('hidden');
         e.classList.remove('current');
       });
+      if (current) {
+        current.scrollIntoView();
+      }
       document.body.classList.remove("menu");
     },
     toggleMenu: function doToggleMenu() {
@@ -1068,19 +1117,6 @@ function initUI() {
   $('#settingsLang select').addEventListener('change', function () {
     document.webL10n.setLanguage(this.value);
   });
-  /*
-  $('#settings [name="install"]').addEventListener('click', function () {
-    var request = window.navigator.mozApps.installPackage("https://alir.5apps.com/package.manifest");
-    request.onerror = function () {
-      window.alert("Error");
-      console.log(this.error, 'error');
-    };
-    request.onsuccess = function () {
-      window.alert("Yeah");
-      tiles.show('list');
-    };
-  });
-  */
   // }}
   // Left menu {{
   $('#menu').addEventListener('click', function (event) {
@@ -1173,17 +1209,6 @@ function initUI() {
 }
 // }}
 
-function initLinks() {
-  "use strict";
-  document.querySelector("#list").addEventListener('click', function (ev) {
-    if (ev.target.target && ev.target.target === '_blank' && ev.target.href) {
-      ev.preventDefault();
-      document.getElementById("linkRef").textContent = ev.target.href;
-      tiles.go('link');
-    }
-  });
-}
-
 window.addEventListener('load', function () {
   "use strict";
   _ = document.webL10n.get;
@@ -1194,7 +1219,8 @@ window.addEventListener('load', function () {
       request.onsuccess = function () {
         if (request.result) {
           isInstalled = true;
-          initLinks();
+          document.body.classList.remove('hosted');
+          document.body.classList.add('installed');
         }
       };
       request.onerror = function () {
@@ -1203,6 +1229,7 @@ window.addEventListener('load', function () {
     }());
   }
   //remoteStorage.enableLog();
+  remoteStorage.setSyncInterval(60000);
   remoteStorage.access.claim('alir', 'rw');
   remoteStorage.caching.enable('/alir/');
   //remoteStorage.caching.enable('/public/alir/');
