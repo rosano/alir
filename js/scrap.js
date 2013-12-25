@@ -52,14 +52,14 @@ function saveScraped(article) {
       id: utils.uuid(),
       url: article.url,
       title: article.title,
-      text: article.html,
+      html: article.html,
       date: Date.now(),
       flags: {
       },
       tags: []
     };
     remoteStorage.alir.savePrivate(obj);
-    window.alert(article.title);
+    window.alert('"' + article.title + '" has been successfully saved');
     utils.log('Created : ' + article.title);
   } catch (e) {
     utils.log(utils.format("Error saving %s : %s", article.title, e), 'error');

@@ -21,7 +21,8 @@ build:
 						addon/data/lib/readabilitySAX/DOMasSAX.js \
 						addon/data/lib/readabilitySAX/readabilitySAX.js \
 						js/scrap.js \
-						-o lib/build.js --source-map lib/build.js.map --screw-ie8
+						-o lib/build.js \
+						--source-map build.js.map --source-map-url /build.js.map --screw-ie8
 	cat css/alir.css css/form.css css/font.css css/widgetCss.css > css/build.css
 	echo "0.1."`git ls | wc -l` > VERSION
 
