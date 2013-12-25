@@ -213,7 +213,7 @@
           <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
           <button data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
           <button data-method="getAll" data-l10n-id="settingsReload">Reload</button>
-          <button data-l10n-id="back" data-method="tileBack" >Back</button>
+          <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
     </div>
     <section id="noteView" data-tile="noteView" class="">
       <header><h2 data-l10n-id="noteViewHeader">View note</h2></header>
@@ -225,7 +225,7 @@
       <div class="content">
       </div>
       <p>
-        <button name="back" data-l10n-id="noteBack" data-method="tileBack">Back</button>
+        <button name="back" data-l10n-id="noteBack" data-object="tiles" data-method="back">Back</button>
         <button name="delete" data-l10n-id="noteDelete">Delete</button>
       </p>
     </section>
@@ -240,7 +240,7 @@
         </fieldset>
         <p class="col2">
           <button name="save" data-l10n-id="noteSave">Save</button>
-          <button name="cancel" data-l10n-id="noteCancel" data-method="tileBack">Cancel</button>
+          <button name="cancel" data-l10n-id="noteCancel" data-object="tiles" data-method="back">Cancel</button>
         </p>
       </form>
     </section>
@@ -258,7 +258,7 @@
         </ul>
         <p class="col2">
           <button name="save" data-l10n-id="tagSave">Save</button>
-          <button name="cancel" data-l10n-id="tagCancel" data-method="tileBack">Cancel</button>
+          <button name="cancel" data-l10n-id="tagCancel" data-object="tiles" data-method="back">Cancel</button>
         </p>
       </form>
     </section>
@@ -267,7 +267,7 @@
       <section class="title">
         <img src="img/icon-256.png" width="256" height="256" alt="Àlir icon" title="Àlir icon" />
       </section>
-      <button data-l10n-id="back" data-method="tileBack" >Back</button>
+      <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
       <section>
         <h3>Licence</h3>
         <p>Àlir — Stack stuffs and read them later.</p>
@@ -289,7 +289,7 @@
           <li>thanks <a href="http://hanblog.info/blog/" target="_blank">Antony</a> for the kick ass ;)</li>
         </ul>
       </section>
-      <button data-l10n-id="back" data-method="tileBack" >Back</button>
+      <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
     </section>
     <section id="auth" data-tile="auth" class="">
       <iframe id="authFrame" mozbrowser>
@@ -297,9 +297,10 @@
     </section>
     <section id="link" data-tile="link" class="">
       <p id="linkRef"></p>
-      <button data-action="linkScrap" data-l10n-id="linkScrap">Scrap</button>
-      <button data-action="linkOpen" data-l10n-id="linkOpen">Open</button>
-      <button data-action="linkCancel" data-l10n-id="linkCancel" data-method="tileBack">Return</button>
+      <button data-object="link" data-method="scrap" data-l10n-id="linkScrap">Scrap</button>
+      <button data-object="link" data-method="open" data-l10n-id="linkOpen">Open</button>
+      <button data-object="link" data-method="share" class="isInstalled" data-l10n-id="linkShare">share</button>
+      <button data-l10n-id="linkCancel" data-object="tiles" data-method="back">Return</button>
     </section>
     <script type="text/javascript" src="lib/build.js"></script>
     <!--

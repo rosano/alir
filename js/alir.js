@@ -82,6 +82,54 @@ window.alir = {
   }
 };
 
+window.link = {
+  open: function () {
+    "use strict";
+    var href = document.getElementById('linkRef').textContent,
+        openURL;
+    openURL = new window.MozActivity({
+      name: "view",
+      data: {
+        type: "url",
+        url: href
+      }
+    });
+    tiles.back();
+  },
+  scrap: function () {
+    "use strict";
+    var href = document.getElementById('linkRef').textContent;
+    try {
+      utils.log("Scraping " + href);
+      scrap(href, function (err, res) {
+        if (err) {
+          utils.log('' + err, 'error');
+          window.alert(err);
+        } else {
+          saveScraped(res);
+        }
+      });
+    } catch (e) {
+      utils.log("" + e, "error");
+      window.alert(e);
+    }
+    tiles.back();
+  },
+  share: function () {
+    "use strict";
+    var href = document.getElementById('linkRef').textContent,
+        openURL;
+    openURL = new window.MozActivity({
+      name: "share",
+      data: {
+        type: "url",
+        url: href
+      }
+    });
+    tiles.back();
+  }
+};
+
 function createXPathFromElement(elm) {
   // source: http://stackoverflow.com/a/5178132
   //jshint maxcomplexity: 12
@@ -456,9 +504,6 @@ function initUI() {
       },
       inspect: function () {
         remoteStorage.inspect();
-      },
-      tileBack: function () {
-        tiles.back();
       },
       tileGo: function (name) {
         tiles.go(name);
@@ -919,38 +964,6 @@ function initUI() {
       displayItem(obj);
       tiles.show('list');
     }
-  });
-  // }}
-  // Links {{
-  forEvent('#link [data-action="linkScrap"]', 'click', function () {
-    var href = document.getElementById('linkRef').textContent;
-    try {
-      utils.log("Scraping " + href);
-      scrap(href, function (err, res) {
-        if (err) {
-          utils.log('' + err, 'error');
-          window.alert(err);
-        } else {
-          saveScraped(res);
-        }
-      });
-    } catch (e) {
-      utils.log("" + e, "error");
-      window.alert(e);
-    }
-    tiles.back();
-  });
-  forEvent('#link [data-action="linkOpen"]', 'click', function () {
-    var href = document.getElementById('linkRef').textContent,
-        openURL;
-    openURL = new window.MozActivity({
-      name: "view",
-      data: {
-        type: "url",
-        url: href
-      }
-    });
-    tiles.back();
   });
   // }}
   // Notes {{
