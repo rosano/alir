@@ -30,6 +30,9 @@ var config,
     config,
     isInstalled,
     _;
+var $  = function (sel, root) { "use strict"; root = root || document; return root.querySelector(sel); },
+    $$ = function (sel, root) { "use strict"; root = root || document; return [].slice.call(root.querySelectorAll(sel)); },
+    forEvent = function (sel, event, fct) { "use strict"; Array.prototype.forEach.call(document.querySelectorAll(sel), function (elmt) { elmt.addEventListener(event, fct); }); };
 config = {
   gesture: false,
   rs: {
@@ -81,6 +84,51 @@ window.alir = {
     }());
   }
 };
+window.item = {
+  current: null,
+  hide: function () {
+    "use strict";
+    var clMenu  = $('#menu').classList,
+        clMain  = $('#main').classList,
+        current = $('#list > .current');
+    if (current && current.id) {
+      config.bookmarks[current.id] = window.scrollY / $('#list').clientHeight;
+      current.classList.remove('current');
+      current.scrollIntoView();
+    }
+    clMenu.remove("detail");
+    clMenu.add("list");
+    clMenu.remove('show');
+    clMain.remove("detail");
+    clMain.add("list");
+    document.body.classList.remove("menu");
+    this.current = null;
+    location.hash = '';
+  },
+  show: function (key) {
+    "use strict";
+    var clItem  = $('[data-key="' + key + '"]').classList,
+        clMenu  = $('#menu').classList,
+        clList  = $('#main').classList;
+    if (key === this.current) {
+      return;
+    }
+    clMenu.add("detail");
+    clMenu.remove("list");
+    clList.add("detail");
+    clList.remove("list");
+    clItem.add('current');
+    $('#menu .content .top').href = '#' + key;
+    if (config.bookmarks[key] && clItem.contains('current')) {
+      window.setTimeout(function () {
+        window.scrollTo(0, config.bookmarks[key] * $('#list').clientHeight);
+      }, 100);
+    }
+    this.current  = key;
+    location.hash = key;
+  }
+};
+
 
 window.link = {
   open: function () {
@@ -416,10 +464,6 @@ function displayItem(obj) {
     });
   }
 
-  if (document.getElementById('main').classList.contains('detail')) {
-    item.classList.add('hidden');
-  }
-
   return item;
 }
 function getAll() {
@@ -436,10 +480,7 @@ function getAll() {
 function initUI() {
   // jshint maxstatements: 60
   "use strict";
-  var $  = function (sel, root) {root = root || document; return root.querySelector(sel); },
-      $$ = function (sel, root) {root = root || document; return [].slice.call(root.querySelectorAll(sel)); },
-      forEvent = function (sel, event, fct) {Array.prototype.forEach.call(document.querySelectorAll(sel), function (elmt) { elmt.addEventListener(event, fct); }); },
-      UI = {},
+  var UI = {},
       menuActions = {};
   UI = {
     input: $('#input'),
@@ -545,7 +586,7 @@ function initUI() {
           params = dataset.params.split(',');
         }
         if (typeof dataset.object !== 'undefined' && typeof window[dataset.object] !== 'undefined' && typeof window[dataset.object][dataset.method] === 'function') {
-          window[dataset.object][dataset.method]();
+          window[dataset.object][dataset.method].apply(window[dataset.object], params);
         } else {
           if (typeof actions[dataset.method] === "undefined") {
             utils.log("Unknown method " + dataset.method);
@@ -567,27 +608,6 @@ function initUI() {
       $('#input [name="title"]').value = "";
       $('#input [name="text"]').value  = "";
       tiles.show('input');
-    },
-    toggleContent: function doToggle() {
-      var cl      = $('#menu').classList,
-          current = $('#list > .current');
-      if (current && current.id) {
-        config.bookmarks[current.id] = window.scrollY / UI.list.clientHeight;
-      }
-      cl.remove("detail");
-      cl.add("list");
-      cl.remove('show');
-      cl = $('#main').classList;
-      cl.remove("detail");
-      cl.add("list");
-      $$('#list li[data-key]').forEach(function (e) {
-        e.classList.remove('hidden');
-        e.classList.remove('current');
-      });
-      if (current) {
-        current.scrollIntoView();
-      }
-      document.body.classList.remove("menu");
     },
     toggleMenu: function doToggleMenu() {
       $('#menu').classList.toggle("show");
@@ -668,26 +688,6 @@ function initUI() {
     }
 
   });
-  function toggleItem(key) {
-    var clItem = $('[data-key="' + key + '"]').classList,
-        clMenu = $('#menu').classList,
-        clList = $('#main').classList;
-    clMenu.toggle("detail");
-    clMenu.toggle("list");
-    clList.toggle("detail");
-    clList.toggle("list");
-    $$('li[data-key]').forEach(function (e) {
-      e.classList.toggle('hidden');
-    });
-    clItem.toggle('hidden');
-    clItem.toggle('current');
-    $('#menu .content .top').href = '#' + key;
-    if (config.bookmarks[key] && clItem.contains('current')) {
-      window.setTimeout(function () {
-        window.scrollTo(0, config.bookmarks[key] * UI.list.clientHeight);
-      }, 100);
-    }
-  }
   function onContentEvent(event) {
     var target = event.target,
         ce, parent;
@@ -748,15 +748,12 @@ function initUI() {
       case 'filterArchive':
         $('#main').classList.toggle('archives');
         break;
-      case 'toggle':
-        toggleItem(ce.key);
-        break;
       case 'delete':
         if (window.confirm(_('confirmDelete'))) {
           remoteStorage.alir[ce.context].remove(ce.key);
           delete config.bookmarks[ce.key];
         }
-        toggleItem(ce.key);
+        window.item.hide();
         break;
       case 'compose':
         remoteStorage.alir[ce.context].getObject(ce.key).then(function (object) {
@@ -875,8 +872,6 @@ function initUI() {
             window.setTimeout(function () {
               items[1].classList.remove('current');
               items[1].classList.remove('hideRight');
-              items[1].classList.add('hidden');
-              items[2].classList.remove('hidden');
               items[2].classList.remove('showLeft');
               items[2].classList.add('current');
               if (typeof config.bookmarks[items[2].dataset.key] !== 'undefined') {
@@ -896,8 +891,6 @@ function initUI() {
             window.setTimeout(function () {
               items[1].classList.remove('current');
               items[1].classList.remove('hideLeft');
-              items[1].classList.add('hidden');
-              items[0].classList.remove('hidden');
               items[0].classList.remove('showRight');
               items[0].classList.add('current');
               if (typeof config.bookmarks[items[0].dataset.key] !== 'undefined') {
@@ -1194,10 +1187,10 @@ function initUI() {
 
   window.addEventListener("hashchange", function () {
     if (window.location.hash === '' && document.getElementById('menu').classList.contains('detail')) {
-      menuActions.toggleContent();
+      window.item.hide();
     }
     if (window.location.hash !== '' && document.getElementById('menu').classList.contains('list')) {
-      toggleItem(window.location.hash.substr(1));
+      window.item.show(window.location.hash.substr(1));
     }
   }, false);
 

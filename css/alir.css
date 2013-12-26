@@ -282,6 +282,12 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #main.list #list > li[data-tags*=",archive,"] {
   display: none;
 }
+#main.detail #list > li {
+  display: none;
+}
+#main.detail #list > li.current {
+  display: block;
+}
 #main.list.archives .filters .archive,
 #main.detail #list > li[data-tags*=",archive,"] .archive {
   color: #ff6347;
