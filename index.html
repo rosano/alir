@@ -131,6 +131,16 @@
             </select>
           </fieldset>
         </fieldset>
+        <fieldset>
+          <legend>Sync</legend>
+          <p>
+            <button data-l10n-id="rsDisconnect" data-action="disconnect"></button>
+          <p>
+          <p class="col2">
+            <button data-l10n-id="rsSync"  data-action="sync">Synchronize</button>
+            <button data-l10n-id="rsReset" data-action="reset">Reset</button>
+          <p>
+        </fieldset>
         <fieldset id="prefRS">
           <legend data-l10n-id="remoteStorage">remoteStorage</legend>
           <fieldset class="inline text">
@@ -143,11 +153,6 @@
           <fieldset>
             <p>
               <button data-l10n-id="rsConnect" data-action="connect"></button>
-              <button data-l10n-id="rsDisconnect" data-action="disconnect"></button>
-            <p>
-            <p class="col2">
-              <button data-l10n-id="rsSync"  data-action="sync">Synchronize</button>
-              <button data-l10n-id="rsReset" data-action="reset">Reset</button>
             <p>
           </fieldset>
         </fieldset>
@@ -159,6 +164,11 @@
               <input type="text" name="dropboxApiKey" id="dropboxApiKey" placeholder="Key" data-l10n-id="dropboxKey" />
               <button type="reset"><span class="icon-remove"></span></button>
             </p>
+          </fieldset>
+          <fieldset>
+            <p>
+              <button data-l10n-id="rsConnect" data-action="connectDropbox"></button>
+            <p>
           </fieldset>
         </fieldset>
         <fieldset id="prefDrive">
@@ -176,6 +186,11 @@
               <input type="text" name="driveApiKey" id="driveApiKey" placeholder="Key" data-l10n-id="driveKey" />
               <button type="reset"><span class="icon-remove"></span></button>
             </p>
+          </fieldset>
+          <fieldset>
+            <p>
+              <button data-l10n-id="rsConnect" data-action="connectDrive"></button>
+            <p>
           </fieldset>
         </fieldset>
         <fieldset class="inline check compact">

@@ -187,10 +187,12 @@ body.popup .shown {
   overflow: auto;
   border: 2px solid white;
   border-radius: 0.5rem;
-  background-color: #FFF;
+  background-color: #444;
+  color: #FFF;
   opacity: 1;
   display: block;
   box-shadow: 0 0 1rem #000;
+  padding: 0.5rem !important;
 }
 body.hosted .ifInstalled, body.installed .ifHosted {
   display: none;

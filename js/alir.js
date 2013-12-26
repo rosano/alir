@@ -1065,12 +1065,18 @@ function initUI() {
     config.rs.login = this.value;
     remoteStorage.widget.view.form.userAddress.value = this.value;
   });
-  $('#prefRS').addEventListener('click', function (event) {
+  $('#settings').addEventListener('click', function (event) {
     if (event.target.dataset && event.target.dataset.action) {
       switch (event.target.dataset.action) {
       case "connect":
         remoteStorage.widget.view.form.userAddress.value = $('#rsLogin').value;
         remoteStorage.widget.view.events.connect(new Event(""));
+        break;
+      case "connectDropbox":
+        remoteStorage.widget.view.connectDropbox();
+        break;
+      case "connectDrive":
+        remoteStorage.widget.view.connectGdrive();
         break;
       case "sync":
         remoteStorage.widget.view.events.sync(new Event(""));
@@ -1087,9 +1093,9 @@ function initUI() {
   function setState(state) {
     var actions = {
       "connect": $("#prefRS [data-action=connect]").classList,
-      "disconnect": $("#prefRS [data-action=disconnect]").classList,
-      "sync": $("#prefRS [data-action=sync]").classList,
-      "reset": $("#prefRS [data-action=reset]").classList
+      "disconnect": $("#settings [data-action=disconnect]").classList,
+      "sync": $("#settings [data-action=sync]").classList,
+      "reset": $("#settings [data-action=reset]").classList
     };
     switch (state) {
     case "initial":
