@@ -34,26 +34,35 @@
           <h1>
 <a name="%C3%80lir" class="anchor" href="#%C3%80lir"><span class="octicon octicon-link"></span></a>Àlir</h1>
 
-<p><img src="img/icon-256.png" alt="A chair"></p>
+<p><img src="https://raw.github.com/clochix/alir/master/img/icon-256.png" alt="A chair"></p>
 
 <p>This is a chair. A good offline place to sit down and read. Àlir’s goal is to provide a similar pleasant feeling.</p>
 
-<p>Àlir is an application I use in the browser of my phone to read articles when I’m offline in the tube. It may also work in other contexts, in the bus or inside Chromium for example, but I haven’t tested it yet. So use it at your own risk and don’t hesitate to suggest improvements. I really need design and UX feedbacks and advices. <a href="https://alir.5apps.com/">There’s a demo</a> kindly hosted by 5apps.</p>
+<p>Àlir is an application I use on my Firefox OS powered phone to read articles when I’m offline in the tube. It may also work in other contexts, in the bus or inside Chromium for example, but I haven’t really tested this use cases yet. So use it at your own risk and don’t hesitate to suggest improvements. I really need design and UX feedbacks and advices. <a href="https://alir.5apps.com/">There’s a demo</a> kindly hosted by 5apps.</p>
 
 <p>Àlir tries to respect the decentralized state of the Internet. The application itself consists only of HTML, JavaScript and CSS, so you can easily host it everywhere on the Web, or install it on your phone.</p>
 
-<p>The application allows to share your data between multiple locations and devices thanks to <a href="http://remotestorage.io/">remoteStorage</a>. In fact, for now, syncinc is the only way to add articles into the application. To synchronize your data, you need a remoteStorage account:</p>
+<p>There are for now two ways to use the application:</p>
 
 <ul>
-<li>if you are tech savvy, install your own sync server. <a href="http://remotestorage.io/get/">Several are available</a>, in Node.js, PHP, Ruby… I tried <a href="https://github.com/jcoglan/restore">reStore</a> and it should work;</li>
-<li>register an account on a <a href="http://remotestorage.io/get/">provider</a>. I currently use a free account provided by <a href="https://5apps.com/storage/beta">5apps</a>;</li>
-<li>alternatively, the developers of remoteStorage are working on gateways to allow the use of mainstream cloud storage as sync servers. If you have a Dropbox or a Google Drive account, you could try to connect to it (I tried with Dropbox, see explanations below);</li>
-</ul><p>There are two ways to use the application:</p>
+<li>if you are a developer and have a Firefox OS powered device, you can install the application (see below) and push articles from the Web browser. Articles will be saved on your phone, so you can read them later, and off line. In this case, the application is autonomous, connecting it to a sync account is optional ;</li>
+<li>otherwise, Àlir is just a Web application, so you can use it in your favorite browser, but to store articles in it, you will need to use a client software and a sync account. Currently, two clients are available, a Firefox addon and a command line interface. You need to connect them to your sync account and use them then tu push content into the application.</li>
+</ul><p>The application allows to share your data between multiple locations and devices thanks to <a href="http://remotestorage.io/">remoteStorage</a>. To synchronize your data, you need a remoteStorage account:</p>
 
 <ul>
-<li>if you are a developer and have a Firefox OS powered device, you can install the application (see below) and push articles from the Web browser. Articles will be saved locally ;</li>
-<li>otherwise, you need to use a distinct client and a Sync account. Currently, two clients are available, a Firefox addon and a command line interface. You need to connect them to your sync account and use them then tu push content into the application.</li>
+<li>if you are tech savvy, install your own sync server. <a href="http://remotestorage.io/get/">Several are available</a>, in Node.js, PHP, Ruby… I tried <a href="https://github.com/jcoglan/restore">reStore</a> and it works pretty well for me ;</li>
+<li>register an account on a <a href="http://remotestorage.io/get/">provider</a>. I currently use a free account provided by <a href="https://5apps.com/storage/beta">5apps</a> ;</li>
+<li>alternatively, the developers of <code>remoteStorage</code> are working on gateways to allow the use of mainstream cloud storage as sync servers. If you have a Dropbox or a Google Drive account, you could try to connect to it (I successfully tried with Dropbox, see explanations below).</li>
 </ul><h2>
+<a name="installing-on-a-firefox-os-device" class="anchor" href="#installing-on-a-firefox-os-device"><span class="octicon octicon-link"></span></a>Installing on a Firefox OS device</h2>
+
+<p>If you have a phone running Firefox OS, you can also install the application. This will allow to put content into it from the browser of the phone.</p>
+
+<p>Application is not yet on any Marketplace, so to install it you need to clone the repository, make the application (<code>make all</code> should be enough) and <a href="https://developer.mozilla.org/en-US/Firefox_OS/Using_the_App_Manager">push it on the phone with the App Manager</a>.</p>
+
+<p>Once the application is installed, you can add any Web page from the Web browser. Just click on the bookmark icon (the star at the bottom), then choose to add the page to the home screen. A list of apps able to handle the bookmark will show up. Select Àlir and if everything works, it will fetch the page content, clean it up using <a href="https://github.com/fb55/readabilitysax">readabilitySAX</a> and add it to your list of items to read.</p>
+
+<h2>
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
 <h3>
@@ -61,20 +70,21 @@
 
 <p>The big bar on the left is a menu you can toggle by taping on it, and a scrollbar to see where you are in the article.</p>
 
-<p>The items in the manu allow to create a new content, change settings, force sync and go offline. Offline means the application shouldn't try to sync with the server. This is currently buggy.</p>
+<p>The items in the menu allow to create a new content, change settings, force sync and go offline. Offline means the application shouldn't try to sync with the server. This is currently buggy.</p>
 
 <p>When you’re on an article, the menu allows to return to the top or go back to the articles list.</p>
 
 <h3>
 <a name="read-article" class="anchor" href="#read-article"><span class="octicon octicon-link"></span></a>Read article</h3>
 
-<p>Some icons on top of the article should allow you to:</p>
+<p>Some icons on the top and under the article should allow you to:</p>
 
 <ul>
 <li>go back to main list;</li>
 <li>archive the article;</li>
 <li>delete the article;</li>
 <li>add tags;</li>
+<li>if the application is installed, to share it with other applications installed on the phone, for example to email the URL of the article;</li>
 <li>if you created the content, you can also edit it;</li>
 </ul><h3>
 <a name="tags" class="anchor" href="#tags"><span class="octicon octicon-link"></span></a>Tags</h3>
@@ -92,7 +102,7 @@
 <p>You can annotate every paragraph of an article with a long-click on it. To read the annotation, click on the icon next to the text.</p>
 
 <h3>
-<a name="writing-notes" class="anchor" href="#writing-notes"><span class="octicon octicon-link"></span></a>Writing notes</h3>
+<a name="writing-articles" class="anchor" href="#writing-articles"><span class="octicon octicon-link"></span></a>Writing articles</h3>
 
 <p>You can add your own articles by clicking on the plus icon in the left menu. You can use Markdown syntax to format your article.</p>
 
@@ -106,13 +116,20 @@
 
 <p>This is an experimental feature, disabled by default, because I’m not satisfied with it. When enabled in settings, it allows to go to previous or next article by sliding to the left / right. But it’s not very accurate, and I often slide when trying to scroll.</p>
 
+<h3>
+<a name="setting-up-sync" class="anchor" href="#setting-up-sync"><span class="octicon octicon-link"></span></a>Setting up Sync</h3>
+
+<p>If you have a <code>remoteStorage</code> account, go to Settings to enter the address and connect. Everything related to <code>remoteStorage</code> (connect/disconnect, force sync or reset if everything is broken) is now here in the settings. The <code>remoteStorage</code> widget wasn’t very useful on mobile devices, so I hid it. </p>
+
 <h2>
 <a name="using-the-addon" class="anchor" href="#using-the-addon"><span class="octicon octicon-link"></span></a>Using the addon</h2>
 
-<p>The addon allows to push articles from Firefox to your application running on another device. You can build the addon from sources with the JetPack SDK, or <a href="https://github.com/clochix/alir/blob/master/addon/alir.xpi">download it</a>. But you should never install an untrusted addon ;) Don’t forget to go to the preferences to set your remoteStorage user name or Dropbox API key. I don’t want to create a Google account, so I have not implemented Google Drive into the addon. Feel free to contribute.</p>
+<p>The addon allows to push articles from Firefox to your application running on another device. You can <a href="https://github.com/clochix/alir/blob/master/addon/alir.xpi">download it</a>, but you should never install an untrusted addon. So I recommend to fork the repository, read the code and build the addon from sources with the JetPack SDK. Once installed, to the preferences to set your remoteStorage user name or Dropbox API key. I don’t want to create a Google account, so I have not implemented Google Drive into the addon. Feel free to contribute.</p>
 
 <h2>
 <a name="using-dropbox" class="anchor" href="#using-dropbox"><span class="octicon octicon-link"></span></a>Using Dropbox</h2>
+
+<p>Here’s how to setup Dropbox to use it as a sync server :</p>
 
 <ul>
 <li>log in to <a href="https://www.dropbox.com/login">https://www.dropbox.com/login</a>;</li>
@@ -135,38 +152,28 @@
 <h3>
 <a name="connect-the-application" class="anchor" href="#connect-the-application"><span class="octicon octicon-link"></span></a>Connect the application</h3>
 
-<p>Click on the left margin, then on option icon, set the API key, reload page (yes, not very friendly). A dropbox icon should appear on top right corner. Click on the icon, allow the application, and you may be able to see the contents you put with the addon.</p>
+<p>Click on the left margin, then on option icon, set the API key, click on the connect button, allow the application, and you may be able to see the contents you put with the addon.</p>
 
 <h2>
-<a name="firefox-os-client" class="anchor" href="#firefox-os-client"><span class="octicon octicon-link"></span></a>Firefox OS Client</h2>
+<a name="using-google-drive" class="anchor" href="#using-google-drive"><span class="octicon octicon-link"></span></a>Using Google Drive</h2>
 
-<p>If you have a phone running Firefox OS, you can also install the application. This will allow to put content into it from the browser of the phone. To do so, click on the bookmark icon (the star at the bottom), then choose to add the page to the home screen. A list of apps able to handle the bookmark will show up. Select Àlir and if everything works, it will fetch the page content, clean it up using <a href="https://github.com/fb55/readabilitysax">readabilitySAX</a> and add it to your list of items to read.</p>
-
-<p>Unfortunately, the process of authenticate against your sync provider from an installed app doesn’t work for now (I need to implement OAuth in the context of a privileged app). So you won’t be able for now to connect to your sync server.</p>
-
-<p>Moreover, the application need some permissions, and installation is only available from the Marketplace. I will put it on the Marketplace once it’s a little bit more usable. For now, you can test it by putting your phone in developer mode and pushing the application form the App Manager.</p>
+<p>You need to give Google your phone number to add a third party application to Google Drive, so I haven’t be able to test it :(</p>
 
 <h2>
 <a name="cli-client" class="anchor" href="#cli-client"><span class="octicon octicon-link"></span></a>CLI Client</h2>
 
-<p>To put an URL into remote storage, use the cli client:
+<p>To put an URL into remote storage using the command line, and assuming Node.js is available on your system, just use:
     put.js --url=http://…</p>
 
-<h3>
-<a name="interactive-mode" class="anchor" href="#interactive-mode"><span class="octicon octicon-link"></span></a>Interactive mode</h3>
+<p>You can also extract URLs from a file (for example an email) and ask what to do:</p>
 
-<p>Extract URLs from file toto and ask what to do:</p>
-
-<pre><code>put.js -i -f toto
+<pre><code>put.js -i -f &lt;file&gt;
 </code></pre>
 
 <p>Extract URLs from file on STDIN and ask whet to do:</p>
 
 <pre><code>cat &lt;file&gt; | put.sh
 </code></pre>
-
-<h3>
-<a name="config-file" class="anchor" href="#config-file"><span class="octicon octicon-link"></span></a>Config file</h3>
 
 <p>The <code>put.js</code> client needs a <code>config.json</code> file with the server path and a auth token:</p>
 
