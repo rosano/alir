@@ -73,6 +73,7 @@ if (navigator.mozSetMessageHandler) {
       var data;
       switch (activity.source.name) {
       case 'save-bookmark':
+      case 'share':
 
         data = activity.source.data;
         if (data.type === 'url') {

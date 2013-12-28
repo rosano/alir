@@ -38,6 +38,14 @@
       "disposition": "inline",
       "href": "/index.html",
       "returnValue": true
+    },
+    "share": {
+      "filters": {
+        "type": "url"
+      },
+      "disposition": "inline",
+      "href": "/index.html",
+      "returnValue": true
     }
   },
   "permissions": {
@@ -56,6 +64,6 @@
     }
   },
   "type": "privileged",
-  "version": "0.1.86"
+  "version": "0.1.90"
 }
 

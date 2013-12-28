@@ -24,7 +24,7 @@ If you have a phone running Firefox OS, you can also install the application. T
 
 Application is not yet on any Marketplace, so to install it you need to clone the repository, make the application (`make all` should be enough) and [push it on the phone with the App Manager](https://developer.mozilla.org/en-US/Firefox_OS/Using_the_App_Manager).
 
-Once the application is installed, you can add any Web page from the Web browser. Just click on the bookmark icon (the star at the bottom), then choose to add the page to the home screen. A list of apps able to handle the bookmark will show up. Select Àlir and if everything works, it will fetch the page content, clean it up using [readabilitySAX](https://github.com/fb55/readabilitysax) and add it to your list of items to read.
+Once the application is installed, you can add any Web page from the Web browser. This can be done by clicking either on the share icon, or on the bookmark icon, then choose to add the page to the home screen. A list of apps able to share the url / handle the bookmark will show up. Select Àlir and if everything works, it will fetch the page content, clean it up using [readabilitySAX](https://github.com/fb55/readabilitysax) and add it to your list of items to read.
 
 ## Usage
 
