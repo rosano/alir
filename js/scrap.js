@@ -58,7 +58,7 @@ function saveScraped(article) {
       },
       tags: []
     };
-    remoteStorage.alir.savePrivate(obj);
+    remoteStorage.alir.saveArticle(obj);
     window.alert('"' + article.title + '" has been successfully saved');
     utils.log('Created : ' + article.title);
   } catch (e) {

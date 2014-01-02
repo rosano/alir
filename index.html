@@ -16,7 +16,7 @@
   </head>
   <body class="online menu-left hosted">
     <div id="templates">
-      <ul id="tmpl-item">
+      <ul id="tmpl-article">
         <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
           <h2><a data-object="item" data-method="show" data-params="{{=key}}"><span class="icon-tags hasNotes"></span>{{=title}}</a></h2>
           <div class="actions">
@@ -51,6 +51,11 @@
           <span>{{=tag}}</span>
         </div>
       </div>
+      <ul id="tmpl-feed">
+        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}}" id="{{=key}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
+          <h2><a data-object="feeds" data-method="show" data-params="{{=key}}"><span class=""></span>{{=title}}</a></h2>
+        </li>
+      </ul>
     </div>
     <div id="rsWidget" class="hidden"></div>
     <div id="menu" class="list">
@@ -62,6 +67,7 @@
         <p><a class="icon-refresh sync" data-action="sync"></a></p>
         <p><a class="icon-cog settings" data-action="settings"></a></p>
         <p><a class="icon-off onoff" data-action="onoff"></a></p>
+        <p><a class="icon-magic isInstalled" data-method="tileShow" data-params="feeds" href="#"></a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
         <span class="icon-refresh syncInProgress"></span>
@@ -317,6 +323,50 @@
       <button data-object="link" data-method="share" class="isInstalled" data-l10n-id="linkShare">share</button>
       <button data-l10n-id="linkCancel" data-object="tiles" data-method="back">Return</button>
     </section>
+    <section data-tile="feeds">
+      <header><h2 data-l10n-id="feeds">Feeds</h2></header>
+      <p><button data-method="tileShow" data-params="feedEdit"data-l10n-id="feedAddButton">Add</button></p>
+      <p><button data-object="feeds" data-method="update" date-l10n-id="feedUpdate">Update</button></p>
+       <p><button data-method="tileShow" data-params="list" data-l10n-id="cancel">Cancel</button></p>
+       <ul id="feeds">
+       </ul>
+    </section>
+    <section data-tile="feedEdit">
+      <header><h2 data-l10n-id="feedEditHeader">Edit Feed</h2></header>
+      <form>
+        <fieldset class="inline text hidden">
+          <p>
+            <label for="feedId" data-l10n-id="feedIdLabel">Id</label>
+            <input type="text" name="id" id="feedId" placeholder="Identifiant" data-l10n-id="feedId" />
+            <button type="reset"><span class="icon-remove"></span></button>
+          </p>
+        </fieldset>
+        <fieldset class="inline text">
+          <p>
+            <label for="feedUrl" data-l10n-id="feedUrlLabel">Url</label>
+            <input type="text" name="url" id="feedUrl" placeholder="URL" data-l10n-id="feedUrl" />
+            <button type="reset"><span class="icon-remove"></span></button>
+          </p>
+        </fieldset>
+        <fieldset class="inline text">
+          <p>
+            <label for="feedTitle" data-l10n-id="feedTitleLabel">Title</label>
+            <input type="text" name="title" id="feedTitle" placeholder="Titre" data-l10n-id="feedTitle" />
+            <button type="reset"><span class="icon-remove"></span></button>
+          </p>
+        </fieldset>
+        <fieldset class="inline check compact">
+          <p>
+            <label for="feedShort" data-l10n-id="feedShort">Left Menu</label>
+            <input type="checkbox" name="feedShort">
+          </p>
+        </fieldset>
+        <p class="col2">
+          <button data-object="feeds" data-method="save" data-l10n-id="feedSave">Save</button>
+          <button data-method="tileShow" data-params="feeds" data-l10n-id="cancel">Cancel</button>
+        </p>
+      </form>
+    </section>
     <script type="text/javascript" src="lib/build.js"></script>
     <!--
     <script type="text/javascript" src="lib/htmlparser.js"></script>
@@ -324,6 +374,7 @@
     <script type="text/javascript" src="lib/webL10n/l10n.js"></script>
     <script type="text/javascript" src="js/touch.js"></script>
     -->
+    <script type="text/javascript" src="js/feeds.js"></script>
     <script type="text/javascript" src="js/alir.js"></script>
   </body>
 </html>

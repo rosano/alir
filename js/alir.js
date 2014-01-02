@@ -262,10 +262,44 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
     }
   });
 
+  privateClient.declareType('feed', {
+    "description": "Feed",
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "id"
+      },
+      "title": {
+        "type": "string"
+      },
+      "url": {
+        "type": "string"
+      },
+      "lastUpdated": {
+        "type": "string"
+      },
+      "type": {
+        "type": "string"
+      },
+      "short": {
+        "type": "boolean"
+      },
+      "articles": {
+        "type": "object"
+      }
+    }
+  });
+
   return {
     exports: {
-      savePrivate: function (article) {
-        return privateClient.storeObject('article', article.id, article);
+      saveArticle: function (article) {
+        article.type = 'article';
+        return privateClient.storeObject('article', '/article/' + article.id, article);
+      },
+      saveFeed: function (feed) {
+        feed.type = 'feed';
+        return privateClient.storeObject('feed', '/feed/' + feed.id, feed);
       },
       goOffline: function () {
         remoteStorage.stopSync();
@@ -370,93 +404,114 @@ function displayItem(obj) {
       item,
       tagsNode,
       classes = [];
+  if (typeof obj.type === "undefined") {
+    obj.type = "article";
+  }
   item = document.getElementById(obj.id);
   if (item) {
     classes = [].slice.call(item.classList);
     item.parentNode.removeChild(item);
   }
-  if (typeof obj.notes !== 'object') {
-    obj.notes = {};
-  }
-  if (typeof obj.date === 'undefined') {
-    obj.date = new Date().toISOString();
-  } else {
-    try {
-      obj.date = new Date(obj.date).toISOString();
-    } catch (e) {
-      console.log("Wrong date : " + obj.date);
+  switch (obj.type) {
+  case 'article':
+    if (typeof obj.notes !== 'object') {
+      obj.notes = {};
     }
-  }
-  data = {
-    key: obj.id,
-    context: 'private',
-    hasNotes: Object.keys(obj.notes).length > 0 ? 'hasNotes' : '',
-    title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-    url: obj.url || '#',
-    date: obj.date,
-    tags: Array.isArray(obj.tags) ? obj.tags.join(',') : '',
-    notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
-    flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
-  };
-  if (utils.trim(data.title) === '') {
-    data.title = _("noTitle");
-  }
-  if (obj.html) {
-    data.type = 'html';
-    data.content = toDom(obj.html, obj.url);
-  } else {
-    data.type = 'text';
-    data.content = obj.text;
-  }
-  item = template('#tmpl-item', data);
-  // Notes {{
-  if (typeof obj.notes === 'object') {
-    Object.keys(obj.notes).forEach(function (noteId, i) {
-      var note = obj.notes[noteId],
-          target,
-          container,
-          a;
-      container = document.createElement('div');
-      container.appendChild(item);
+    if (typeof obj.date === 'undefined') {
+      obj.date = new Date().toISOString();
+    } else {
       try {
-        target = document.evaluate(note.xpath, container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        obj.date = new Date(obj.date).toISOString();
       } catch (e) {
-        console.log("Unable to evaluate XPath " + note.xpath + ' : ' + e);
+        console.log("Wrong date : " + obj.date);
       }
-      if (target) {
-        a = document.createElement('a');
-        a.setAttribute('class', 'note icon-tag');
-        a.setAttribute('data-note', noteId);
-        a.setAttribute('href', '#' + obj.id + '/' + noteId);
-        target.insertBefore(a, target.firstChild);
-      } else {
-        console.log("Unable to evaluate XPath " + note.xpath);
-      }
-    });
+    }
+    data = {
+      key: obj.id,
+      context: 'private',
+      hasNotes: Object.keys(obj.notes).length > 0 ? 'hasNotes' : '',
+      title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+      url: obj.url || '#',
+      date: obj.date,
+      tags: Array.isArray(obj.tags) ? obj.tags.join(',') : '',
+      notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
+      flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
+    };
+    if (utils.trim(data.title) === '') {
+      data.title = _("noTitle");
+    }
+    if (obj.html) {
+      data.type = 'html';
+      data.content = toDom(obj.html, obj.url);
+    } else {
+      data.type = 'text';
+      data.content = obj.text;
+    }
+    item = template('#tmpl-article', data);
+    // Notes {{
+    if (typeof obj.notes === 'object') {
+      Object.keys(obj.notes).forEach(function (noteId, i) {
+        var note = obj.notes[noteId],
+            target,
+            container,
+            a;
+        container = document.createElement('div');
+        container.appendChild(item);
+        try {
+          target = document.evaluate(note.xpath, container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        } catch (e) {
+          console.log("Unable to evaluate XPath " + note.xpath + ' : ' + e);
+        }
+        if (target) {
+          a = document.createElement('a');
+          a.setAttribute('class', 'note icon-tag');
+          a.setAttribute('data-note', noteId);
+          a.setAttribute('href', '#' + obj.id + '/' + noteId);
+          target.insertBefore(a, target.firstChild);
+        } else {
+          console.log("Unable to evaluate XPath " + note.xpath);
+        }
+      });
+    }
+    // }}
+    // Tags {{
+    if (Array.isArray(obj.tags) && obj.tags.length > 0) {
+      tagsNode = item.querySelector('.tags');
+      obj.tags.forEach(function (tag) {
+        var elmt = template('#tmpl-tag', {tag: tag});
+        tagsNode.appendChild(elmt);
+        if (tags.indexOf(tag) === -1) {
+          tags.push(tag);
+          (function (tag) {
+            var elmt = document.createElement('li');
+            elmt.dataset.tag = tag;
+            elmt.textContent = tag;
+            insertInList(document.getElementById('tagList'), "li", elmt, function (e) { return (e.dataset.tag > tag); });
+          })(tag);
+        }
+      });
+    }
+    // }}
+    // Sort items by date {{
+    // @TODO allow multiple sorts
+    insertInList(document.getElementById('list'), "[data-key]", item, function (e) { return (e.dataset.date < obj.date); });
+    // }}
+    break;
+  case 'feed':
+    data = {
+      key: obj.id,
+      context: 'private',
+      title: title,
+      url: obj.url
+    };
+    item = template('#tmpl-feed', data);
+    insertInList(document.getElementById('feeds'), "[data-key]", item, function (e) { return (e.dataset.title < obj.title); });
+    // update feed cache
+    window.feeds.cache(obj);
+    break;
+  default:
+    console.log("Unknown item type: " + obj.type);
   }
-  // }}
-  // Tags {{
-  if (Array.isArray(obj.tags) && obj.tags.length > 0) {
-    tagsNode = item.querySelector('.tags');
-    obj.tags.forEach(function (tag) {
-      var elmt = template('#tmpl-tag', {tag: tag});
-      tagsNode.appendChild(elmt);
-      if (tags.indexOf(tag) === -1) {
-        tags.push(tag);
-        (function (tag) {
-          var elmt = document.createElement('li');
-          elmt.dataset.tag = tag;
-          elmt.textContent = tag;
-          insertInList(document.getElementById('tagList'), "li", elmt, function (e) { return (e.dataset.tag > tag); });
-        })(tag);
-      }
-    });
-  }
-  // }}
-  // Sort items by date {{
-  // @TODO allow multiple sorts
-  insertInList(document.getElementById('list'), "[data-key]", item, function (e) { return (e.dataset.date < obj.date); });
-  // }}
 
   if (classes.length !== 0) {
     classes.forEach(function (cl) {
@@ -736,7 +791,7 @@ function initUI() {
         } else {
           article.id   = ce.key;
           article.tags = tags.filter(function (t) {return t !== ''; });
-          remoteStorage.alir.savePrivate(article);
+          remoteStorage.alir.saveArticle(article);
         }
       });
     }
@@ -934,7 +989,7 @@ function initUI() {
           article.text  = $('#input [name="text"]').value;
           article.html  = new Showdown.converter().makeHtml(article.text);
           article.date  = Date.now();
-          remoteStorage.alir.savePrivate(article);
+          remoteStorage.alir.saveArticle(article);
           displayItem(article);
           tiles.show('list');
         }
@@ -953,7 +1008,7 @@ function initUI() {
         },
         tags: ['note']
       };
-      remoteStorage.alir.savePrivate(obj);
+      remoteStorage.alir.saveArticle(obj);
       displayItem(obj);
       tiles.show('list');
     }
@@ -980,7 +1035,7 @@ function initUI() {
           xpath: $('#noteEdit [name="xpath"]').value,
           content: $('#noteEdit [name="text"]').value
         };
-        remoteStorage.alir.savePrivate(article);
+        remoteStorage.alir.saveArticle(article);
         tiles.back();
       }
     });
@@ -997,7 +1052,7 @@ function initUI() {
         } else {
           delete article.notes[noteId];
           article.id = articleId;
-          remoteStorage.alir.savePrivate(article);
+          remoteStorage.alir.saveArticle(article);
           tiles.back();
         }
       });

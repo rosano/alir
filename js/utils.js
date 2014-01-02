@@ -135,6 +135,10 @@ function Tiles(global) {
           window.scrollTo(0, next.y);
         }
       }
+    },
+    $ : function (name) {
+      var root = document.querySelector('[data-tile="' + name + '"]');
+      return function (sel) { return root.querySelector(sel); };
     }
   };
 }
