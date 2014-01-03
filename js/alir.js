@@ -526,13 +526,15 @@ function displayItem(obj) {
 }
 function getAll() {
   "use strict";
-  remoteStorage.alir.private.getAll('').then(function (objects) {
-    if (objects) {
-      Object.keys(objects).forEach(function (key) {
-        objects[key].id = key;
-        displayItem(objects[key]);
-      });
-    }
+  ['article', 'feed'].forEach(function (type) {
+    remoteStorage.alir.private.getAll(type + '/').then(function (objects) {
+      if (objects) {
+        Object.keys(objects).forEach(function (key) {
+          objects[key].id = key;
+          displayItem(objects[key]);
+        });
+      }
+    });
   });
 }
 function initUI() {
@@ -776,7 +778,7 @@ function initUI() {
     return ce;
   }
   UI.main.addEventListener('click', function onClick(event) {
-    //jshint maxcomplexity: 12
+    //jshint maxcomplexity: 15
     var ce = onContentEvent(event);
     function switchTag(tag) {
       var tags = ce.keyNode.dataset.tags.split(',').filter(function (e) { return e !== ''; }),
@@ -788,7 +790,7 @@ function initUI() {
         tags.splice(1, 0, tag);
         ce.keyNode.dataset.tags = ',' + tags.join(',').replace(',,,', ',,') + ',';
       }
-      remoteStorage.get('/alir/' + ce.key).then(function (err, article, contentType, revision) {
+      remoteStorage.get('/alir/article/' + ce.key).then(function (err, article, contentType, revision) {
         if (err !== 200) {
           window.alert(err);
         } else {
@@ -817,18 +819,23 @@ function initUI() {
         break;
       case 'delete':
         if (window.confirm(_('confirmDelete'))) {
-          remoteStorage.alir[ce.context].remove(ce.key);
+          remoteStorage.alir[ce.context].remove('/article/' + ce.key);
           delete config.bookmarks[ce.key];
         }
         window.item.hide();
         break;
       case 'compose':
-        remoteStorage.alir[ce.context].getObject(ce.key).then(function (object) {
-          $('#input [name="id"]').value    = ce.key;
-          $('#input [name="title"]').value = object.title;
-          $('#input [name="url"]').value   = object.url;
-          $('#input [name="text"]').value  = object.text;
-          tiles.show('input');
+        //remoteStorage.alir[ce.context].getObject('/article/' + ce.key).then(function (object) {
+        remoteStorage.get('/alir/article/' + ce.key).then(function (err, article, contentType, revision) {
+          if (err !== 200) {
+            window.alert(err);
+          } else {
+            $('#input [name="id"]').value    = ce.key;
+            $('#input [name="title"]').value = article.title;
+            $('#input [name="url"]').value   = article.url;
+            $('#input [name="text"]').value  = article.text;
+            tiles.show('input');
+          }
         });
         break;
       case 'share':
@@ -846,7 +853,7 @@ function initUI() {
         }());
         break;
       case 'note':
-        remoteStorage.get('/alir/' + ce.key).then(function (err, article, contentType, revision) {
+        remoteStorage.get('/alir/article/' + ce.key).then(function (err, article, contentType, revision) {
           if (err !== 200) {
             window.alert(err);
           } else {
@@ -995,7 +1002,7 @@ function initUI() {
 
     if (id) {
       // update
-      remoteStorage.get('/alir/' + id).then(function (err, article, contentType, revision) {
+      remoteStorage.get('/alir/article/' + id).then(function (err, article, contentType, revision) {
         if (err !== 200) {
           window.alert(err);
           tiles.show('list');
@@ -1039,7 +1046,7 @@ function initUI() {
     if (!noteId) {
       noteId = utils.uuid();
     }
-    remoteStorage.get('/alir/' + articleId).then(function (err, article, contentType, revision) {
+    remoteStorage.get('/alir/article/' + articleId).then(function (err, article, contentType, revision) {
       if (err !== 200) {
         window.alert(err);
         tiles.back();
@@ -1062,7 +1069,7 @@ function initUI() {
       var articleId = $('#noteView [name="articleId"]').value,
           noteId    = $('#noteView [name="noteId"]').value;
 
-      remoteStorage.get('/alir/' + articleId).then(function (err, article, contentType, revision) {
+      remoteStorage.get('/alir/article/' + articleId).then(function (err, article, contentType, revision) {
         if (err !== 200) {
           window.alert(err);
           tiles.back();
@@ -1334,16 +1341,17 @@ window.addEventListener('load', function () {
   remoteStorage.displayWidget("rsWidget");
   initUI();
   remoteStorage.alir.private.on('change', function onChange(ev) {
-    var elmt, item;
+    var elmt, item, id;
+    id = ev.relativePath.split('/').pop();
     if (typeof ev.oldValue === 'undefined' && typeof ev.newValue !== 'undefined') {
       console.log("Create " + ev.relativePath);
       if (typeof ev.newValue.id === 'undefined') {
-        ev.newValue.id = ev.relativePath;
+        ev.newValue.id = id;
       }
       displayItem(ev.newValue);
     } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue === 'undefined') {
       console.log("Delete " + ev.relativePath);
-      elmt = document.getElementById(ev.relativePath);
+      elmt = document.getElementById(id);
       if (elmt) {
         elmt.parentNode.removeChild(elmt);
       }
@@ -1351,11 +1359,23 @@ window.addEventListener('load', function () {
     } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue !== 'undefined') {
       console.log("Update " + ev.relativePath);
       if (typeof ev.newValue.id === 'undefined') {
-        ev.newValue.id = ev.relativePath;
+        ev.newValue.id = id;
       }
       item = displayItem(ev.newValue);
     }
   });
+  //@TODO Remove this
+  // This is just a migration step for previous contents
+  (function () {
+    remoteStorage.alir.private.getAll('').then(function (all) {
+      Object.keys(all).forEach(function (key) {
+        if (key.substr(-1) !== '/') {
+          remoteStorage.alir.saveArticle(all[key]);
+          remoteStorage.alir.private.remove(key);
+        }
+      });
+    });
+  }());
   getAll();
 
 /*
