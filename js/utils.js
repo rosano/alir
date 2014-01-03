@@ -101,6 +101,8 @@ function Tiles(global) {
           e.classList.remove('shown');
         }
       });
+      document.getElementById('menu').classList.remove('show');
+      document.body.classList.remove("menu");
     },
     go: function (name, cb) {
       tiles.push({name: current, y: window.scrollY, cb: cb});
@@ -116,6 +118,8 @@ function Tiles(global) {
       } else {
         this.show(name);
       }
+      document.getElementById('menu').classList.remove('show');
+      document.body.classList.remove("menu");
     },
     back: function (res) {
       var current, next;
@@ -135,6 +139,8 @@ function Tiles(global) {
           window.scrollTo(0, next.y);
         }
       }
+      document.getElementById('menu').classList.remove('show');
+      document.body.classList.remove("menu");
     },
     $ : function (name) {
       var root = document.querySelector('[data-tile="' + name + '"]');

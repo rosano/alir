@@ -16,6 +16,14 @@ window.feeds = {
         id = $('[name="id"]').value,
         obj;
 
+    function doSave(feed) {
+      remoteStorage.alir.saveFeed(feed);
+      window.feeds.cache(feed);
+      tiles.show('feeds');
+      $('[name="url"]').value   = '';
+      $('[name="title"]').value = '';
+      $('[name="feedShort"]').checked = false;
+    }
     if (id) {
       // update
       remoteStorage.get('/alir/feed/' + id).then(function (err, obj, contentType, revision) {
@@ -28,10 +36,8 @@ window.feeds = {
           obj.title = $('[name="title"]').value;
           obj.short = $('[name="feedShort"]').checked;
           obj.date  = Date.now();
-          remoteStorage.alir.saveFeed(obj);
-          window.feeds.cache(obj);
-          tiles.show('feeds');
         }
+        doSave(obj);
       });
     } else {
       // create
@@ -43,9 +49,7 @@ window.feeds = {
         short: $('[name="feedShort"]').checked,
         articles: {}
       };
-      remoteStorage.alir.saveFeed(obj);
-      window.feeds.cache(obj);
-      tiles.show('feeds');
+      doSave(obj);
     }
   },
   fetch: function (url) {

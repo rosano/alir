@@ -202,7 +202,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   padding: 0;
 }
 #list .content,
-#list .actions,
+#list .toolbar,
 #list .articleMenu {
   display: none;
 }
@@ -210,11 +210,11 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   color: #444;
 }
 #list .current .content,
-#list .current .actions,
+#list .current .toolbar,
 #list .current .articleMenu {
   display: block;
 }
-#list .content + .actions {
+#list .content + .toolbar {
   margin-top: 2rem;
 }
 #list .current .articleMenu {
@@ -247,7 +247,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   border-radius: 0 1.5em 1.5em 0 / 0 50% 50% 0;
   margin: 0px 5px;
 }
-#list .actions .compose {
+#list .toolbar .compose {
   display: none;
 }
 #list [data-flags*=",editable,"] .compose {
@@ -260,10 +260,9 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   width: calc(100% - 5rem);
 }
 #main .filters a,
-#main .current .actions a {
-  padding: .3em;
+.toolbar a {
+  padding: .5em;
   position: relative;
-  top: -0.5em;
 }
 #main .filters a {
   font-size: 1rem;

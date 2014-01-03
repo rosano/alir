@@ -35,7 +35,7 @@
               <p><a class="icon-share ifInstalled" data-action="share" href="#"></a></p>
             </div>
           </div>
-          <div class="actions">
+          <div class="toolbar">
             <a class="icon-chevron-left" data-object="item" data-method="hide" href="#"></a>
             <a class="icon-trash" data-action="delete" href="#"></a>
             <a class="icon-pencil compose" data-action="compose" href="#"></a>
@@ -49,7 +49,7 @@
             </p>
             <div class="{{=type}}">{{=content}}</div>
           </div>
-          <div class="actions">
+          <div class="toolbar">
             <a class="icon-chevron-left" data-object="item" data-method="hide" href="#"></a>
             <a class="icon-trash" data-action="delete" href="#"></a>
             <a class="icon-pencil compose" data-action="compose" href="#"></a>
@@ -338,11 +338,13 @@
     </section>
     <section data-tile="feeds">
       <header><h2 data-l10n-id="feeds">Feeds</h2></header>
-      <p><button data-method="tileShow" data-params="feedEdit"data-l10n-id="feedAddButton">Add</button></p>
-      <p><button data-object="feeds" data-method="update" date-l10n-id="feedUpdate">Update</button></p>
-       <p><button data-method="tileShow" data-params="list" data-l10n-id="cancel">Cancel</button></p>
-       <ul id="feeds">
-       </ul>
+      <p class="toolbar">
+        <a class="icon-chevron-left" data-method="tileShow" data-params="list"></a>
+        <a class="icon-plus" data-method="tileShow" data-params="feedEdit" ></a>
+        <a class="icon-refresh" data-object="feeds" data-method="update"></a>
+      </p>
+      <ul id="feeds">
+      </ul>
     </section>
     <section data-tile="feedEdit">
       <header><h2 data-l10n-id="feedEditHeader">Edit Feed</h2></header>
