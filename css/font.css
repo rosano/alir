@@ -2,14 +2,14 @@
 	font-family: 'icomoon';
 	src:url('fonts/icomoon.eot');
 	src:url('fonts/icomoon.eot?#iefix') format('embedded-opentype'),
-		url('fonts/icomoon.ttf') format('truetype'),
 		url('fonts/icomoon.woff') format('woff'),
+		url('fonts/icomoon.ttf') format('truetype'),
 		url('fonts/icomoon.svg#icomoon') format('svg');
 	font-weight: normal;
 	font-style: normal;
 }
 
-[class*="icon-"] {
+[class^="icon-"], [class*=" icon-"] {
 	font-family: 'icomoon';
 	speak: none;
 	font-style: normal;
@@ -115,4 +115,49 @@
 }
 .icon-inbox:before {
 	content: "\e61e";
+}
+.icon-unlink:before {
+	content: "\e61f";
+}
+.icon-wrench:before {
+	content: "\e620";
+}
+.icon-info:before {
+	content: "\e621";
+}
+.icon-question:before {
+	content: "\e622";
+}
+.icon-exclamation:before {
+	content: "\e623";
+}
+.icon-sun:before {
+	content: "\e624";
+}
+.icon-moon:before {
+	content: "\e625";
+}
+.icon-flag:before {
+	content: "\e626";
+}
+.icon-bookmark:before {
+	content: "\e627";
+}
+.icon-ban-circle:before {
+	content: "\e628";
+}
+.icon-lock:before {
+	content: "\e629";
+}
+.icon-share:before {
+	content: "\e62a";
+}
+.icon-comment:before {
+	content: "\e62b";
+}
+.icon-comments:before {
+	content: "\e62c";
+}
+.icon-rss:before {
+	content: "\e62d";
 }
