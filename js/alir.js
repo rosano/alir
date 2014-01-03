@@ -118,12 +118,15 @@ window.item = {
     clList.add("detail");
     clList.remove("list");
     clItem.add('current');
+    clItem.add('read');
+    document.querySelector('li.current .articleActions').classList.add('hidden');
     $('#menu .content .top').href = '#' + key;
     if (config.bookmarks[key] && clItem.contains('current')) {
       window.setTimeout(function () {
         window.scrollTo(0, config.bookmarks[key] * $('#list').clientHeight);
       }, 100);
     }
+
     this.current  = key;
     location.hash = key;
   }
@@ -797,11 +800,20 @@ function initUI() {
     }
     if (ce.action) {
       switch (ce.action) {
+      case 'menu':
+        $('li.current .articleActions').classList.toggle('hidden');
+        break;
       case 'archive':
         switchTag('archive');
         break;
+      case 'star':
+        switchTag('star');
+        break;
       case 'filterArchive':
         $('#main').classList.toggle('archives');
+        break;
+      case 'filterStar':
+        $('#main').classList.toggle('stars');
         break;
       case 'delete':
         if (window.confirm(_('confirmDelete'))) {
@@ -860,6 +872,7 @@ function initUI() {
         break;
       case 'deleteTag':
         switchTag(ce.actionTarget);
+        break;
       }
     }
   });
@@ -929,6 +942,7 @@ function initUI() {
               items[1].classList.remove('hideRight');
               items[2].classList.remove('showLeft');
               items[2].classList.add('current');
+              items[2].classList.add('read');
               if (typeof config.bookmarks[items[2].dataset.key] !== 'undefined') {
                 window.scrollTo(0, config.bookmarks[items[2].dataset.key] * UI.list.clientHeight);
               } else {
@@ -936,6 +950,7 @@ function initUI() {
               }
             }, 500);
           }
+          document.querySelector('li.current .articleActions').classList.add('hidden');
           break;
         case 'W':
           items = getItems();
@@ -948,6 +963,7 @@ function initUI() {
               items[1].classList.remove('hideLeft');
               items[0].classList.remove('showRight');
               items[0].classList.add('current');
+              items[0].classList.add('read');
               if (typeof config.bookmarks[items[0].dataset.key] !== 'undefined') {
                 window.scrollTo(0, config.bookmarks[items[0].dataset.key] * UI.list.clientHeight);
               } else {
@@ -955,6 +971,7 @@ function initUI() {
               }
             }, 500);
           }
+          document.querySelector('li.current .articleActions').classList.add('hidden');
           break;
         }
       }

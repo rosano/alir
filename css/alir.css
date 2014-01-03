@@ -202,15 +202,30 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   padding: 0;
 }
 #list .content,
-#list .actions {
+#list .actions,
+#list .articleMenu {
   display: none;
 }
+#main.list #list > li.read {
+  color: #444;
+}
 #list .current .content,
-#list .current .actions {
+#list .current .actions,
+#list .current .articleMenu {
   display: block;
 }
 #list .content + .actions {
   margin-top: 2rem;
+}
+#list .current .articleMenu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: .7rem;
+  width: 1.5rem;
+  font-size: 1rem;
+  background-color: rgba(255, 255, 255, .5);
+  z-index: 1000;
 }
 #list .current .content .note {
   padding: 10px;
@@ -246,7 +261,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 }
 #main .filters a,
 #main .current .actions a {
-  padding: .5em;
+  padding: .3em;
   position: relative;
   top: -0.5em;
 }
@@ -271,13 +286,15 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #main.detail > .filters {
   display: none;
 }
-#list > li h2 .hasNotes {
+#list > li h2 span {
   display: none;
 }
-#main.list #list > li.hasNotes h2 .hasNotes {
+#main.list #list > li.hasNotes h2 .hasNotes,
+#main.list #list > li[data-tags*=",archive,"] h2 .isArchive,
+#main.list #list > li[data-tags*=",star"] h2 .isStar
+{
   display: inline;
   font-size: 1rem;
-  padding: 0 0.5rem;
 }
 #main.list #list > li[data-tags*=",archive,"] {
   display: none;
@@ -292,8 +309,22 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #main.detail #list > li[data-tags*=",archive,"] .archive {
   color: #ff6347;
 }
+#main.list.stars .filters .star,
+#main.detail #list > li[data-tags*=",star,"] .star {
+  color: yellow;
+}
 #main.list.archives #list > li[data-tags*=",archive,"] {
   display: block;
+}
+#main.list.stars #list > li:not([data-tags*=",star,"]) {
+  display: none;
+}
+#main.list.stars #list > li[data-tags*=",star,"] {
+  display: block;
+}
+#list h2 .icon-star {
+  color: yellow;
+  text-shadow: 0 0 1px #000;
 }
 #main.list #list > li > h2 {
   margin: 0.66rem 0;
