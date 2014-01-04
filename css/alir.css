@@ -264,8 +264,17 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   padding: .5em;
   position: relative;
 }
-#main .filters a {
-  font-size: 1rem;
+#main .filters .delete {
+  display: none;
+}
+#main.edit .filters .delete {
+  display: inline;
+}
+#main .delitem {
+  display: none;
+}
+#main.edit .delitem {
+  display: inline;
 }
 #list > li {
   max-width: 35em;

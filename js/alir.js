@@ -117,6 +117,7 @@ window.item = {
     clMenu.remove("list");
     clList.add("detail");
     clList.remove("list");
+    clList.remove("edit");
     clItem.add('current');
     clItem.add('read');
     document.querySelector('li.current .articleActions').classList.add('hidden');
@@ -778,7 +779,7 @@ function initUI() {
     return ce;
   }
   UI.main.addEventListener('click', function onClick(event) {
-    //jshint maxcomplexity: 15
+    //jshint maxcomplexity: 20
     var ce = onContentEvent(event);
     function switchTag(tag) {
       var tags = ce.keyNode.dataset.tags.split(',').filter(function (e) { return e !== ''; }),
@@ -879,6 +880,24 @@ function initUI() {
         break;
       case 'deleteTag':
         switchTag(ce.actionTarget);
+        break;
+      case 'editArticles':
+        $('#main').classList.toggle('edit');
+        break;
+      case 'deleteArticles':
+        (function () {
+          var toDel = $$('#list h2 .delitem:checked');
+          if (toDel.length > 0) {
+            if (window.confirm(_('articlesDelete', {nb: toDel.length}))) {
+              toDel.forEach(function (elmt) {
+                var key = elmt.dataset.key;
+                remoteStorage.alir.private.remove('/article/' + key);
+                delete config.bookmarks[key];
+              });
+            }
+          }
+          $('#main').classList.remove('edit');
+        }());
         break;
       }
     }

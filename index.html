@@ -19,6 +19,7 @@
       <ul id="tmpl-article">
         <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
           <h2><a data-object="item" data-method="show" data-params="{{=key}}">
+            <input type="checkbox" class="delitem" data-key="{{=key}}" />
             <span class="icon-comment hasNotes"></span>
             <span class="icon-inbox isArchive"></span>
             <span class="icon-star isStar"></span>
@@ -43,6 +44,7 @@
           </div>
           <div class="content">
             <p><a class="url" href="{{=url}}" target="_blank">{{=url}}</a></p>
+            <p>{{=date}}</p>
             <p class="notes">
             </p>
             <p class="tags">
@@ -128,6 +130,8 @@
         <a class="icon-inbox archive" data-action="filterArchive" href="#"></a>
         <a class="icon-star star" data-action="filterStar" href="#"></a>
         <a class="icon-tags" data-action="addTag" href="#"></a>
+        <a class="icon-pencil" data-action="editArticles" href="#"></a>
+        <a class="icon-trash delete" data-action="deleteArticles" href="#"></a>
         <fieldset class="inline text compact">
           <p>
             <input type="text" name="listFilter" id="listFilter" placeholder="Filter" data-l10n-id="listFilter" />
