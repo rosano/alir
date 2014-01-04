@@ -4,11 +4,7 @@ window.feeds = {
   _cache: {},
   cache: function (obj) {
     "use strict";
-    window.feeds._cache[obj.url] = {
-      id: obj.id,
-      short: obj.short,
-      articles: obj.articles
-    };
+    window.feeds._cache[obj.url] = obj;
   },
   save: function () {
     "use strict";
@@ -52,7 +48,8 @@ window.feeds = {
       doSave(obj);
     }
   },
-  fetch: function (url) {
+  fetch: function (url, test, cb) {
+    //jshint maxcomplexity: 15
     "use strict";
     function getUrl(url, cb) {
       var xhr, options;
@@ -74,21 +71,37 @@ window.feeds = {
       xhr.send();
     }
     getUrl(url, function (err, doc) {
+      //jshint maxstatements: 22
       var feedUpdated,
-          items,
-          isShort = false;
+          root,
+          format = 'atom',
+          cache;
       if (typeof window.feeds._cache[url] === 'undefined') {
-        items = {};
-      } else {
-        items   = window.feeds._cache[url].articles;
-        isShort = window.feeds._cache[url].short;
+        window.feeds._cache[url] = {
+          'articles': {},
+          'short': false,
+          'title': '???'
+        };
       }
+      cache = window.feeds._cache[url];
+      utils.log('Updating feed ' + cache.title, "info");
       if (err) {
         console.log(err);
       } else {
-        feedUpdated = new Date(doc.querySelector("feed > updated").textContent);
-        [].slice.call(doc.querySelectorAll('feed > entry')).forEach(function (entry) {
-          var itemId, itemUpdated, itemUrl, article;
+        root = doc.firstChild.tagName;
+        if (root === "rss") {
+          format = 'rss';
+          root = "rss > channel ";
+        }
+        utils.log("Feed format : " + format, "info");
+        feedUpdated = doc.querySelector(root + " > updated");
+        if (feedUpdated) {
+          feedUpdated = new Date(feedUpdated.textContent);
+        }
+        root = format === 'atom' ? root + ' > entry' : root + ' > item';
+        [].slice.call(doc.querySelectorAll(root)).forEach(function (entry) {
+          //jshint maxstatements: 30
+          var itemContent, itemId, itemTitle, itemUpdated, itemUrl;
           function getVal(key, prop) {
             var val = entry.querySelector(key);
             if (val) {
@@ -101,66 +114,82 @@ window.feeds = {
               return null;
             }
           }
-          itemId = getVal('id');
-          if (itemId !== null) {
-            itemUpdated = entry.querySelector("updated") || entry.querySelector("published");
-            if (itemUpdated) {
-              itemUpdated = new Date(itemUpdated.textContent);
-              if (itemUpdated > feedUpdated) {
-                feedUpdated = itemUpdated;
-              }
-              if (typeof items[itemId] === 'undefined' ||
-                  typeof items[itemId] !== 'undefined' && items[itemId].updated < itemUpdated) {
-                itemUrl = getVal('link', 'href');
-                items[itemId] = {
-                  url: itemUrl,
-                  updated: itemUpdated
-                };
-                if (isShort) {
-                  window.scrap(itemUrl, function (err, res) {
-                    if (err) {
-                      utils.log(err, 'error');
-                    } else {
-                      article = {
-                        id:    utils.uuid(),
-                        url:   res.url,
-                        title: res.title,
-                        html:  res.html,
-                        date:  itemUpdated,
-                        flags: {
-                          editable: false
-                        },
-                        tags: ['feed']
-                      };
-                      remoteStorage.alir.saveArticle(article);
-                    }
-                  });
-                } else {
-                  article = {
-                    id:    utils.uuid(),
-                    url:   itemUrl,
-                    title: getVal('title'),
-                    html:  getVal('content'),
-                    date:  itemUpdated,
-                    flags: {
-                      editable: false
-                    },
-                    tags: ['feed']
-                  };
-                  remoteStorage.alir.saveArticle(article);
-                }
-              }
+          itemId      = format === 'atom' ? getVal('id') : getVal('guid');
+          itemUrl     = format === 'atom' ? getVal('link', 'href') : entry.querySelector('link').textContent;
+          itemTitle   = getVal('title');
+          itemContent = getVal('content');
+          itemUpdated = entry.querySelector("updated") || entry.querySelector("published") || entry.querySelector("pubdate") || entry.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", 'date');
+          if (itemUpdated && itemUpdated.length) {
+            itemUpdated = itemUpdated[0];
+          }
+          if (!!!itemId || !!!itemUpdated) {
+            return;
+          }
+          itemUpdated = new Date(itemUpdated.textContent).toISOString();
+          if (typeof cache.articles[itemId] !== 'undefined' && cache.articles[itemId].updated >= itemUpdated) {
+            return;
+          }
+          if (typeof cache.articles[itemId] === 'undefined') {
+            utils.log('New article "%s"', itemTitle, "info");
+          } else {
+            utils.log('Article Updated : "%s" "%s" < "%s"', itemTitle, cache.articles[itemId].updated, itemUpdated, "info");
+          }
+          if (itemUpdated > feedUpdated) {
+            feedUpdated = itemUpdated;
+          }
+          function doSave(content) {
+            var article = {
+              id:    utils.uuid(),
+              url:   itemUrl,
+              title: itemTitle,
+              html:  content,
+              date:  itemUpdated,
+              flags: {
+                editable: false
+              },
+              tags: ['feed', cache.title]
+            };
+            if (test !== true) {
+              remoteStorage.alir.saveArticle(article);
             }
           }
-        });
-        window.feeds._cache[url].articles = items;
-        remoteStorage.get('/alir/feed/' + window.feeds._cache[url].id).then(function (err, obj, contentType, revision) {
-          if (err === 200) {
-            obj.articles = items;
-            remoteStorage.alir.saveFeed(obj);
+          cache.articles[itemId] = {
+            url: itemUrl,
+            updated: itemUpdated
+          };
+          if (test !== true && (cache.short || !!!itemContent)) {
+            window.scrap(itemUrl, function (err, res) {
+              if (err) {
+                utils.log(err, 'error');
+              } else {
+                doSave(res.html);
+              }
+            });
+          } else {
+            doSave(itemContent);
           }
         });
+        if (test !== true) {
+          remoteStorage.get('/alir/feed/' + window.feeds._cache[url].id).then(function (err, obj, contentType, revision) {
+            if (err === 200) {
+              obj.articles = cache.articles;
+              remoteStorage.alir.saveFeed(obj);
+            }
+          });
+        }
       }
+      if (cb) {
+        cb(cache.articles);
+      }
+    });
+  },
+  test: function () {
+    "use strict";
+    var $   = tiles.$('feedEdit'),
+        url = $('[name="url"]').value;
+    window.feeds.fetch(url, true, function (items) {
+      items = items || {};
+      window.alert("Found " + Object.keys(items).length + " item");
     });
   },
   show: function () {
@@ -168,8 +197,15 @@ window.feeds = {
   },
   update: function () {
     "use strict";
-    Object.keys(window.feeds._cache).forEach(function (url) {
-      window.feeds.fetch(url);
+    var feeds = Object.keys(window.feeds._cache),
+        toFetch = feeds.length;
+    feeds.forEach(function (url) {
+      window.feeds.fetch(url, false, function () {
+        toFetch--;
+        if (toFetch === 0) {
+          window.alert("Feeds updated");
+        }
+      });
     });
   }
 };
