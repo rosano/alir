@@ -1159,6 +1159,9 @@ function initUI() {
       case "disconnect":
         remoteStorage.widget.view.events.disconnect(new Event(""));
         break;
+      case "cacheReset":
+        remoteStorage.caching.reset();
+        break;
       }
     }
   });
