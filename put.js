@@ -101,14 +101,14 @@ function put(obj) {
   "use strict";
   var config,
       req,
-      slug,
+      //slug,
       requestOptions;
 
   config = JSON.parse(fs.readFileSync(require('path').resolve(__dirname, 'config.json')));
 
   requestOptions = {
     hostname: config.hostname,
-    path: config.path,
+    path: config.path + '/article/',
     port: config.port,
     method: "PUT",
     headers: {
@@ -119,7 +119,7 @@ function put(obj) {
   };
 
 
-  slug = obj.url.split('://').pop().split('?').shift().split('#').shift().replace(/[^\w\./]/g, '');
+  //slug = obj.url.split('://').pop().split('?').shift().split('#').shift().replace(/[^\w\./]/g, '');
 
   shasum.update(obj.url, 'utf8');
   requestOptions.path += shasum.digest('hex');

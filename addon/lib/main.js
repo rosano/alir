@@ -203,8 +203,9 @@ function putContent(url, token, content) {
 
   slug   = require('sdk/util/uuid').uuid().toString().replace(/\W/g, '');
   content.id = slug;
+  content.type = 'artcicle';
   request({
-    url: url + slug,
+    url: url + '/article/' + slug,
     headers: {
       "Authorization": "Bearer " + token,
       "Content-Type": "application/json"
