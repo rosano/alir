@@ -22,6 +22,7 @@
             <input type="checkbox" class="delitem" data-key="{{=key}}" />
             <span class="icon-comment hasNotes"></span>
             <span class="icon-inbox isArchive"></span>
+            <span class="icon-rss isFeed"></span>
             <span class="icon-star isStar"></span>
             {{=title}}</a></h2>
           <div class="articleMenu">
@@ -128,8 +129,9 @@
     <div id="main" class="list" data-tile="list">
       <form class="filters">
         <a class="icon-inbox archive" data-action="filterArchive" href="#"></a>
+        <a class="icon-rss feed isInstalled" data-action="filterFeed" href="#"></a>
         <a class="icon-star star" data-action="filterStar" href="#"></a>
-        <a class="icon-tags" data-action="addTag" href="#"></a>
+        <a class="icon-tags" data-action="addFilterTag" href="#"></a>
         <a class="icon-pencil" data-action="editArticles" href="#"></a>
         <a class="icon-trash delete" data-action="deleteArticles" href="#"></a>
         <fieldset class="inline text compact">
@@ -335,7 +337,7 @@
     </section>
     <section id="link" data-tile="link" class="">
       <p id="linkRef"></p>
-      <button data-object="link" data-method="scrap" data-l10n-id="linkScrap">Scrap</button>
+      <button data-object="link" data-method="scrap" class="ifInstalled" data-l10n-id="linkScrap">Scrap</button>
       <button data-object="link" data-method="open" data-l10n-id="linkOpen">Open</button>
       <button data-object="link" data-method="share" class="ifInstalled" data-l10n-id="linkShare">share</button>
       <button data-l10n-id="linkCancel" data-object="tiles" data-method="back">Return</button>

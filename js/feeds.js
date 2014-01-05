@@ -117,7 +117,7 @@ window.feeds = {
           itemId      = format === 'atom' ? getVal('id') : getVal('guid');
           itemUrl     = format === 'atom' ? getVal('link', 'href') : entry.querySelector('link').textContent;
           itemTitle   = getVal('title');
-          itemContent = getVal('content');
+          itemContent = getVal('content') || getVal('summary');
           itemUpdated = entry.querySelector("updated") || entry.querySelector("published") || entry.querySelector("pubdate") || entry.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", 'date');
           if (itemUpdated && itemUpdated.length) {
             itemUpdated = itemUpdated[0];

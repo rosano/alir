@@ -139,13 +139,17 @@ window.link = {
     "use strict";
     var href = document.getElementById('linkRef').textContent,
         openURL;
-    openURL = new window.MozActivity({
-      name: "view",
-      data: {
-        type: "url",
-        url: href
-      }
-    });
+    if (isInstalled) {
+      openURL = new window.MozActivity({
+        name: "view",
+        data: {
+          type: "url",
+          url: href
+        }
+      });
+    } else {
+      window.open(href);
+    }
     tiles.back();
   },
   scrap: function () {
@@ -490,7 +494,7 @@ function displayItem(obj) {
             var elmt = document.createElement('li');
             elmt.dataset.tag = tag;
             elmt.textContent = tag;
-            insertInList(document.getElementById('tagList'), "li", elmt, function (e) { return (e.dataset.tag > tag); });
+            insertInList(document.getElementById('tagList'), "li", elmt, function (e) { return (e.dataset.tag.toLowerCase() > tag.toLowerCase()); });
           })(tag);
         }
       });
@@ -509,7 +513,7 @@ function displayItem(obj) {
       url: obj.url
     };
     item = template('#tmpl-feed', data);
-    insertInList(document.getElementById('feeds'), "[data-key]", item, function (e) { return (e.dataset.title < obj.title); });
+    insertInList(document.getElementById('feeds'), "[data-key]", item, function (e) { return (e.dataset.title.toLowerCase() < obj.title.toLowerCase()); });
     // update feed cache
     window.feeds.cache(obj);
     break;
@@ -814,6 +818,9 @@ function initUI() {
         break;
       case 'filterArchive':
         $('#main').classList.toggle('archives');
+        break;
+      case 'filterFeed':
+        $('#main').classList.toggle('feeds');
         break;
       case 'filterStar':
         $('#main').classList.toggle('stars');
@@ -1128,8 +1135,8 @@ function initUI() {
         dynamicSheet.deleteRule(0);
       }
       if (utils.trim(filter.value) !== '') {
-        dynamicSheet.insertRule("#main.list li[data-tags] { display: none; }", 0);
-        dynamicSheet.insertRule('#main.list li[data-tags*="' + filter.value + '"], #main.list li[data-title*="' + filter.value + '"] { display: block; }', 1);
+        dynamicSheet.insertRule("#main.list #list > li[data-tags] { display: none !important; }", 0);
+        dynamicSheet.insertRule('#main.list #list > li[data-tags*="' + filter.value + '"], #main.list #list > li[data-title*="' + filter.value + '"] { display: block !important; }', 1);
       }
     }
     filter.addEventListener("keyup", onFilterChange);
@@ -1138,7 +1145,7 @@ function initUI() {
       filter.value = '';
       onFilterChange();
     });
-    document.querySelector("#main .filters [data-action=addTag]").addEventListener("click", function () {
+    document.querySelector("#main .filters [data-action=addFilterTag]").addEventListener("click", function () {
       tiles.go('tagTile', function (tag) {
         if (typeof tag !== 'undefined') {
           if (tag !== null) {
@@ -1392,6 +1399,8 @@ window.addEventListener('load', function () {
     remoteStorage.alir.private.getAll('').then(function (all) {
       Object.keys(all).forEach(function (key) {
         if (key.substr(-1) !== '/') {
+          utils.log("Migrating article " + all[key].title, "info");
+          all[key].id = key;
           remoteStorage.alir.saveArticle(all[key]);
           remoteStorage.alir.private.remove(key);
         }

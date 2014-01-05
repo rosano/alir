@@ -299,12 +299,14 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 }
 #main.list #list > li.hasNotes h2 .hasNotes,
 #main.list #list > li[data-tags*=",archive,"] h2 .isArchive,
+#main.list #list > li[data-tags*=",feed,"] h2 .isFeed,
 #main.list #list > li[data-tags*=",star"] h2 .isStar
 {
   display: inline;
   font-size: 1rem;
 }
-#main.list #list > li[data-tags*=",archive,"] {
+#main.list #list > li[data-tags*=",archive,"],
+#main.list #list > li[data-tags*=",feed,"] {
   display: none;
 }
 #main.detail #list > li {
@@ -314,14 +316,17 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   display: block;
 }
 #main.list.archives .filters .archive,
-#main.detail #list > li[data-tags*=",archive,"] .archive {
+#main.detail #list > li[data-tags*=",archive,"] .archive,
+#main.list.feeds .filters .feed,
+#main.detail #list > li[data-tags*=",feed,"] .feed {
   color: #ff6347;
 }
 #main.list.stars .filters .star,
 #main.detail #list > li[data-tags*=",star,"] .star {
   color: yellow;
 }
-#main.list.archives #list > li[data-tags*=",archive,"] {
+#main.list.archives #list > li[data-tags*=",archive,"],
+#main.list.feeds #list > li[data-tags*=",feed,"] {
   display: block;
 }
 #main.list.stars #list > li:not([data-tags*=",star,"]) {
