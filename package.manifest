@@ -48,7 +48,13 @@
       "returnValue": true
     }
   },
+  "messages": {
+    "alarm" : "/index.html"
+  },
   "permissions": {
+    "alarms": {
+      "description": "To fetch feeds"
+    },
     "systemXHR":{},
     "browser": {}
   },
@@ -64,6 +70,6 @@
     }
   },
   "type": "privileged",
-  "version": "0.1.96"
+  "version": "0.2.01"
 }
 

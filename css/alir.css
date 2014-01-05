@@ -227,6 +227,9 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   background-color: rgba(255, 255, 255, .5);
   z-index: 1000;
 }
+#list .current .articleMenu .articleActions {
+  background-color: rgba(255, 255, 255, .7);
+}
 #list .current .content .note {
   padding: 10px;
   display: block;
@@ -264,14 +267,17 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   padding: .5em;
   position: relative;
 }
-#main .filters .delete {
+#main .filters .delete,
+#main.edit .filters a {
   display: none;
 }
+#main.edit .filters .edit,
 #main.edit .filters .delete {
   display: inline;
 }
 #main .delitem {
   display: none;
+  margin-right: 1rem;
 }
 #main.edit .delitem {
   display: inline;

@@ -47,6 +47,7 @@ config = {
   },
   lang: 'en-US',
   menu: true,
+  alarmInterval: 60,
   bookmarks: {}
 };
 
@@ -513,7 +514,7 @@ function displayItem(obj) {
       url: obj.url
     };
     item = template('#tmpl-feed', data);
-    insertInList(document.getElementById('feeds'), "[data-key]", item, function (e) { return (e.dataset.title.toLowerCase() < obj.title.toLowerCase()); });
+    insertInList(document.getElementById('feeds'), "[data-key]", item, function (e) { return (e.dataset.title.toLowerCase() < title.toLowerCase()); });
     // update feed cache
     window.feeds.cache(obj);
     break;
@@ -584,6 +585,7 @@ function initUI() {
         document.body.classList.remove('menu-left');
         document.body.classList.add('menu-right');
       }
+      $('#alarmInterval').value   = conf.alarmInterval;
       if (typeof conf.bookmarks === 'undefined') {
         conf.bookmarks = {};
       }
@@ -1250,6 +1252,12 @@ function initUI() {
   });
   $('#settingsLang select').addEventListener('change', function () {
     document.webL10n.setLanguage(this.value);
+  });
+  $('#alarmInterval').addEventListener('change', function () {
+    config.alarmInterval = this.value;
+    window.alarms.reset(function () {
+      window.alarms.plan();
+    });
   });
   // }}
   // Left menu {{

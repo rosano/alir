@@ -131,8 +131,8 @@
         <a class="icon-inbox archive" data-action="filterArchive" href="#"></a>
         <a class="icon-rss feed isInstalled" data-action="filterFeed" href="#"></a>
         <a class="icon-star star" data-action="filterStar" href="#"></a>
-        <a class="icon-tags" data-action="addFilterTag" href="#"></a>
-        <a class="icon-pencil" data-action="editArticles" href="#"></a>
+        <a class="icon-tags tags" data-action="addFilterTag" href="#"></a>
+        <a class="icon-pencil edit" data-action="editArticles" href="#"></a>
         <a class="icon-trash delete" data-action="deleteArticles" href="#"></a>
         <fieldset class="inline text compact">
           <p>
@@ -156,16 +156,6 @@
             </select>
           </fieldset>
         </fieldset>
-        <fieldset>
-          <legend>Sync</legend>
-          <p class="col2">
-            <button data-l10n-id="rsConnect" data-action="connect"></button>
-            <button data-l10n-id="rsDisconnect" data-action="disconnect"></button>
-            <button data-l10n-id="rsSync"  data-action="sync"></button>
-            <button data-l10n-id="rsReset" data-action="reset"></button>
-            <button data-l10n-id="rsCache" data-action="cacheReset"></button>
-          </p>
-        </fieldset>
         <fieldset id="prefRS">
           <legend data-l10n-id="remoteStorage">remoteStorage</legend>
           <fieldset class="inline text">
@@ -176,9 +166,13 @@
             </p>
           </fieldset>
           <fieldset>
-            <p>
+            <p class="col2">
               <button data-l10n-id="rsConnect" data-action="connect"></button>
-            <p>
+              <button data-l10n-id="rsDisconnect" data-action="disconnect"></button>
+              <button data-l10n-id="rsSync"  data-action="sync"></button>
+              <button data-l10n-id="rsReset" data-action="reset"></button>
+              <button data-l10n-id="rsCache" data-action="cacheReset"></button>
+            </p>
           </fieldset>
         </fieldset>
         <fieldset id="prefDropbox">
@@ -236,6 +230,11 @@
             <input type="text" name="prefToken" id="prefToken" disabled>
           </p>
         </fieldset>
+        <fieldset class="ifInstalled">
+          <legend data-l10n-id="alarmsLegend"></legend>
+          <label for="alarmInterval" data-l10n-id="alarmInterval"></label>
+          <input type="text" name="alarmInterval" id="alarmInterval" size="5" />
+        </fieldset>
         <p>
           <button data-method="tileGo"   data-params="credits"  data-l10n-id="settingsCredits">Credits</button>
           <button data-method="tileGo"   data-params="advanced" data-l10n-id="settingsAdvanced" data-method="tileGo">Advanced</button>
@@ -248,12 +247,18 @@
       </form>
     </div>
     <div data-tile="advanced">
-          <button data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
-          <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
-          <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
-          <button data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
-          <button data-method="getAll" data-l10n-id="settingsReload">Reload</button>
-          <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
+      <button data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
+      <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
+      <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
+      <button data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
+      <button data-method="getAll" data-l10n-id="settingsReload">Reload</button>
+      <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
+      <fieldset class="ifInstalled">
+        <legend data-l10n-id="alarmsLegend"></legend>
+        <button data-object="alarms" data-method="display" data-l10n-id="alarmsDisplay"></button>
+        <button data-object="alarms" data-method="plan" data-l10n-id="alarmsPlan"></button>
+        <button data-object="alarms" data-method="reset" data-l10n-id="alarmsReset"></button>
+      </fieldset>
     </div>
     <section id="noteView" data-tile="noteView" class="">
       <header><h2 data-l10n-id="noteViewHeader">View note</h2></header>

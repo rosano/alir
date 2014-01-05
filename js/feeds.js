@@ -1,5 +1,5 @@
 //jshint browser: true
-/* global remoteStorage: true, tiles: true, utils: true */
+/* global remoteStorage: true, tiles: true, utils: true, _: true */
 window.feeds = {
   _cache: {},
   cache: function (obj) {
@@ -210,3 +210,103 @@ window.feeds = {
   }
 };
 
+// Manage alarms
+if (navigator.mozAlarms) {
+  window.alarms = {
+    display: function () {
+      "use strict";
+      var request = navigator.mozAlarms.getAll();
+
+      request.onsuccess = function () {
+        var alarms  = this.result;
+        if (alarms.length === 0) {
+          utils.log(_('alarmsNoAlarms'), 'warning');
+        } else {
+          alarms.forEach(function (alarm) {
+            utils.log(alarm.data.action + " at " + alarm.date, "info");
+          });
+        }
+      };
+
+      request.onerror = function () {
+        utils.log('Error getting alarms: ' + this.error);
+      };
+    },
+    plan: function () {
+      "use strict";
+      var request = navigator.mozAlarms.getAll();
+
+      request.onsuccess = function () {
+        var alarms   = this.result,
+            current  = new Date(),
+            nb       = alarms.length,
+            interval = window.config.alarmInterval || 60;
+        utils.log(alarms.length + " alarms planned", "info");
+        alarms.forEach(function (alarm) {
+          if (alarm.date > current) {
+            current = alarm.date;
+          }
+        });
+        utils.log("Last alarm planned at " + current.toISOString(), "info");
+        while (nb < 10) {
+          current.setMinutes(current.getMinutes() + parseInt(interval, 10));
+          window.alarms.set(current);
+          nb++;
+        }
+      };
+
+      request.onerror = function () {
+        utils.log('Error getting alarms: ' + this.error);
+      };
+    },
+    set: function (date) {
+      "use strict";
+      var alarm, request;
+      alarm = {
+        date: date,
+        respectTimezone: 'ignoreTimezone',
+        data: {
+          action: 'feedUpdate'
+        }
+      };
+      request = navigator.mozAlarms.add(alarm.date, alarm.respectTimezone, alarm.data);
+
+      request.onsuccess = function () {
+        utils.log("Alarm planned at " + date, "info");
+      };
+      request.onerror = function () {
+        utils.log("Error planning alarm at " + date, "error");
+      };
+    },
+    reset: function (cb) {
+      "use strict";
+      var request = navigator.mozAlarms.getAll();
+
+      request.onsuccess = function () {
+        this.result.forEach(function (alarm) {
+          navigator.mozAlarms.remove(alarm.id);
+        });
+        if (cb) {
+          cb();
+        }
+      };
+
+      request.onerror = function () {
+        utils.log('Error getting alarms: ' + this.error);
+      };
+    },
+  };
+  if (navigator.mozSetMessageHandler) {
+    navigator.mozSetMessageHandler("alarm", function (mozAlarm) {
+      "use strict";
+      utils.log("alarm fired: " + JSON.stringify(mozAlarm.data), "info");
+      switch (mozAlarm.data.action) {
+      case 'feedUpdate':
+        window.feeds.update();
+        window.alarms.plan();
+      }
+    });
+  }
+
+  window.alarms.plan();
+}
