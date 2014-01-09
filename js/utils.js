@@ -82,6 +82,31 @@ var utils = {
     "use strict";
     sel = sel + ', ' + sel + ' *';
     return matchesSelector.call(elmt, sel);
+  },
+  /**
+   * Return parent element matching criteria
+   *
+   * @param {DOMElement}
+   * @param {Function}
+   *
+   * @return {DOMElement|null}
+   */
+  parent: function (elmt, match) {
+    "use strict";
+    var res = null, found = false;
+    while (!found) {
+      if (elmt.nodeType !== 1) {
+        found = true;
+      } else {
+        if (match(elmt)) {
+          res   = elmt;
+          found = true;
+        } else {
+          elmt = elmt.parentNode;
+        }
+      }
+    }
+    return res;
   }
 };
 

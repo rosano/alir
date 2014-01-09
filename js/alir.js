@@ -627,27 +627,54 @@ function initUI() {
     // Generic event Listener
     document.body.addEventListener('click', function (ev) {
       //jshint curly: false
-      var parent = ev.target.parentNode,
-          params = [],
-          dataset = ev.target.dataset;
-      // Reset buttons {
-      if (utils.match(ev.target, "button[type=reset]")) {
-        ev.preventDefault();
-        while (parent.tagName !== 'FIELDSET' && (parent = parent.parentNode)) ;
-        if (parent !== null) {
-          $$("input", parent).forEach(function (elmt) {
-            elmt.value = '';
-          });
+      var params = [],
+          dataset = ev.target.dataset,
+          listeners;
+      listeners = [
+        {
+          // Reset button
+          sel: "button[type=reset]",
+          action: function (elmt) {
+            var res = utils.parent(elmt, function (el) { return el.tagName === 'FIELDSET'; });
+            if (res !== null) {
+              $$("input", res).forEach(function (el) {
+                el.value = '';
+              });
+            }
+          }
+        },
+        // Links inside content
+        {
+          sel: "#list .content a[href][target]",
+          action: function (elmt) {
+            document.getElementById("linkRef").textContent = elmt.href;
+            tiles.go('link');
+          }
+        },
+        // Containers
+        {
+          sel: ".container .header",
+          action: function (elmt) {
+            var target = utils.parent(elmt, function (el) { return el.classList.contains('container'); });
+            if (target) {
+              target.classList.toggle('folded');
+            }
+          }
         }
-      }
-      // }
-      // Links inside content {
-      if (utils.match(ev.target, "#list .content a[href][target]")) {
-        ev.preventDefault();
-        document.getElementById("linkRef").textContent = ev.target.href;
-        tiles.go('link');
-      }
-      // }
+        /*,
+        {
+          sel: "",
+          action: function (elmt) {
+          }
+        }
+        */
+      ];
+      listeners.forEach(function (listener) {
+        if (utils.match(ev.target, listener.sel)) {
+          ev.preventDefault();
+          listener.action(ev.target);
+        }
+      });
       if (dataset && dataset.method) {
         if (typeof dataset.params !== "undefined") {
           params = dataset.params.split(',');
@@ -1372,6 +1399,7 @@ window.addEventListener('load', function () {
   }
   //remoteStorage.enableLog();
   remoteStorage.setSyncInterval(60000);
+  remoteStorage.setBackgroundSyncInterval(300000);
   remoteStorage.access.claim('alir', 'rw');
   remoteStorage.caching.enable('/alir/');
   //remoteStorage.caching.enable('/public/alir/');

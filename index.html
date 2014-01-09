@@ -147,89 +147,99 @@
     <div id="settings" class="" data-tile="settings">
       <header><h2 data-l10n-id="settings">Settings</h2></header>
       <form >
-        <fieldset id="settingsLang">
-          <legend data-l10n-id="settingsLang">Language</legend>
-          <fieldset class="inline text">
-            <select>
-              <option value="en-US" data-l10n-id="settingsLangUs">Simplified English</option>
-              <option value="fr" data-l10n-id="settingsLangFr">French</option>
-            </select>
-          </fieldset>
-        </fieldset>
-        <fieldset id="prefRS">
-          <legend data-l10n-id="remoteStorage">remoteStorage</legend>
-          <fieldset class="inline text">
-            <p>
-              <label for="rsLogin" data-l10n-id="rsLoginLabel">Login</label>
-              <input type="email" name="rsLogin" id="rsLogin" placeholder="user@host" data-l10n-id="rsLogin" />
-              <button type="reset"><span class="icon-remove"></span></button>
-            </p>
-          </fieldset>
-          <fieldset>
-            <p class="col2">
-              <button data-l10n-id="rsConnect" data-action="connect"></button>
-              <button data-l10n-id="rsDisconnect" data-action="disconnect"></button>
-              <button data-l10n-id="rsSync"  data-action="sync"></button>
-              <button data-l10n-id="rsReset" data-action="reset"></button>
-              <button data-l10n-id="rsCache" data-action="cacheReset"></button>
-            </p>
-          </fieldset>
-        </fieldset>
-        <fieldset id="prefDropbox">
-          <legend data-l10n-id="dropbox">Dropbox</legend>
-          <fieldset class="inline text">
-            <p>
-              <label for="dropboxApiKey" data-l10n-id="dropboxKeyLabel">Key</label>
-              <input type="text" name="dropboxApiKey" id="dropboxApiKey" placeholder="Key" data-l10n-id="dropboxKey" />
-              <button type="reset"><span class="icon-remove"></span></button>
-            </p>
-          </fieldset>
-          <fieldset>
-            <p>
-              <button data-l10n-id="rsConnect" data-action="connectDropbox"></button>
-            <p>
-          </fieldset>
-        </fieldset>
-        <fieldset id="prefDrive">
-          <legend data-l10n-id="drive">Google Drive</legend>
-          <fieldset class="inline text">
-            <p>
-              <label for="driveClientId" data-l10n-id="driveIdLabel">Client Id</label>
-              <input type="text" name="driveClientId" id="driveClientId" placeholder="ClientId" data-l10n-id="driveId" />
-              <button type="reset"><span class="icon-remove"></span></button>
-            </p>
-          </fieldset>
-          <fieldset class="inline text">
-            <p>
-              <label for="driveApiKey" data-l10n-id="driveKeyLabel">Key</label>
-              <input type="text" name="driveApiKey" id="driveApiKey" placeholder="Key" data-l10n-id="driveKey" />
-              <button type="reset"><span class="icon-remove"></span></button>
-            </p>
-          </fieldset>
-          <fieldset>
-            <p>
-              <button data-l10n-id="rsConnect" data-action="connectDrive"></button>
-            <p>
-          </fieldset>
-        </fieldset>
-        <fieldset class="inline check compact">
-          <p>
-            <label for="prefMenuLeft" data-l10n-id="settingsMenu">Left Menu</label>
-            <input type="checkbox" name="prefMenuLeft" id="prefMenuLeft" checked>
-          </p>
-        </fieldset>
-        <fieldset class="inline check compact">
-          <p>
-            <label for="prefGesture" data-l10n-id="settingsGesture">Gestures</label>
-            <input type="checkbox" name="prefGesture" id="prefGesture" >
-          </p>
-        </fieldset>
-        <fieldset class="inline text">
-          <p>
-            <label for="prefToken" data-l10n-id="settingsToken">Token</label>
-            <input type="text" name="prefToken" id="prefToken" disabled>
-          </p>
-        </fieldset>
+        <section class="container folded">
+          <header class="header"><h2 data-l10n-id="settingsMisc"></h3></header>
+          <div>
+            <fieldset id="settingsLang">
+              <legend data-l10n-id="settingsLang">Language</legend>
+              <fieldset class="inline text">
+                <select>
+                  <option value="en-US" data-l10n-id="settingsLangUs">Simplified English</option>
+                  <option value="fr" data-l10n-id="settingsLangFr">French</option>
+                </select>
+              </fieldset>
+            </fieldset>
+            <fieldset class="inline check compact">
+              <p>
+                <label for="prefMenuLeft" data-l10n-id="settingsMenu">Left Menu</label>
+                <input type="checkbox" name="prefMenuLeft" id="prefMenuLeft" checked>
+              </p>
+            </fieldset>
+            <fieldset class="inline check compact">
+              <p>
+                <label for="prefGesture" data-l10n-id="settingsGesture">Gestures</label>
+                <input type="checkbox" name="prefGesture" id="prefGesture" >
+              </p>
+            </fieldset>
+          </div>
+        </section>
+        <section class="container folded">
+          <header class="header"><h2 data-l10n-id="settingsSync"></h3></header>
+          <div>
+            <fieldset id="prefRS">
+              <legend data-l10n-id="remoteStorage">remoteStorage</legend>
+              <fieldset class="inline text">
+                <p>
+                  <label for="rsLogin" data-l10n-id="rsLoginLabel">Login</label>
+                  <input type="email" name="rsLogin" id="rsLogin" placeholder="user@host" data-l10n-id="rsLogin" />
+                  <button type="reset"><span class="icon-remove"></span></button>
+                </p>
+              </fieldset>
+              <fieldset>
+                <p class="col2">
+                  <button data-l10n-id="rsConnect" data-action="connect"></button>
+                  <button data-l10n-id="rsDisconnect" data-action="disconnect"></button>
+                  <button data-l10n-id="rsSync"  data-action="sync"></button>
+                  <button data-l10n-id="rsReset" data-action="reset"></button>
+                  <button data-l10n-id="rsCache" data-action="cacheReset"></button>
+                </p>
+              </fieldset>
+              <fieldset class="inline text">
+                <p>
+                  <label for="prefToken" data-l10n-id="settingsToken">Token</label>
+                  <input type="text" name="prefToken" id="prefToken" disabled>
+                </p>
+              </fieldset>
+            </fieldset>
+            <fieldset id="prefDropbox">
+              <legend data-l10n-id="dropbox">Dropbox</legend>
+              <fieldset class="inline text">
+                <p>
+                  <label for="dropboxApiKey" data-l10n-id="dropboxKeyLabel">Key</label>
+                  <input type="text" name="dropboxApiKey" id="dropboxApiKey" placeholder="Key" data-l10n-id="dropboxKey" />
+                  <button type="reset"><span class="icon-remove"></span></button>
+                </p>
+              </fieldset>
+              <fieldset>
+                <p>
+                  <button data-l10n-id="rsConnect" data-action="connectDropbox"></button>
+                <p>
+              </fieldset>
+            </fieldset>
+            <fieldset id="prefDrive">
+              <legend data-l10n-id="drive">Google Drive</legend>
+              <fieldset class="inline text">
+                <p>
+                  <label for="driveClientId" data-l10n-id="driveIdLabel">Client Id</label>
+                  <input type="text" name="driveClientId" id="driveClientId" placeholder="ClientId" data-l10n-id="driveId" />
+                  <button type="reset"><span class="icon-remove"></span></button>
+                </p>
+              </fieldset>
+              <fieldset class="inline text">
+                <p>
+                  <label for="driveApiKey" data-l10n-id="driveKeyLabel">Key</label>
+                  <input type="text" name="driveApiKey" id="driveApiKey" placeholder="Key" data-l10n-id="driveKey" />
+                  <button type="reset"><span class="icon-remove"></span></button>
+                </p>
+              </fieldset>
+              <fieldset>
+                <p>
+                  <button data-l10n-id="rsConnect" data-action="connectDrive"></button>
+                <p>
+              </fieldset>
+            </fieldset>
+          </div>
+        </section>
         <fieldset class="ifInstalled">
           <legend data-l10n-id="alarmsLegend"></legend>
           <label for="alarmInterval" data-l10n-id="alarmInterval"></label>
@@ -401,6 +411,7 @@
     <script type="text/javascript" src="lib/htmlparser.js"></script>
     <script type="text/javascript" src="lib/remotestorage.js"></script>
     <script type="text/javascript" src="lib/webL10n/l10n.js"></script>
+    <script type="text/javascript" src="js/utils.js"></script>
     <script type="text/javascript" src="js/touch.js"></script>
     -->
     <script type="text/javascript" src="js/feeds.js"></script>
