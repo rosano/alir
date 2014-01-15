@@ -11,6 +11,7 @@
     <link href="css/widgetCss.css" rel="stylesheet" type="text/css">
     -->
     <link href="css/dynamic.css"   rel="stylesheet" type="text/css" id="dynamicCss">
+    <link href="css/user.css"   rel="stylesheet" type="text/css" id="userCss">
     <link rel="icon" type="image/png" href="/img/icon-32.png" />
     <link rel="prefetch" type="application/l10n" href="locales/locales.ini" />
   </head>
@@ -257,6 +258,14 @@
       </form>
     </div>
     <div data-tile="advanced">
+      <fieldset>
+        <p>
+          <input id="styleFontSize" type="range" min="0.3" max="3" step="0.1" />
+        </p>
+        <p id="styleFontSizeSample">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+      </fieldset>
       <button data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
       <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
       <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>

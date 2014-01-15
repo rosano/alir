@@ -48,7 +48,10 @@ config = {
   lang: 'en-US',
   menu: true,
   alarmInterval: 60,
-  bookmarks: {}
+  bookmarks: {},
+  style: {
+    fontSize: 1
+  }
 };
 
 tiles = new Tiles();
@@ -187,6 +190,26 @@ window.link = {
   }
 };
 
+// User styles {{
+(function () {
+  "use strict";
+  var dynamicSheet = document.getElementById('userCss').sheet,
+      input = $('#styleFontSize');
+  function updateStyle(conf) {
+    while (dynamicSheet.cssRules[0]) {
+      dynamicSheet.deleteRule(0);
+    }
+    dynamicSheet.insertRule("#list .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; }", 0);
+  }
+  window.alir.on('configLoaded', function (conf) {
+    updateStyle(conf.style);
+  });
+  input.addEventListener('change',  function () {
+    window.config.style.fontSize = this.value;
+    updateStyle(window.config.style);
+  });
+}());
+// }}
 function createXPathFromElement(elm) {
   // source: http://stackoverflow.com/a/5178132
   //jshint maxcomplexity: 12
