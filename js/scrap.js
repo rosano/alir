@@ -82,6 +82,7 @@ if (navigator.mozSetMessageHandler) {
             scrap(data.url, function (err, res) {
               if (err) {
                 utils.log(err, 'error');
+                saveScraped({url: data.url, title: '???', html: '???'});
                 activity.postError(err);
               } else {
                 saveScraped(res);
@@ -90,7 +91,7 @@ if (navigator.mozSetMessageHandler) {
             });
           } catch (e) {
             activity.postError('cancelled');
-            utils.log("" + e, "error");
+            utils.log(e.toString(), "error");
           }
         } else {
           activity.postError('type not supported');
@@ -106,4 +107,3 @@ if (navigator.mozSetMessageHandler) {
     }
   });
 }
-

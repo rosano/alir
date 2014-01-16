@@ -958,6 +958,24 @@ function initUI() {
           $('#main').classList.remove('edit');
         }());
         break;
+      case 'reload':
+        window.scrap(ce.keyNode.dataset.url, function (err, res) {
+          if (err) {
+            utils.log(err, 'error');
+            window.alert("Erreur reloading content");
+          } else {
+            remoteStorage.get('/alir/article/' + ce.key).then(function (err, article, contentType, revision) {
+              if (err !== 200) {
+                window.alert(err);
+              } else {
+                article.title = res.title;
+                article.html  = res.html;
+                remoteStorage.alir.saveArticle(article);
+              }
+            });
+          }
+        });
+        break;
       }
     }
   });
