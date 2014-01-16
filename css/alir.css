@@ -127,13 +127,13 @@ body.menu-right #menu.show {
   color: #FFFFFF;
   text-decoration: none;
 }
-#menu.detail .content .back,
-#menu.detail .content .top
+/*
+#menu.detail .content .detail
 {
   display: inline;
 }
-#menu.list .content .back,
-#menu.list .content .top
+*/
+#menu.list .content .detail
 {
   display: none;
 }
@@ -141,18 +141,16 @@ body.menu-left #menu .content .icon-chevron-right,
 body.menu-right #menu .content .icon-chevron-left {
   display: none;
 }
-#menu.detail .content .sync,
-#menu.detail .content .settings,
-#menu.detail .content .new
+#menu.detail .content .main
 {
   display: none;
 }
-#menu.list .content .sync,
-#menu.list .content .settings,
-#menu.list .content .new
+/*
+#menu.list .content .main
 {
   display: inline;
 }
+*/
 #menu .content label.onoff {
   margin-left: -10px;
 }
@@ -308,13 +306,13 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #list > li h2 span {
   display: none;
 }
+#list > li h2 span.title,
 #main.list #list > li.hasNotes h2 .hasNotes,
 #main.list #list > li[data-tags*=",archive,"] h2 .isArchive,
 #main.list #list > li[data-tags*=",feed,"] h2 .isFeed,
 #main.list #list > li[data-tags*=",star"] h2 .isStar
 {
   display: inline;
-  font-size: 1rem;
 }
 #main.list #list > li[data-tags*=",archive,"],
 #main.list #list > li[data-tags*=",feed,"] {
@@ -345,6 +343,10 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 }
 #main.list.stars #list > li[data-tags*=",star,"] {
   display: block;
+}
+/* Hide URL of article without url */
+#list > li[data-url*="#"] .content .url, #list > li[data-url*=""] .content .url {
+  display: none;
 }
 #list h2 .icon-star {
   color: yellow;

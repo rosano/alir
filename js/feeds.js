@@ -1,5 +1,5 @@
 //jshint browser: true
-/* global remoteStorage: true, tiles: true, utils: true, _: true */
+/* global remoteStorage: true, template: true, tiles: true, utils: true, _: true, $:true */
 window.feeds = {
   _cache: {},
   cache: function (obj) {
@@ -32,8 +32,8 @@ window.feeds = {
           obj.title = $('[name="title"]').value;
           obj.short = $('[name="feedShort"]').checked;
           obj.date  = Date.now();
+          doSave(obj);
         }
-        doSave(obj);
       });
     } else {
       // create
@@ -155,12 +155,14 @@ window.feeds = {
           }
           cache.articles[itemId] = {
             url: itemUrl,
-            updated: itemUpdated
+            updated: itemUpdated,
+            title: itemTitle
           };
           if (test !== true && (cache.short || !!!itemContent)) {
             window.scrap(itemUrl, function (err, res) {
               if (err) {
                 utils.log(err, 'error');
+                doSave(err.toString());
               } else {
                 doSave(res.html);
               }
@@ -173,6 +175,7 @@ window.feeds = {
           remoteStorage.get('/alir/feed/' + window.feeds._cache[url].id).then(function (err, obj, contentType, revision) {
             if (err === 200) {
               obj.articles = cache.articles;
+              obj.date     = Date.now();
               remoteStorage.alir.saveFeed(obj);
             }
           });
@@ -183,17 +186,57 @@ window.feeds = {
       }
     });
   },
-  test: function () {
+  test: function (url) {
     "use strict";
-    var $   = tiles.$('feedEdit'),
-        url = $('[name="url"]').value;
+    var $   = tiles.$('feedEdit');
+    url = url || $('[name="url"]').value;
     window.feeds.fetch(url, true, function (items) {
       items = items || {};
       window.alert("Found " + Object.keys(items).length + " item");
     });
   },
-  show: function () {
-    // @TODO
+  create: function () {
+    "use strict";
+    var $   = tiles.$('feedEdit');
+    $('[name="id"]').value    = '';
+    $('[name="url"]').value   = '';
+    $('[name="title"]').value = '';
+    $('[name="feedShort"]').checked = false;
+    tiles.show('feedEdit');
+  },
+  edit: function (url) {
+    "use strict";
+    var $    = tiles.$('feedEdit'),
+        feed = this._cache[url];
+    $('[name="id"]').value    = feed.id;
+    $('[name="url"]').value   = feed.url;
+    $('[name="title"]').value = feed.title;
+    $('[name="feedShort"]').checked = feed.short;
+    tiles.show('feedEdit');
+  },
+  show: function (url) {
+    "use strict";
+    var feed = this._cache[url],
+        parent = $("#feedDetail");
+    feed.items = utils.toArray(feed.articles);
+    feed.items.forEach(function (v, k) {
+      if (!v.title) {
+        feed.items[k].title = v.url.split('/').pop();
+      }
+    });
+    feed.items.sort(function (a, b) {return a.updated > b.updated ? -1 : 1; });
+    parent.innerHTML = '';
+    parent.appendChild(template('tmpl-feed-detail', feed));
+    tiles.go('feedShow');
+  },
+  delete: function (url) {
+    "use strict";
+    var feed = this._cache[url];
+    if (window.confirm(_('feedConfirmDelete', {title: feed.title}))) {
+      remoteStorage.alir.private.remove('/feed/' + feed.id);
+      delete this._cache[url];
+      tiles.show('feeds');
+    }
   },
   update: function () {
     "use strict";
@@ -242,6 +285,10 @@ if (navigator.mozAlarms) {
             nb       = alarms.length,
             interval = window.config.alarmInterval || 60;
         utils.log(alarms.length + " alarms planned", "info");
+        if (alarms.length === 0) {
+          current.setMinutes(current.getMinutes() + 1);
+          window.alarms.set(current);
+        }
         alarms.forEach(function (alarm) {
           if (alarm.date > current) {
             current = alarm.date;
@@ -299,7 +346,10 @@ if (navigator.mozAlarms) {
   if (navigator.mozSetMessageHandler) {
     navigator.mozSetMessageHandler("alarm", function (mozAlarm) {
       "use strict";
-      utils.log("alarm fired: " + JSON.stringify(mozAlarm.data), "info");
+      console.log("alarm fired: " + JSON.stringify(mozAlarm.data));
+      try {
+        utils.log("alarm fired: " + JSON.stringify(mozAlarm.data), "info");
+      }
       switch (mozAlarm.data.action) {
       case 'feedUpdate':
         window.feeds.update();

@@ -1,5 +1,5 @@
 //jshint browser: true
-/* exported Tiles template */
+/*global $:true, RemoteStorage: true */
 var matchesSelector = document.documentElement.matches ||
                       document.documentElement.matchesSelector ||
                       document.documentElement.webkitMatchesSelector ||
@@ -86,8 +86,8 @@ var utils = {
   /**
    * Return parent element matching criteria
    *
-   * @param {DOMElement}
-   * @param {Function}
+   * @param {DOMElement} elmt
+   * @param {Function}   match
    *
    * @return {DOMElement|null}
    */
@@ -107,72 +107,92 @@ var utils = {
       }
     }
     return res;
+  },
+  /**
+   * Convert Object to array
+   *
+   * @param {Object} obj
+   * @param {String} key
+   *
+   * @return {Array}
+   */
+  toArray: function (obj, key) {
+    "use strict";
+    key = key || '_id';
+    var res = [];
+    Object.keys(obj).forEach(function (k) {
+      var item = obj[k];
+      item[key] = k;
+      res.push(item);
+    });
+    return res;
   }
 };
 
-function Tiles(global) {
+window.Tiles = function (global) {
   "use strict";
+  RemoteStorage.eventHandling(this, "shown");
   var current,
       tiles = [],
       popup = (window.matchMedia("(min-width: 37rem) and (min-height: 37rem)").matches);
-  return {
-    show: function (name) {
+  this.show = function (name) {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
+      if (e.dataset.tile === name) {
+        e.classList.add('shown');
+        window.scrollTo(0, 0);
+        current = name;
+      } else {
+        e.classList.remove('shown');
+      }
+    });
+    document.getElementById('menu').classList.remove('show');
+    document.body.classList.remove("menu");
+    this._emit('shown', name);
+  };
+  this.go = function (name, cb) {
+    tiles.push({name: current, y: window.scrollY, cb: cb});
+    if (popup) {
+      document.body.classList.add("popup");
       Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
         if (e.dataset.tile === name) {
-          e.classList.add('shown');
+          e.classList.add('popup');
           window.scrollTo(0, 0);
           current = name;
-        } else {
-          e.classList.remove('shown');
         }
       });
-      document.getElementById('menu').classList.remove('show');
-      document.body.classList.remove("menu");
-    },
-    go: function (name, cb) {
-      tiles.push({name: current, y: window.scrollY, cb: cb});
-      if (popup) {
-        document.body.classList.add("popup");
-        Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
-          if (e.dataset.tile === name) {
-            e.classList.add('popup');
-            window.scrollTo(0, 0);
-            current = name;
-          }
-        });
-      } else {
-        this.show(name);
-      }
-      document.getElementById('menu').classList.remove('show');
-      document.body.classList.remove("menu");
-    },
-    back: function (res) {
-      var current, next;
-      if (popup) {
-        current = document.querySelector(".popup[data-tile]");
-        if (current) {
-          current.classList.remove('popup');
-        }
-        document.body.classList.remove('popup');
-      } else {
-        next = tiles.pop();
-        if (typeof next === 'object') {
-          this.show(next.name);
-          if (typeof next.cb === 'function') {
-            next.cb(res);
-          }
-          window.scrollTo(0, next.y);
-        }
-      }
-      document.getElementById('menu').classList.remove('show');
-      document.body.classList.remove("menu");
-    },
-    $ : function (name) {
-      var root = document.querySelector('[data-tile="' + name + '"]');
-      return function (sel) { return root.querySelector(sel); };
+      this._emit('shown', name);
+    } else {
+      this.show(name);
     }
+    document.getElementById('menu').classList.remove('show');
+    document.body.classList.remove("menu");
   };
-}
+  this.back = function (res) {
+    var popupElmt, next;
+    if (popup) {
+      popupElmt = document.querySelector(".popup[data-tile]");
+      if (popupElmt) {
+        popupElmt.classList.remove('popup');
+      }
+      document.body.classList.remove('popup');
+    } else {
+      next = tiles.pop();
+      if (typeof next === 'object') {
+        this.show(next.name);
+        if (typeof next.cb === 'function') {
+          next.cb(res);
+        }
+        window.scrollTo(0, next.y);
+      }
+    }
+    document.getElementById('menu').classList.remove('show');
+    document.body.classList.remove("menu");
+  };
+  this.$ = function (name) {
+    var root = document.querySelector('[data-tile="' + name + '"]');
+    return function (sel) { return root.querySelector(sel); };
+  };
+};
 
 /**
  * My own mini-templating system
@@ -182,47 +202,149 @@ function Tiles(global) {
  *
  * @return {DOMDocumentFragment}
  */
-function template(sel, data) {
+window.template = function template(sel, data) {
   "use strict";
-  var re  = new RegExp("{{(=.*?)}}", 'g'),
+  var re  = new RegExp("{{([=#].*?)}}", 'g'),
       frag,
       xpathResult,
-      i, j, elmt, name, value;
-  function repl(match) {
-    var res = data, tmp, expr, fct;
-    match = match.substr(3, match.length - 5);
-    tmp = match.split('|');
-    expr = utils.trim(tmp.shift()).split('.');
-    while (res && expr.length > 0) {
-      res = res[expr.shift()];
-    }
-    if (tmp.length > 0) {
-      while ((fct = tmp.shift()) !== undefined) {
-        switch (utils.trim(fct).toLowerCase()) {
-        case "tolowercase":
-          res = res.toLowerCase();
-          break;
-        default:
-          console.log("Unknown template function " + fct);
-        }
+      i, elmt, attr;
+  function getData(path, val) {
+    var res = val, expr;
+    if (path !== '.') {
+      expr = path.split('.');
+      while (res && expr.length > 0) {
+        res = res[expr.shift()];
       }
+    }
+    if (typeof res === 'undefined') {
+      console.log("UNDEFINED", path, val);
     }
     return res;
   }
-  frag = document.querySelector(sel).cloneNode(true);
-  xpathResult = document.evaluate('//*[contains(@*, "{{=")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-  for (i = 0; i < xpathResult.snapshotLength; i++) {
-    elmt = xpathResult.snapshotItem(i);
-    for (j = 0; j < elmt.attributes.length; j++) {
-      name  = elmt.attributes[j].name;
-      value = elmt.attributes[j].value;
-      elmt.attributes[name].value = value.replace(re, repl);
+  function repl(match) {
+    var res, tmp, fct, type, value;
+    type = match[2];
+    match = match.substr(3, match.length - 5);
+    switch (type) {
+      case '=':
+        // Value
+        tmp = match.split('|');
+        res = getData(utils.trim(tmp.shift()), data);
+        if (tmp.length > 0) {
+          while ((fct = tmp.shift()) !== undefined) {
+            switch (utils.trim(fct).toLowerCase()) {
+            case "join":
+              res = res.join(',');
+              break;
+            case "tolocal":
+              res = new Date(res).toLocaleString();
+              break;
+            case "tolowercase":
+              res = res.toLowerCase();
+              break;
+            default:
+              console.log("Unknown template function " + fct);
+            }
+          }
+        }
+        break;
+      case '#':
+        // Sub template
+        tmp = match.split(' ');
+        value = getData(tmp[1], data);
+        if (Array.isArray(value)) {
+          res = value.reduce(function (p, c) {
+            var val = {};
+            val[tmp[1]] = c;
+            return p + window.template(tmp[0], val).outerHTML;
+          }, '');
+        } else {
+          res = window.template(tmp[0], data).outerHTML;
+        }
+        break;
     }
+    return res;
   }
-  xpathResult = document.evaluate('//*[contains(., "{{=")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  frag = document.getElementById(sel).cloneNode(true);
+  xpathResult = document.evaluate('//@*[contains(., "{{=")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
+  for (i = 0; i < xpathResult.snapshotLength; i++) {
+    attr = xpathResult.snapshotItem(i);
+    attr.nodeValue = attr.nodeValue.replace(re, repl);
+  }
+  xpathResult = document.evaluate('//*[contains(text(),"{{")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
   for (i = 0; i < xpathResult.snapshotLength; i++) {
     elmt = xpathResult.snapshotItem(i);
     elmt.innerHTML = elmt.innerHTML.replace(re, repl);
   }
   return frag.children[0];
-}
+};
+/**
+ * Article comment
+ */
+window.Comment = function () {
+  "use strict";
+  /*global remoteStorage: true, tiles: true, _: true */
+  var UI;
+  UI = {
+    article: $('#noteEdit [name="articleId"]'),
+    path:    $('#noteEdit [name="xpath"]'),
+    content: $('#noteEdit [name="text"]')
+  };
+
+  function load(cb) {
+    var articleId = $('#noteEdit [name="articleId"]').value;
+
+    remoteStorage.get('/alir/article/' + articleId).then(function (err, article) {
+      if (err === 200) {
+        article.id = articleId;
+      }
+      cb(err, article);
+    });
+  }
+
+  this.create = function (article, path) {
+    UI.article.value = article;
+    UI.path.value    = path;
+    UI.content.value = '';
+    window.tiles.go('noteEdit');
+  };
+
+  this.save = function () {
+    var noteId    = $('#noteEdit [name="noteId"]').value;
+    if (!noteId) {
+      noteId = utils.uuid();
+    }
+    load(function (err, article) {
+      if (err !== 200) {
+        window.alert(err);
+        tiles.back();
+      } else {
+        if (typeof article.notes !== 'object') {
+          article.notes = {};
+        }
+        article.notes[noteId] = {
+          xpath: $('#noteEdit [name="xpath"]').value,
+          content: $('#noteEdit [name="text"]').value
+        };
+        remoteStorage.alir.saveArticle(article);
+        tiles.back();
+      }
+    });
+  };
+
+  this.delete = function () {
+    var noteId    = $('#noteEdit [name="noteId"]').value;
+    if (window.confirm(_('noteConfirmDelete'))) {
+      load(function (err, article) {
+        if (err !== 200) {
+          window.alert(err);
+          tiles.back();
+        } else {
+          delete article.notes[noteId];
+          remoteStorage.alir.saveArticle(article);
+        }
+      });
+    }
+    tiles.back();
+  };
+};

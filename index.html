@@ -18,18 +18,18 @@
   <body class="online menu-left hosted">
     <div id="templates">
       <ul id="tmpl-article">
-        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
-          <h2><a data-object="item" data-method="show" data-params="{{=key}}">
-            <input type="checkbox" class="delitem" data-key="{{=key}}" />
+        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags|join}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
+          <h2><a data-object="articles" data-method="show" data-params="{{=key}}">
+            <input type="checkbox" class="delitem" />
             <span class="icon-comment hasNotes"></span>
             <span class="icon-inbox isArchive"></span>
             <span class="icon-rss isFeed"></span>
             <span class="icon-star isStar"></span>
-            {{=title}}</a></h2>
+            <span class="title">{{=title}}</span></a></h2>
           <div class="articleMenu">
             <a class="icon-reorder" data-action="menu"></a>
             <div class="articleActions hidden">
-              <p><a class="icon-chevron-left" data-object="item" data-method="hide" href="#"></a></p>
+              <p><a class="icon-chevron-left" data-object="articles" data-method="hide" href="#"></a></p>
               <p><a class="icon-inbox archive" data-action="archive" href="#"></a></p>
               <p><a class="icon-star star" data-action="star" href="#"></a></p>
               <p><a class="icon-trash" data-action="delete" href="#"></a></p>
@@ -40,22 +40,23 @@
             </div>
           </div>
           <div class="toolbar">
-            <a class="icon-chevron-left" data-object="item" data-method="hide" href="#"></a>
+            <a class="icon-chevron-left" data-object="articles" data-method="hide" href="#"></a>
             <a class="icon-trash" data-action="delete" href="#"></a>
             <a class="icon-pencil compose" data-action="compose" href="#"></a>
             <a class="icon-share ifInstalled" data-action="share" href="#"></a>
           </div>
           <div class="content">
-            <p><a class="url" href="{{=url}}" target="_blank">{{=url}}</a></p>
+            <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
             <p>{{=date}}</p>
             <p class="notes">
             </p>
             <p class="tags">
+              {{#tmpl-tag tags}}
             </p>
             <div class="{{=type}}">{{=content}}</div>
           </div>
           <div class="toolbar">
-            <a class="icon-chevron-left" data-object="item" data-method="hide" href="#"></a>
+            <a class="icon-chevron-left" data-object="articles" data-method="hide" href="#"></a>
             <a class="icon-trash" data-action="delete" href="#"></a>
             <a class="icon-pencil compose" data-action="compose" href="#"></a>
             <a class="icon-share ifInstalled" data-action="share" href="#"></a>
@@ -64,27 +65,46 @@
       </ul>
       <div id="tmpl-tag">
         <div class="tag">
-          <span class="icon-remove" data-action="deleteTag" data-target="{{=tag}}"></span>
-          <span>{{=tag}}</span>
+          <span class="icon-remove" data-action="deleteTag" data-target="{{=tags}}"></span>
+          <span>{{=tags}}</span>
         </div>
       </div>
       <ul id="tmpl-feed">
         <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}}" id="{{=key}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
-          <h2><a data-object="feeds" data-method="show" data-params="{{=key}}"><span class=""></span>{{=title}}</a></h2>
+          <h2><a data-object="feeds" data-method="show" data-params="{{=url}}"><span class=""></span>{{=title}}</a></h2>
         </li>
+      </ul>
+      <div id="tmpl-feed-detail">
+        <div>
+          <h2>{{=title}}</h2>
+          <p>{{=url}}</p>
+          <p>{{=date|tolocal}}</p>
+          <ul>
+            {{#tmpl-feed-item items}}
+          </ul>
+          <p class="col2">
+            <button data-l10n-id="feedEdit" data-object="feeds" data-method="edit" data-params="{{=url}}"></button>
+            <button data-l10n-id="feedDelete" data-object="feeds" data-method="delete" data-params="{{=url}}"></button>
+            <button data-l10n-id="feedTest" data-object="feeds" data-method="test" data-params="{{=url}}"></button>
+            <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
+          </p>
+        </div>
+      </div>
+      <ul id="tmpl-feed-item">
+        <li>{{=items.title}} - {{=items.updated|tolocal}}</li>
       </ul>
     </div>
     <div id="rsWidget" class="hidden"></div>
     <div id="menu" class="list">
       <div class="content">
-        <p><a class="icon-plus new" data-action="create"></a></p>
-        <p><a class="icon-chevron-up top" href="#list"></a></p>
-        <p><a class="icon-chevron-left back" data-object="item" data-method="hide"></a></p>
-        <p><a class="icon-chevron-right back" data-object="item" data-method="hide"></a></p>
+        <p><a class="icon-plus new main" data-action="create"></a></p>
+        <p><a class="icon-chevron-up top detail" href="#list"></a></p>
+        <p><a class="icon-chevron-left back detail" data-object="articles" data-method="hide"></a></p>
+        <p><a class="icon-chevron-right back detail" data-object="articles" data-method="hide"></a></p>
         <p><a class="icon-refresh sync" data-action="sync"></a></p>
-        <p><a class="icon-cog settings" data-action="settings"></a></p>
+        <p><a class="icon-cog settings main" data-action="settings"></a></p>
         <p><a class="icon-off onoff" data-action="onoff"></a></p>
-        <p><a class="icon-rss ifInstalled" data-method="tileShow" data-params="feeds" href="#"></a></p>
+        <p><a class="icon-rss ifInstalled main" data-method="tileShow" data-params="feeds" href="#"></a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
         <span class="icon-refresh syncInProgress"></span>
@@ -155,7 +175,7 @@
             <fieldset id="settingsLang">
               <legend data-l10n-id="settingsLang">Language</legend>
               <fieldset class="inline text">
-                <select>
+                <select data-target="lang">
                   <option value="en-US" data-l10n-id="settingsLangUs">Simplified English</option>
                   <option value="fr" data-l10n-id="settingsLangFr">French</option>
                 </select>
@@ -181,7 +201,7 @@
             <fieldset class="inline check compact">
               <p>
                 <label for="prefGesture" data-l10n-id="settingsGesture">Gestures</label>
-                <input type="checkbox" name="prefGesture" id="prefGesture" >
+                <input type="checkbox" name="prefGesture" id="prefGesture" data-target="gesture" >
               </p>
             </fieldset>
           </div>
@@ -256,7 +276,7 @@
         <fieldset class="ifInstalled">
           <legend data-l10n-id="alarmsLegend"></legend>
           <label for="alarmInterval" data-l10n-id="alarmInterval"></label>
-          <input type="text" name="alarmInterval" id="alarmInterval" size="5" />
+          <input type="text" name="alarmInterval" id="alarmInterval" size="5" data-target="alarm" />
         </fieldset>
         <p>
           <button data-method="tileGo"   data-params="credits"  data-l10n-id="settingsCredits">Credits</button>
@@ -302,7 +322,8 @@
       </div>
       <p>
         <button name="back" data-l10n-id="noteBack" data-object="tiles" data-method="back">Back</button>
-        <button name="delete" data-l10n-id="noteDelete">Delete</button>
+        <button data-object="comment" data-method="edit" data-l10n-id="noteEdit"></button>
+        <button data-object="comment" data-method="delete" data-l10n-id="noteDelete"></button>
       </p>
     </section>
     <section id="noteEdit" data-tile="noteEdit" class="">
@@ -315,7 +336,7 @@
           <textarea rows="10" cols="40" name="text" placeholder="Note" data-l10n-id="noteContent"></textarea>
         </fieldset>
         <p class="col2">
-          <button name="save" data-l10n-id="noteSave">Save</button>
+          <button data-object="comment" data-method="save" data-l10n-id="noteSave">Save</button>
           <button name="cancel" data-l10n-id="noteCancel" data-object="tiles" data-method="back">Cancel</button>
         </p>
       </form>
@@ -407,7 +428,7 @@
         </fieldset>
         <fieldset class="inline text">
           <p>
-            <label for="feedTitle" data-l10n-id="feedTitleLabel">Title</label>
+            <label for="feedTitle" data-l10n-id="feedTitleLabel"></label>
             <input type="text" name="title" id="feedTitle" placeholder="Titre" data-l10n-id="feedTitle" />
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
@@ -426,6 +447,10 @@
           <button data-object="feeds" data-method="test" data-l10n-id="feedTest">Save</button>
         </p>
       </form>
+    </section>
+    <section data-tile="feedShow">
+      <div id="feedDetail">
+      </div>
     </section>
     <script type="text/javascript" src="lib/build.js"></script>
     <!--

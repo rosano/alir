@@ -108,7 +108,7 @@ function put(obj) {
 
   requestOptions = {
     hostname: config.hostname,
-    path: config.path + '/article/',
+    path: config.path + 'article/',
     port: config.port,
     method: "PUT",
     headers: {
