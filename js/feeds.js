@@ -84,7 +84,7 @@ window.feeds = {
         };
       }
       cache = window.feeds._cache[url];
-      utils.log('Updating feed ' + cache.title, "info");
+      utils.log('Updating feed ' + cache.title, "debug");
       if (err) {
         console.log(err);
       } else {
@@ -93,7 +93,7 @@ window.feeds = {
           format = 'rss';
           root = "rss > channel ";
         }
-        utils.log("Feed format : " + format, "info");
+        utils.log("Feed format : " + format, "debug");
         feedUpdated = doc.querySelector(root + " > updated");
         if (feedUpdated) {
           feedUpdated = new Date(feedUpdated.textContent);
@@ -247,7 +247,7 @@ window.feeds = {
       window.feeds.fetch(url, false, function () {
         toFetch--;
         if (toFetch === 0) {
-          window.alert("Feeds updated");
+          utils.log("Feeds updated", "debug");
         }
       });
     });
@@ -308,7 +308,7 @@ if (navigator.mozAlarms) {
           utils.log(_('alarmsNoAlarms'), 'warning');
         } else {
           alarms.forEach(function (alarm) {
-            utils.log(alarm.data.action + " at " + alarm.date, "info");
+            utils.log(alarm.data.action + " at " + alarm.date, "debug");
           });
         }
       };
@@ -326,7 +326,7 @@ if (navigator.mozAlarms) {
             current  = new Date(),
             nb       = alarms.length,
             interval = window.config.alarmInterval || 60;
-        utils.log(alarms.length + " alarms planned", "info");
+        utils.log(alarms.length + " alarms planned", "debug");
         if (alarms.length === 0) {
           current.setMinutes(current.getMinutes() + 1);
           window.alarms.set(current);
@@ -336,7 +336,7 @@ if (navigator.mozAlarms) {
             current = alarm.date;
           }
         });
-        utils.log("Last alarm planned at " + current.toISOString(), "info");
+        utils.log("Last alarm planned at " + current.toISOString(), "debug");
         while (nb < 10) {
           current.setMinutes(current.getMinutes() + parseInt(interval, 10));
           window.alarms.set(current);
@@ -361,7 +361,7 @@ if (navigator.mozAlarms) {
       request = navigator.mozAlarms.add(alarm.date, alarm.respectTimezone, alarm.data);
 
       request.onsuccess = function () {
-        utils.log("Alarm planned at " + date, "info");
+        utils.log("Alarm planned at " + date, "debug");
       };
       request.onerror = function () {
         utils.log("Error planning alarm at " + date, "error");

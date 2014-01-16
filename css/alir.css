@@ -227,11 +227,23 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   padding: .7rem;
   width: 1.5rem;
   font-size: 1rem;
-  background-color: rgba(255, 255, 255, .5);
+  background-color: rgba(255, 255, 255, 1);
   z-index: 1000;
 }
+#list .current .articleMenu > p {
+  position: fixed;
+  background-color: #FFF;
+  margin-top: -0.7rem;
+  padding: 1rem 0;
+}
+#list .current .articleMenu.folded {
+  background-color: rgba(255, 255, 255, .5);
+}
 #list .current .articleMenu .articleActions {
-  background-color: rgba(255, 255, 255, .7);
+  transition: margin 1s ease-in-out;
+}
+#list .current .articleMenu.folded .articleActions {
+  margin-top: -100vh;
 }
 #list .current .content .note {
   padding: 10px;
