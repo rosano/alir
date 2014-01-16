@@ -48,6 +48,7 @@ config = {
   lang: 'en-US',
   menu: true,
   alarmInterval: 60,
+  logLevel: 'info',
   bookmarks: {},
   style: {
     fontSize: 1
@@ -609,6 +610,7 @@ function initUI() {
         document.body.classList.add('menu-right');
       }
       $('#alarmInterval').value   = conf.alarmInterval;
+      $('#settingsLoglevel').value = conf.logLevel;
       if (typeof conf.bookmarks === 'undefined') {
         conf.bookmarks = {};
       }
@@ -1318,14 +1320,28 @@ function initUI() {
       config.menu = false;
     }
   });
-  $('#settingsLang select').addEventListener('change', function () {
-    document.webL10n.setLanguage(this.value);
-  });
-  $('#alarmInterval').addEventListener('change', function () {
-    config.alarmInterval = this.value;
+  $('#settings').addEventListener('change', function (ev) {
+    var val = ev.target.value;
+    if (ev.target.dataset.target) {
+      switch (ev.target.dataset.target) {
+      case 'alarm':
+        config.alarmInterval = val;
     window.alarms.reset(function () {
       window.alarms.plan();
     });
+        break;
+      case 'gesture':
+        config.gesture = document.getElementById('prefGesture');
+        break;
+      case 'lang':
+        config.lang = val;
+        document.webL10n.setLanguage(val);
+        break;
+      case 'logLevel':
+        config.logLevel = val;
+        utils.logLevel  = val;
+      }
+    }
   });
   // }}
   // Left menu {{
