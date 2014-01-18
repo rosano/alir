@@ -130,7 +130,7 @@ window.feeds = {
             return;
           }
           if (typeof cache.articles[itemId] === 'undefined') {
-            utils.log('New article "%s"', itemTitle, "info");
+            utils.log('New article "%s" in "%s"', itemTitle, cache.title, "info");
           } else {
             utils.log('Article Updated : "%s" "%s" < "%s"', itemTitle, cache.articles[itemId].updated, itemUpdated, "info");
           }
@@ -347,9 +347,7 @@ if (navigator.mozAlarms) {
     navigator.mozSetMessageHandler("alarm", function (mozAlarm) {
       "use strict";
       console.log("alarm fired: " + JSON.stringify(mozAlarm.data));
-      try {
-        utils.log("alarm fired: " + JSON.stringify(mozAlarm.data), "info");
-      }
+      utils.log("alarm fired: " + JSON.stringify(mozAlarm.data), "info");
       switch (mozAlarm.data.action) {
       case 'feedUpdate':
         window.feeds.update();

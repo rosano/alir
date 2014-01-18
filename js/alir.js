@@ -61,7 +61,23 @@ comment = new window.Comment();
 
 function Alir() {
   "use strict";
+  var self = this,
+      dynamicSheet = document.getElementById('userCss').sheet;
   RemoteStorage.eventHandling(this, "configLoaded");
+  function updateStyle(conf) {
+    while (dynamicSheet.cssRules[0]) {
+      dynamicSheet.deleteRule(0);
+    }
+    $('#styleFontSize').value = conf.fontSize;
+    dynamicSheet.insertRule("#list .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; }", 0);
+  }
+  self.on('configLoaded', function (conf) {
+    updateStyle(conf.style);
+  });
+  $('#styleFontSize').addEventListener('change',  function () {
+    window.config.style.fontSize = this.value;
+    updateStyle(window.config.style);
+  });
   this.install = function () {
     (function () {
       var request = window.navigator.mozApps.installPackage("https://alir.5apps.com/package.manifest");
@@ -89,6 +105,10 @@ function Alir() {
         alert("Error: " + request.error.name);
       };
     }());
+  };
+  this.styleReset = function () {
+    window.config.style.fontSize = 1;
+    updateStyle(window.config.style.fontSize);
   };
 }
 window.alir = new Alir();
@@ -213,26 +233,6 @@ Alir.link = {
   }
 };
 
-// User styles {{
-(function () {
-  "use strict";
-  var dynamicSheet = document.getElementById('userCss').sheet,
-      input = $('#styleFontSize');
-  function updateStyle(conf) {
-    while (dynamicSheet.cssRules[0]) {
-      dynamicSheet.deleteRule(0);
-    }
-    dynamicSheet.insertRule("#list .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; }", 0);
-  }
-  window.alir.on('configLoaded', function (conf) {
-    updateStyle(conf.style);
-  });
-  input.addEventListener('change',  function () {
-    window.config.style.fontSize = this.value;
-    updateStyle(window.config.style);
-  });
-}());
-// }}
 function createXPathFromElement(elm) {
   // source: http://stackoverflow.com/a/5178132
   //jshint maxcomplexity: 12
@@ -399,7 +399,7 @@ function toDom(str, fullUrl) {
     sandbox.innerHTML = str;
     //return _('contentError');
   }
-  Array.prototype.forEach.call(sandbox.querySelectorAll('script, style'), function (e) {
+  Array.prototype.forEach.call(sandbox.querySelectorAll('script, style', 'frame', 'iframe'), function (e) {
     e.parentNode.removeChild(e);
   });
   ['class', 'id', 'style', 'onclick', 'onload'].forEach(function (attr) {
@@ -487,7 +487,7 @@ function displayItem(obj) {
       title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
       url: obj.url || '#',
       date: obj.date,
-      tags: Array.isArray(obj.tags) ? tags : [],
+      tags: Array.isArray(obj.tags) ? obj.tags : [],
       notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
       flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
     };
@@ -574,14 +574,18 @@ function displayItem(obj) {
 }
 function getAll() {
   "use strict";
+  var startTime = {};
   ['article', 'feed'].forEach(function (type) {
+    startTime[type] = window.performance.now();
     remoteStorage.alir.private.getAll(type + '/').then(function (objects) {
+      utils.log(utils.format("All %s got in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
       if (objects) {
         Object.keys(objects).forEach(function (key) {
           objects[key].id = key;
           displayItem(objects[key]);
         });
       }
+      utils.log(utils.format("All %s displayed in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
     });
   });
 }
@@ -738,6 +742,12 @@ function initUI() {
         }
       }
     });
+    document.body.addEventListener('focus', function (ev) {
+      if (ev.target.tagName === 'TEXTAREA') {
+        // Move carret to the end of textarea
+        ev.target.selectionStart = ev.target.value.length;
+      }
+    }, true);
   })();
   // }}
 
@@ -819,14 +829,14 @@ function initUI() {
       }
     });
     if (features.indexOf('Dropbox') !== -1) {
-      $('#prefDropbox').style.display = '';
+      $('#prefDropbox').classList.remove('hidden');
     } else {
-      $('#prefDropbox').style.display = 'none';
+      $('#prefDropbox').classList.add('hidden');
     }
     if (features.indexOf('GoogleDrive') !== -1) {
-      $('#prefDrive').style.display = '';
+      $('#prefDrive').classList.remove('hidden');
     } else {
-      $('#prefDrive').style.display = 'none';
+      $('#prefDrive').classList.add('hidden');
     }
 
   });
@@ -994,6 +1004,7 @@ function initUI() {
               if (err !== 200) {
                 window.alert(err);
               } else {
+                article.id    = ce.key;
                 article.title = res.title;
                 article.html  = res.html;
                 remoteStorage.alir.saveArticle(article);
@@ -1251,7 +1262,8 @@ function initUI() {
     }
   }
   remoteStorage.on('ready', function () {
-    setState('connected');
+    utils.log(utils.format("Ready fired at %s", Math.round(window.performance.now())), "debug");
+    setState(remoteStorage.remote.connected ? 'connected' : 'initial');
   });
   remoteStorage.on('disconnected', function () {
     setState('initial');
@@ -1447,6 +1459,7 @@ window.addEventListener('load', function () {
   });
   //@TODO Remove this
   // This is just a migration step for previous contents
+  /*
   (function () {
     remoteStorage.alir.private.getAll('').then(function (all) {
       Object.keys(all).forEach(function (key) {
@@ -1459,6 +1472,7 @@ window.addEventListener('load', function () {
       });
     });
   }());
+  */
   getAll();
 
 /*

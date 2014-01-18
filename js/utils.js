@@ -207,7 +207,8 @@ window.template = function template(sel, data) {
   var re  = new RegExp("{{([=#].*?)}}", 'g'),
       frag,
       xpathResult,
-      i, elmt, attr;
+      i, elmt, attr/*,
+      startTime = window.performance.now()*/;
   function getData(path, val) {
     var res = val, expr;
     if (path !== '.') {
@@ -276,6 +277,7 @@ window.template = function template(sel, data) {
     elmt = xpathResult.snapshotItem(i);
     elmt.innerHTML = elmt.innerHTML.replace(re, repl);
   }
+//  utils.log(utils.format("Template %s rendered in %s", sel, Math.round((window.performance.now() - startTime))), "debug");
   return frag.children[0];
 };
 /**
@@ -331,9 +333,14 @@ window.Comment = function () {
       }
     });
   };
-
+  this.edit = function () {
+    ["articleId", "noteId", "xpath", "text"].forEach(function (field) {
+      $('#noteEdit [name="' + field + '"]').value = $('#noteEdit [name="' + field + '"]').value;
+    });
+    window.tiles.show('noteEdit');
+  };
   this.delete = function () {
-    var noteId    = $('#noteEdit [name="noteId"]').value;
+    var noteId    = $('#noteView [name="noteId"]').value;
     if (window.confirm(_('noteConfirmDelete'))) {
       load(function (err, article) {
         if (err !== 200) {
