@@ -21,11 +21,6 @@
     "name": "Clochix",
     "url": "http://clochix.net"
   },
-  "permissions": {
-    "desktop-notification": {
-      "description": "Allows to display notifications"
-    }
-  },
   "activities": {
     "save-bookmark": {
       "filters": {
@@ -48,15 +43,18 @@
       "returnValue": true
     }
   },
-  "messages": {
-    "alarm" : "/index.html"
-  },
+  "messages": [
+    { "alarm" : "/index.html" }
+  ],
   "permissions": {
     "alarms": {
       "description": "To fetch feeds"
     },
     "systemXHR":{},
-    "browser": {}
+    "browser": {},
+    "desktop-notification": {
+      "description": "Allows to display notifications"
+    }
   },
   "default_locale": "en",
   "locales": {
@@ -70,6 +68,6 @@
     }
   },
   "type": "privileged",
-  "version": "0.2.01"
+  "version": "0.2.09"
 }
 

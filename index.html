@@ -32,22 +32,21 @@
           <div class="articleMenu">
             <p><a class="icon-reorder" data-action="menu"></a></p>
             <div class="articleActions">
-              <p><a class="icon-chevron-left" data-object="articles" data-method="hide" href="#"></a></p>
-              <p><a class="icon-chevron-left" data-object="item" data-method="hide" href="#"></a></p>
-              <p><a class="icon-inbox archive" data-action="archive" href="#"></a></p>
-              <p><a class="icon-star star" data-action="star" href="#"></a></p>
-              <p><a class="icon-trash" data-action="delete" href="#"></a></p>
-              <p><a class="icon-tags" data-action="addTag" href="#"></a></p>
-              <p><a class="icon-pencil compose" data-action="compose" href="#"></a></p>
-              <p><a class="icon-share ifInstalled" data-action="share" href="#"></a></p>
+              <p><a class="icon-chevron-left" data-object="articles" data-method="hide" ></a></p>
+              <p><a class="icon-inbox archive" data-action="archive" ></a></p>
+              <p><a class="icon-star star" data-action="star" ></a></p>
+              <p><a class="icon-trash" data-action="delete" ></a></p>
+              <p><a class="icon-tags" data-action="addTag" ></a></p>
+              <p><a class="icon-pencil compose" data-action="compose" ></a></p>
+              <p><a class="icon-share ifInstalled" data-action="share" ></a></p>
               <p><a class="icon-refresh ifInstalled" data-action="reload"></a></p>
             </div>
           </div>
           <div class="toolbar">
-            <a class="icon-chevron-left" data-object="articles" data-method="hide" href="#"></a>
-            <a class="icon-trash" data-action="delete" href="#"></a>
-            <a class="icon-pencil compose" data-action="compose" href="#"></a>
-            <a class="icon-share ifInstalled" data-action="share" href="#"></a>
+            <a class="icon-chevron-left" data-object="articles" data-method="hide" ></a>
+            <a class="icon-trash" data-action="delete" ></a>
+            <a class="icon-pencil compose" data-action="compose" ></a>
+            <a class="icon-share ifInstalled" data-action="share" ></a>
           </div>
           <div class="content">
             <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
@@ -60,10 +59,10 @@
             <div class="{{=type}}">{{=content}}</div>
           </div>
           <div class="toolbar">
-            <a class="icon-chevron-left" data-object="articles" data-method="hide" href="#"></a>
-            <a class="icon-trash" data-action="delete" href="#"></a>
-            <a class="icon-pencil compose" data-action="compose" href="#"></a>
-            <a class="icon-share ifInstalled" data-action="share" href="#"></a>
+            <a class="icon-chevron-left" data-object="articles" data-method="hide" ></a>
+            <a class="icon-trash" data-action="delete" ></a>
+            <a class="icon-pencil compose" data-action="compose" ></a>
+            <a class="icon-share ifInstalled" data-action="share" ></a>
           </div>
         </li>
       </ul>
@@ -85,7 +84,7 @@
           </header>
           <p>{{=url}}</p>
           <p>{{=date|tolocal}}</p>
-          <p>
+          <p class="toolbar">
             <a class="icon-pencil"  data-object="feeds" data-method="edit"   data-params="{{=url}}"></a>
             <a class="icon-trash"   data-object="feeds" data-method="delete" data-params="{{=url}}"></a>
             <a class="icon-refresh" data-object="feeds" data-method="update" data-params="{{=url}}"></a>
@@ -120,7 +119,7 @@
         <p><a class="icon-refresh sync" data-action="sync"></a></p>
         <p><a class="icon-cog settings main" data-action="settings"></a></p>
         <p><a class="icon-off onoff" data-action="onoff"></a></p>
-        <p><a class="icon-rss ifInstalled main" data-method="tileShow" data-params="feeds" href="#"></a></p>
+        <p><a class="icon-rss ifInstalled main" data-method="tileShow" data-params="feeds" ></a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
         <span class="icon-refresh syncInProgress"></span>
@@ -166,12 +165,12 @@
     </div>
     <div id="main" class="list" data-tile="list">
       <form class="filters">
-        <a class="icon-inbox archive" data-action="filterArchive" href="#"></a>
-        <a class="icon-rss feed isInstalled" data-action="filterFeed" href="#"></a>
-        <a class="icon-star star" data-action="filterStar" href="#"></a>
-        <a class="icon-tags tags" data-action="addFilterTag" href="#"></a>
-        <a class="icon-pencil edit" data-action="editArticles" href="#"></a>
-        <a class="icon-trash delete" data-action="deleteArticles" href="#"></a>
+        <a class="icon-inbox archive" data-action="filterArchive" ></a>
+        <a class="icon-rss feed isInstalled" data-action="filterFeed" ></a>
+        <a class="icon-star star" data-action="filterStar" ></a>
+        <a class="icon-tags tags" data-action="addFilterTag" ></a>
+        <a class="icon-pencil edit" data-action="editArticles" ></a>
+        <a class="icon-trash delete" data-action="deleteArticles" ></a>
         <fieldset class="inline text compact">
           <p>
             <input type="text" name="listFilter" id="listFilter" placeholder="Filter" data-l10n-id="listFilter" />

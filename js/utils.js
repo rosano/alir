@@ -37,12 +37,20 @@ var utils = {
     "use strict";
     return str.replace(/^\s+/, '').replace(/\s+$/, '');
   },
+  getDate: function (d) {
+    "use strict";
+    d = (typeof d  === 'undefined' ? new Date() : (typeof d === 'object' ? d : new Date(d)));
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString();
+  },
   log: function log() {
     "use strict";
     var args = Array.prototype.slice.call(arguments),
         level,
         levelNum,
-        message;
+        message,
+        ui,
+        curDate = utils.getDate().substr(11, 8);
     if (args.length > 1) {
       level = args.pop();
     } else {
@@ -61,8 +69,41 @@ var utils = {
       } else {
         message = utils.format.apply(null, args);
       }
-      document.getElementById('debugLog').innerHTML += utils.format('<span class="%s">[%s][%s]</span> %s\n', level, new Date().toISOString().substr(11, 8), level + new Array(10 - level.length).join(' '), message);
-      console.log(utils.format('=====> [%s][%s] %s\n', new Date().toISOString().substr(11, 8), level + new Array(10 - level.length).join(' '), message));
+      ui = document.getElementById('debugLog');
+      ui.innerHTML = utils.format('<span class="%s">[%s][%s]</span> %s\n', level, curDate, level + new Array(10 - level.length).join(' '), message) + ui.innerHTML;
+      console.log(utils.format('=====> [%s][%s] %s\n', curDate, level + new Array(10 - level.length).join(' '), message));
+    }
+  },
+  notify: function (title, body, cb) {
+    "use strict";
+    var notif;
+    if ("Notification" in window) {
+      if (window.Notification.permission === "granted") {
+        notif = new window.Notification(title, {body: body});
+        if (cb) {
+          notif.addEventListener('click', cb);
+        }
+      } else if (window.Notification.permission !== 'denied') {
+        window.Notification.requestPermission(function (permission) {
+          if (!('permission' in window.Notification)) {
+            window.Notification.permission = permission;
+          }
+          if (permission === "granted") {
+            notif = new window.Notification(title, {body: body});
+            if (cb) {
+              notif.addEventListener('click', cb);
+            }
+          }
+        });
+      }
+    } else if ("mozNotification" in navigator) {
+      notif = navigator.mozNotification.createNotification(title, body);
+      notif.show();
+      if (cb) {
+        notif.addEventListener('click', cb);
+      }
+    } else {
+      window.alert(title + "\n" + body);
     }
   },
   merge: function (a, b) {
@@ -227,42 +268,42 @@ window.template = function template(sel, data) {
     type = match[2];
     match = match.substr(3, match.length - 5);
     switch (type) {
-      case '=':
-        // Value
-        tmp = match.split('|');
-        res = getData(utils.trim(tmp.shift()), data);
-        if (tmp.length > 0) {
-          while ((fct = tmp.shift()) !== undefined) {
-            switch (utils.trim(fct).toLowerCase()) {
-            case "join":
-              res = res.join(',');
-              break;
-            case "tolocal":
-              res = new Date(res).toLocaleString();
-              break;
-            case "tolowercase":
-              res = res.toLowerCase();
-              break;
-            default:
-              console.log("Unknown template function " + fct);
-            }
+    case '=':
+      // Value
+      tmp = match.split('|');
+      res = getData(utils.trim(tmp.shift()), data);
+      if (tmp.length > 0) {
+        while ((fct = tmp.shift()) !== undefined) {
+          switch (utils.trim(fct).toLowerCase()) {
+          case "join":
+            res = res.join(',');
+            break;
+          case "tolocal":
+            res = new Date(res).toLocaleString();
+            break;
+          case "tolowercase":
+            res = res.toLowerCase();
+            break;
+          default:
+            console.log("Unknown template function " + fct);
           }
         }
-        break;
-      case '#':
-        // Sub template
-        tmp = match.split(' ');
-        value = getData(tmp[1], data);
-        if (Array.isArray(value)) {
-          res = value.reduce(function (p, c) {
-            var val = {};
-            val[tmp[1]] = c;
-            return p + window.template(tmp[0], val).outerHTML;
-          }, '');
-        } else {
-          res = window.template(tmp[0], data).outerHTML;
-        }
-        break;
+      }
+      break;
+    case '#':
+      // Sub template
+      tmp = match.split(' ');
+      value = getData(tmp[1], data);
+      if (Array.isArray(value)) {
+        res = value.reduce(function (p, c) {
+          var val = {};
+          val[tmp[1]] = c;
+          return p + window.template(tmp[0], val).outerHTML;
+        }, '');
+      } else {
+        res = window.template(tmp[0], data).outerHTML;
+      }
+      break;
     }
     return res;
   }

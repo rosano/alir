@@ -39,4 +39,4 @@ watch:
 	while true; do inotifywait -e close_write,moved_to,create,modify js/* css/alir.css; make build; done
 
 clean:
-	git checkout VERSION build.js.map css/build.css lib/build.js
+	git checkout alir.zip VERSION build.js.map css/build.css lib/build.js

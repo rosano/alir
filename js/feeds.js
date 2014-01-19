@@ -1,13 +1,26 @@
 //jshint browser: true
 /* global remoteStorage: true, template: true, tiles: true, utils: true, _: true, $:true */
-window.feeds = {
-  _cache: {},
-  cache: function (obj) {
-    "use strict";
-    window.feeds._cache[obj.url] = obj;
-  },
-  save: function () {
-    "use strict";
+function Feeds() {
+  "use strict";
+  var _cache = {},
+      self = this,
+      plan,
+      notify;
+  if (window.alarms && window.alarms.plan) {
+    console.log("[ERROR] alarms not defined");
+    plan = window.alarms.plan;
+  } else {
+    plan = function () {};
+  }
+  if (window.utils) {
+    notify = window.utils.notify;
+  } else {
+    notify = function () {};
+  }
+  this.cache = function (obj) {
+    _cache[obj.url] = obj;
+  };
+  this.save = function () {
     var $  = tiles.$('feedEdit'),
         id = $('[name="id"]').value,
         obj;
@@ -47,10 +60,9 @@ window.feeds = {
       };
       doSave(obj);
     }
-  },
-  fetch: function (url, test, cb) {
+  };
+  this.fetch = function (url, test, cb) {
     //jshint maxcomplexity: 15
-    "use strict";
     function getUrl(url, cb) {
       var xhr, options;
       options = {
@@ -71,27 +83,30 @@ window.feeds = {
       xhr.send();
     }
     getUrl(url, function (err, doc) {
-      //jshint maxstatements: 22
+      //jshint maxstatements: 25
       var feedUpdated,
           root,
           format = 'atom',
           cache;
-      if (typeof window.feeds._cache[url] === 'undefined') {
-        window.feeds._cache[url] = {
+      if (typeof _cache[url] === 'undefined') {
+        _cache[url] = {
           'articles': {},
           'short': false,
           'title': '???'
         };
       }
-      cache = window.feeds._cache[url];
+      cache = _cache[url];
       utils.log('Updating feed ' + cache.title, "debug");
       if (err) {
         console.log(err);
       } else {
-        root = doc.firstChild.tagName;
-        if (root === "rss") {
+        root = doc.getElementsByTagName('rss');
+        if (root.length > 0) {
           format = 'rss';
-          root = "rss > channel ";
+          root   = "rss > channel ";
+        } else {
+          format = 'atom';
+          root   = 'feed ';
         }
         utils.log("Feed format : " + format, "debug");
         feedUpdated = doc.querySelector(root + " > updated");
@@ -118,19 +133,20 @@ window.feeds = {
           itemUrl     = format === 'atom' ? getVal('link', 'href') : entry.querySelector('link').textContent;
           itemTitle   = getVal('title');
           itemContent = getVal('content') || getVal('summary');
-          itemUpdated = entry.querySelector("updated") || entry.querySelector("published") || entry.querySelector("pubdate") || entry.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", 'date');
-          if (itemUpdated && itemUpdated.length) {
+          itemUpdated = entry.querySelector("updated") || entry.querySelector("published") || entry.querySelector("pubDate") || entry.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", 'date');
+          if (itemUpdated && typeof itemUpdated.length !== 'undefined') {
             itemUpdated = itemUpdated[0];
           }
           if (!!!itemId || !!!itemUpdated) {
             return;
           }
-          itemUpdated = new Date(itemUpdated.textContent).toISOString();
+          itemUpdated = utils.getDate(itemUpdated.textContent);
           if (typeof cache.articles[itemId] !== 'undefined' && cache.articles[itemId].updated >= itemUpdated) {
             return;
           }
           if (typeof cache.articles[itemId] === 'undefined') {
             utils.log('New article "%s" in "%s"', itemTitle, cache.title, "info");
+            utils.notify('New article', utils.format('"%s" in "%s"', itemTitle, cache.title));
           } else {
             utils.log('Article Updated : "%s" "%s" < "%s"', itemTitle, cache.articles[itemId].updated, itemUpdated, "info");
           }
@@ -173,7 +189,7 @@ window.feeds = {
           }
         });
         if (test !== true) {
-          remoteStorage.get('/alir/feed/' + window.feeds._cache[url].id).then(function (err, obj, contentType, revision) {
+          remoteStorage.get('/alir/feed/' + _cache[url].id).then(function (err, obj, contentType, revision) {
             if (err === 200) {
               obj.articles = cache.articles;
               obj.date     = Date.now();
@@ -186,38 +202,34 @@ window.feeds = {
         cb(cache.articles);
       }
     });
-  },
-  test: function (url) {
-    "use strict";
+  };
+  this.test = function (url) {
     var $   = tiles.$('feedEdit');
     url = url || $('[name="url"]').value;
     window.feeds.fetch(url, true, function (items) {
       items = items || {};
       window.alert("Found " + Object.keys(items).length + " item");
     });
-  },
-  create: function () {
-    "use strict";
+  };
+  this.create = function () {
     var $   = tiles.$('feedEdit');
     $('[name="id"]').value    = '';
     $('[name="url"]').value   = '';
     $('[name="title"]').value = '';
     $('[name="feedShort"]').checked = false;
     tiles.show('feedEdit');
-  },
-  edit: function (url) {
-    "use strict";
+  };
+  this.edit = function (url) {
     var $    = tiles.$('feedEdit'),
-        feed = this._cache[url];
+        feed = _cache[url];
     $('[name="id"]').value    = feed.id;
     $('[name="url"]').value   = feed.url;
     $('[name="title"]').value = feed.title;
     $('[name="feedShort"]').checked = feed.short;
     tiles.show('feedEdit');
-  },
-  show: function (url) {
-    "use strict";
-    var feed = this._cache[url],
+  };
+  this.show = function (url) {
+    var feed = _cache[url],
         parent = $("#feedDetail");
     feed.items = utils.toArray(feed.articles);
     feed.items.forEach(function (v, k) {
@@ -229,19 +241,17 @@ window.feeds = {
     parent.innerHTML = '';
     parent.appendChild(template('tmpl-feed-detail', feed));
     tiles.go('feedShow');
-  },
-  delete: function (url) {
-    "use strict";
-    var feed = this._cache[url];
+  };
+  this.delete = function (url) {
+    var feed = _cache[url];
     if (window.confirm(_('feedConfirmDelete', {title: feed.title}))) {
       remoteStorage.alir.private.remove('/feed/' + feed.id);
-      delete this._cache[url];
+      delete _cache[url];
       tiles.show('feeds');
     }
-  },
-  update: function () {
-    "use strict";
-    var feeds = Object.keys(window.feeds._cache),
+  };
+  this.update = function () {
+    var feeds = Object.keys(_cache),
         toFetch = feeds.length;
     feeds.forEach(function (url) {
       window.feeds.fetch(url, false, function () {
@@ -251,9 +261,8 @@ window.feeds = {
         }
       });
     });
-  },
-  showArticle: function (url) {
-    "use strict";
+  };
+  this.showArticle = function (url) {
     var elmt = $('[data-url="' + url + '"]');
     if (elmt) {
       tiles.go('list');
@@ -292,9 +301,41 @@ window.feeds = {
         });
       }
     }
-  }
-};
-
+  };
+  this.handleNotificationMessage = function (message) {
+    if (!message.clicked) {
+      return;
+    }
+    navigator.mozApps.getSelf().onsuccess = function gotSelf(evt) {
+      var app = evt.target.result;
+      if (app !== null) {
+        app.launch();
+      }
+    };
+  };
+  this.handleAlarmMessage = function (mozAlarm) {
+    try {
+      utils.log("alarm fired: " + JSON.stringify(mozAlarm.data), "debug");
+    } catch (e) {
+      console.log(e);
+    }
+    switch (mozAlarm.data.action) {
+    case 'feedUpdate':
+      try {
+        self.update();
+      } catch (e) {
+        notify("Error in updating", e.toString());
+        console.log(e);
+      }
+      try {
+        plan();
+      } catch (e) {
+        notify("Error in planning", e.toString());
+        console.log(e);
+      }
+    }
+  };
+}
 // Manage alarms
 if (navigator.mozAlarms) {
   window.alarms = {
@@ -320,6 +361,9 @@ if (navigator.mozAlarms) {
     plan: function () {
       "use strict";
       var request = navigator.mozAlarms.getAll();
+      if (typeof window.utils !== 'object') {
+        window.utils = window.console;
+      }
 
       request.onsuccess = function () {
         var alarms   = this.result,
@@ -336,7 +380,7 @@ if (navigator.mozAlarms) {
             current = alarm.date;
           }
         });
-        utils.log("Last alarm planned at " + current.toISOString(), "debug");
+        utils.log("Last alarm planned at " + utils.getDate(current), "debug");
         while (nb < 10) {
           current.setMinutes(current.getMinutes() + parseInt(interval, 10));
           window.alarms.set(current);
@@ -385,18 +429,12 @@ if (navigator.mozAlarms) {
       };
     },
   };
+  window.feeds = new Feeds();
   if (navigator.mozSetMessageHandler) {
-    navigator.mozSetMessageHandler("alarm", function (mozAlarm) {
-      "use strict";
-      console.log("alarm fired: " + JSON.stringify(mozAlarm.data));
-      utils.log("alarm fired: " + JSON.stringify(mozAlarm.data), "info");
-      switch (mozAlarm.data.action) {
-      case 'feedUpdate':
-        window.feeds.update();
-        window.alarms.plan();
-      }
-    });
+    navigator.mozSetMessageHandler("alarm", window.feeds.handleAlarmMessage);
   }
 
   window.alarms.plan();
+} else {
+  window.feeds = new Feeds();
 }

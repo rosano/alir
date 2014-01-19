@@ -492,10 +492,10 @@ function displayItem(obj) {
       obj.notes = {};
     }
     if (typeof obj.date === 'undefined') {
-      obj.date = new Date().toISOString();
+      obj.date = utils.getDate();
     } else {
       try {
-        obj.date = new Date(obj.date).toISOString();
+        obj.date = utils.getDate(obj.date);
       } catch (e) {
         console.log("Wrong date : " + obj.date);
       }
@@ -1449,6 +1449,16 @@ window.addEventListener('load', function () {
   "use strict";
   _ = document.webL10n.get;
   // Check if application is installed
+
+  if (typeof navigator.mozHasPendingMessage === 'function' && typeof navigator.mozSetMessageHandler === 'function') {
+    if (navigator.mozHasPendingMessage('alarm')) {
+      utils.notify('Pending alarms');
+      navigator.mozSetMessageHandler("alarm", window.feeds.handleAlarmMessage);
+    }
+  } else {
+    utils.notify('Not installed');
+  }
+
   if (window.navigator.mozApps) {
     (function () {
       var request = window.navigator.mozApps.getSelf();
@@ -1501,14 +1511,18 @@ window.addEventListener('load', function () {
   /*
   (function () {
     remoteStorage.alir.private.getAll('').then(function (all) {
-      Object.keys(all).forEach(function (key) {
-        if (key.substr(-1) !== '/') {
-          utils.log("Migrating article " + all[key].title, "info");
-          all[key].id = key;
-          remoteStorage.alir.saveArticle(all[key]);
-          remoteStorage.alir.private.remove(key);
-        }
-      });
+      if (typeof all === 'object') {
+        Object.keys(all).forEach(function (key) {
+          if (key.substr(-1) !== '/') {
+            utils.log("Migrating article " + all[key].title, "info");
+            all[key].id = key;
+            remoteStorage.alir.saveArticle(all[key]);
+            remoteStorage.alir.private.remove(key);
+          }
+        });
+      } else {
+        console.log('Nothing to migrate');
+      }
     });
   }());
   */
