@@ -19,13 +19,16 @@
     <div id="templates">
       <ul id="tmpl-article">
         <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags|join}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
-          <h2><a data-object="articles" data-method="show" data-params="{{=key}}">
-            <input type="checkbox" class="delitem" />
-            <span class="icon-comment hasNotes"></span>
-            <span class="icon-inbox isArchive"></span>
-            <span class="icon-rss isFeed"></span>
-            <span class="icon-star isStar"></span>
-            <span class="title">{{=title}}</span></a></h2>
+          <h2>
+            <input type="checkbox" class="delitem" data-action="none" />
+            <a data-object="articles" data-method="show" data-params="{{=key}}">
+              <span class="icon-comment hasNotes"></span>
+              <span class="icon-inbox isArchive"></span>
+              <span class="icon-rss isFeed"></span>
+              <span class="icon-star isStar"></span>
+              <span class="title">{{=title}}</span>
+            </a>
+          </h2>
           <div class="articleMenu">
             <a class="icon-reorder" data-action="menu"></a>
             <div class="articleActions hidden">

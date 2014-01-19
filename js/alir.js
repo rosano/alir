@@ -181,7 +181,7 @@ function Article() {
 }
 window.articles = new Article();
 
-Alir.link = {
+window.link = {
   open: function () {
     "use strict";
     var href = document.getElementById('linkRef').textContent,
@@ -556,7 +556,7 @@ function displayItem(obj) {
       url: obj.url
     };
     item = template('tmpl-feed', data);
-    insertInList(document.getElementById('feeds'), "[data-key]", item, function (e) { return (e.dataset.title.toLowerCase() < title.toLowerCase()); });
+    insertInList(document.getElementById('feeds'), "[data-key]", item, function (e) { return (e.dataset.title.toLowerCase() > title.toLowerCase()); });
     // update feed cache
     window.feeds.cache(obj);
     break;
@@ -871,7 +871,8 @@ function initUI() {
   }
   UI.main.addEventListener('click', function onClick(event) {
     //jshint maxcomplexity: 20
-    var ce = onContentEvent(event);
+    var ce = onContentEvent(event),
+        elmt;
     function switchTag(tag) {
       var tags = ce.keyNode.dataset.tags.split(',').filter(function (e) { return e !== ''; }),
           i    = tags.indexOf(tag);
@@ -894,6 +895,8 @@ function initUI() {
     }
     if (ce.action) {
       switch (ce.action) {
+      case 'none':
+        break;
       case 'menu':
         $('li.current .articleActions').classList.toggle('hidden');
         break;
@@ -916,6 +919,10 @@ function initUI() {
         if (window.confirm(_('confirmDelete'))) {
           remoteStorage.alir[ce.context].remove('/article/' + ce.key);
           delete config.bookmarks[ce.key];
+          elmt = document.getElementById(ce.key);
+          if (elmt) {
+            elmt.classList.add('hidden');
+          }
         }
         window.articles.hide();
         break;
@@ -984,10 +991,13 @@ function initUI() {
           if (toDel.length > 0) {
             if (window.confirm(_('articlesDelete', {nb: toDel.length}))) {
               toDel.forEach(function (elmt) {
-                //@FIXME Broken !!!
-                //var key = elmt.parentNode.dataset.key;
-                //remoteStorage.alir.private.remove('/article/' + key);
-                //delete config.bookmarks[key];
+                var key = utils.parent(elmt, function (e) { return typeof e.dataset.key !== 'undefined'; });
+                if (key) {
+                  key.classList.add('hidden');
+                  key = key.dataset.key;
+                  remoteStorage.alir.private.remove('/article/' + key);
+                  delete config.bookmarks[key];
+                }
               });
             }
           }
@@ -1177,12 +1187,13 @@ function initUI() {
     var dynamicSheet = document.getElementById('dynamicCss').sheet,
         filter = document.getElementById('listFilter');
     function onFilterChange() {
+      var filterVal = filter.value.toLowerCase();
       while (dynamicSheet.cssRules[0]) {
         dynamicSheet.deleteRule(0);
       }
-      if (utils.trim(filter.value) !== '') {
+      if (utils.trim(filterVal) !== '') {
         dynamicSheet.insertRule("#main.list #list > li[data-tags] { display: none !important; }", 0);
-        dynamicSheet.insertRule('#main.list #list > li[data-tags*="' + filter.value + '"], #main.list #list > li[data-title*="' + filter.value + '"] { display: block !important; }', 1);
+        dynamicSheet.insertRule('#main.list #list > li[data-tags*="' + filterVal + '"], #main.list #list > li[data-title*="' + filterVal + '"] { display: block !important; }', 1);
       }
     }
     filter.addEventListener("keyup", onFilterChange);

@@ -284,6 +284,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 }
 #main.edit .delitem {
   display: inline;
+  float: left;
 }
 #list > li {
   max-width: 35em;
