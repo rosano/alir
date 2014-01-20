@@ -134,19 +134,39 @@ function Article() {
     if (key === currentId) {
       return;
     }
-    var clItem  = $('[data-key="' + key + '"]').classList,
-        clMenu  = $('#menu').classList,
-        clList  = $('#main').classList;
-    clMenu.add("detail");
-    clMenu.remove("list");
-    clList.add("detail");
-    clList.remove("list");
-    clList.remove("edit");
-    clItem.add('current');
-    clItem.add('read');
+    function doShow() {
+      var clItem  = $('[data-key="' + key + '"]').classList,
+          clMenu  = $('#menu').classList,
+          clList  = $('#main').classList;
+      clMenu.add("detail");
+      clMenu.remove("list");
+      clList.add("detail");
+      clList.remove("list");
+      clList.remove("edit");
+      clItem.add('current');
+      clItem.add('read');
 
-    currentId = key;
-    this.onShown();
+      currentId = key;
+      self.onShown();
+    }
+    var elmt = document.getElementById(key);
+    if (elmt) {
+      if (elmt.dataset.loaded === "true") {
+        doShow();
+      } else {
+        remoteStorage.alir.private.getObject('article/' + key).then(function (article) {
+          if (article) {
+            elmt.parentNode.removeChild(elmt);
+            article.id = key;
+            article.doLoad = true;
+            window.displayItem(article);
+            doShow();
+          } else {
+            utils.log("Unable to load article " + key, "error");
+          }
+        });
+      }
+    }
   };
   this.onShown = function onShown() {
     document.querySelector('li.current .articleActions').classList.add('hidden');
@@ -452,7 +472,7 @@ function insertInList(list, selector, item, comp) {
  *
  */
 function displayItem(obj) {
-  //jshint maxstatements: 35, debug: true, maxcomplexity: 18
+  //jshint maxstatements: 35, debug: true, maxcomplexity: 20
   "use strict";
   var title = obj.title || obj.id,
       data  = {},
@@ -489,17 +509,25 @@ function displayItem(obj) {
       date: obj.date,
       tags: Array.isArray(obj.tags) ? obj.tags : [],
       notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
-      flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
+      flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : '',
+      loaded: obj.doLoad === true
     };
     if (utils.trim(data.title) === '') {
       data.title = _("noTitle");
     }
-    if (obj.html) {
-      data.type = 'html';
-      data.content = toDom(obj.html, obj.url);
+    // in order not to create huge DOM, we only display article content
+    // when explicitely asked
+    if (obj.doLoad === true) {
+      if (obj.html) {
+        data.type = 'html';
+        data.content = toDom(obj.html, obj.url);
+      } else {
+        data.type = 'text';
+        data.content = obj.text;
+      }
     } else {
-      data.type = 'text';
-      data.content = obj.text;
+      data.type = 'none';
+      data.content = '';
     }
     item = template('tmpl-article', data);
     // Notes {{
