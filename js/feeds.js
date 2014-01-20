@@ -152,6 +152,7 @@ window.feeds = {
             if (test !== true) {
               remoteStorage.alir.saveArticle(article);
             }
+            return article.id;
           }
           cache.articles[itemId] = {
             url: itemUrl,
@@ -250,6 +251,47 @@ window.feeds = {
         }
       });
     });
+  },
+  showArticle: function (url) {
+    "use strict";
+    var elmt = $('[data-url="' + url + '"]');
+    if (elmt) {
+      tiles.go('list');
+      window.articles.show(elmt.dataset.key);
+    } else {
+      if (window.confirm(_('feedShowReload'))) {
+        window.scrap(url, function (err, article) {
+          var obj;
+          if (err) {
+            utils.log(err, 'error');
+            article = {
+              url: url,
+              title: '???',
+              html: '???'
+            };
+          }
+          obj = {
+            id: utils.uuid(),
+            url: article.url,
+            title: article.title,
+            html: article.html,
+            date: Date.now(),
+            flags: {
+              editable: false
+            },
+            tags: ['feed']
+          };
+          remoteStorage.alir.saveArticle(obj).then(function () {
+            utils.log('Created : ' + obj.title, "info");
+            // Hack: Article may not be really created yet, so we display it
+            obj.doLoad = true;
+            window.displayItem(obj);
+            tiles.go('list');
+            window.articles.show(obj.id);
+          });
+        });
+      }
+    }
   }
 };
 

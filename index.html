@@ -79,7 +79,9 @@
       </ul>
       <div id="tmpl-feed-detail">
         <div>
-          <h2>{{=title}}</h2>
+          <header>
+            <h2>{{=title}}</h2>
+          </header>
           <p>{{=url}}</p>
           <p>{{=date|tolocal}}</p>
           <p>
@@ -94,11 +96,6 @@
           <ul>
             {{#tmpl-feed-item items}}
           </ul>
-          <p>
-            <a class="icon-pencil"  data-object="feeds" data-method="edit"   data-params="{{=url}}"></a>
-            <a class="icon-trash"   data-object="feeds" data-method="delete" data-params="{{=url}}"></a>
-            <a class="icon-refresh" data-object="feeds" data-method="update" data-params="{{=url}}"></a>
-          </p>
           <p class="col2">
             <button data-l10n-id="feedTest" data-object="feeds" data-method="test" data-params="{{=url}}"></button>
             <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
@@ -106,7 +103,10 @@
         </div>
       </div>
       <ul id="tmpl-feed-item">
-        <li>{{=items.title}} - {{=items.updated|tolocal}}</li>
+        <li data-object="feeds" data-method="showArticle" data-params="{{=items.url}}">
+          <p class="title">{{=items.title}}</p>
+          <p class="updated">{{=items.updated|tolocal}}</p>
+        </li>
       </ul>
     </div>
     <div id="rsWidget" class="hidden"></div>
@@ -466,9 +466,7 @@
         </p>
       </form>
     </section>
-    <section data-tile="feedShow">
-      <div id="feedDetail">
-      </div>
+    <section data-tile="feedShow" id="feedDetail">
     </section>
     <script type="text/javascript" src="lib/build.js"></script>
     <!--
