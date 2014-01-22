@@ -13,6 +13,10 @@ body {
 .container.folded .header + * {
   display: none;
 }
+.clicked {
+  color: yellow;
+  transition: color 400ms;
+}
 /* }} */
 #templates {
   display: none;

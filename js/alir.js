@@ -36,6 +36,7 @@ var $  = function (sel, root) { "use strict"; root = root || document; return ro
     forEvent = function (sel, event, fct) { "use strict"; Array.prototype.forEach.call(document.querySelectorAll(sel), function (elmt) { elmt.addEventListener(event, fct); }); };
 config = {
   gesture: false,
+  vibrate: false,
   rs: {
     login: ''
   },
@@ -628,6 +629,17 @@ function initUI() {
     main: $('#main'),
     menu: {}
   };
+  function clicked(elmt) {
+    if (typeof elmt !== 'undefined' && elmt instanceof Element) {
+      elmt.classList.add('clicked');
+      window.setTimeout(function () {
+        elmt.classList.remove('clicked');
+      }, 400);
+    }
+    if (config.vibrate && typeof window.navigator.vibrate === 'function') {
+      window.navigator.vibrate(50);
+    }
+  }
   // reload configuration
   (function () {
     var conf = localStorage.getItem('config');
@@ -704,7 +716,8 @@ function initUI() {
     document.body.addEventListener('click', function (ev) {
       //jshint curly: false
       var params = [],
-          dataset = ev.target.dataset,
+          target  = ev.target,
+          dataset = target.dataset,
           listeners;
 
       listeners = [
@@ -749,10 +762,12 @@ function initUI() {
       listeners.forEach(function (listener) {
         if (utils.match(ev.target, listener.sel)) {
           ev.preventDefault();
+          clicked(ev.target);
           listener.action(ev.target);
         }
       });
       if (typeof dataset.method === 'undefined' && typeof ev.target.parentNode.dataset.method !== 'undefined') {
+        target  = ev.target.parentNode;
         dataset = ev.target.parentNode.dataset;
       }
       if (dataset.method) {
@@ -760,11 +775,13 @@ function initUI() {
           params = dataset.params.split(',');
         }
         if (typeof dataset.object !== 'undefined' && typeof window[dataset.object] !== 'undefined' && typeof window[dataset.object][dataset.method] === 'function') {
+          clicked(target);
           window[dataset.object][dataset.method].apply(window[dataset.object], params);
         } else {
           if (typeof actions[dataset.method] === "undefined") {
             utils.log("Unknown method " + dataset.method);
           } else {
+            clicked(target);
             actions[dataset.method].apply(null, params);
           }
         }
@@ -922,6 +939,7 @@ function initUI() {
       });
     }
     if (ce.action) {
+      clicked(event.target);
       switch (ce.action) {
       case 'none':
         break;
@@ -1347,6 +1365,9 @@ function initUI() {
       case 'gesture':
         config.gesture = document.getElementById('prefGesture');
         break;
+      case 'vibrate':
+        config.vibrate = document.getElementById('prefVibrate');
+        break;
       case 'lang':
         config.lang = val;
         document.webL10n.setLanguage(val);
@@ -1363,6 +1384,7 @@ function initUI() {
     var target = event.target,
         action = target.dataset.action;
     if (action && menuActions[action]) {
+      clicked(target);
       menuActions[action]();
     }
   });
@@ -1388,10 +1410,9 @@ function initUI() {
 
   // Preferences
   (function () {
-    var gesture = document.getElementById('prefGesture');
-    gesture.checked = config.gesture;
-    gesture.addEventListener('change', function () {
-      config.gesture = gesture.checked;
+    ['gesture', 'vibrate'].forEach(function (pref) {
+      var elmt = document.getElementById('pref' + pref[0].toUpperCase() + pref.substr(1));
+      elmt.checked = config[pref];
     });
   }());
 
