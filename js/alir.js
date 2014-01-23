@@ -63,7 +63,8 @@ comment = new window.Comment();
 function Alir() {
   "use strict";
   var self = this,
-      dynamicSheet = document.getElementById('userCss').sheet;
+      dynamicSheet = document.getElementById('userCss').sheet,
+      slider = $('#styleFontSize');
   RemoteStorage.eventHandling(this, "configLoaded");
   function updateStyle(conf) {
     while (dynamicSheet.cssRules[0]) {
@@ -72,13 +73,15 @@ function Alir() {
     $('#styleFontSize').value = conf.fontSize;
     dynamicSheet.insertRule("#list .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; }", 0);
   }
+  function onSizeChanged(event) {
+    window.config.style.fontSize = slider.value;
+    updateStyle(window.config.style);
+  }
   self.on('configLoaded', function (conf) {
     updateStyle(conf.style);
   });
-  $('#styleFontSize').addEventListener('change',  function () {
-    window.config.style.fontSize = this.value;
-    updateStyle(window.config.style);
-  });
+  slider.addEventListener('change',  onSizeChanged);
+  slider.addEventListener('input',  onSizeChanged);
   this.install = function () {
     (function () {
       var request = window.navigator.mozApps.installPackage("https://alir.5apps.com/package.manifest");
@@ -862,6 +865,12 @@ function initUI() {
   remoteStorage.on("wire-done", function (e) {
     document.body.classList.remove('sync');
   });
+  remoteStorage.remote.on("wire-busy", function (e) {
+    document.body.classList.add('sync');
+  });
+  remoteStorage.remote.on("wire-done", function (e) {
+    document.body.classList.remove('sync');
+  });
   //remoteStorage.on("sync-updated", function (e) {
   //  console.log(e);
   //});
@@ -1053,8 +1062,8 @@ function initUI() {
       case 'reload':
         window.scrap(ce.keyNode.dataset.url, function (err, res) {
           if (err) {
-            utils.log(err, 'error');
-            window.alert("Erreur reloading content");
+            utils.log(err.toString(), 'error');
+            window.alert("Error reloading content");
           } else {
             remoteStorage.get('/alir/article/' + ce.key).then(function (err, article, contentType, revision) {
               if (err !== 200) {
@@ -1188,6 +1197,7 @@ function initUI() {
           article.html  = new Showdown.converter().makeHtml(article.text);
           article.date  = Date.now();
           remoteStorage.alir.saveArticle(article);
+          article.doLoad = true;
           displayItem(article);
           tiles.show('list');
         }
@@ -1207,6 +1217,7 @@ function initUI() {
         tags: ['note']
       };
       remoteStorage.alir.saveArticle(obj);
+      obj.doLoad = true;
       displayItem(obj);
       tiles.show('list');
     }
@@ -1363,10 +1374,10 @@ function initUI() {
         });
         break;
       case 'gesture':
-        config.gesture = document.getElementById('prefGesture');
+        config.gesture = document.getElementById('prefGesture').checked;
         break;
       case 'vibrate':
-        config.vibrate = document.getElementById('prefVibrate');
+        config.vibrate = document.getElementById('prefVibrate').checked;
         break;
       case 'lang':
         config.lang = val;
@@ -1467,14 +1478,29 @@ function initUI() {
 // }}
 
 window.addEventListener('load', function () {
+  //jshint maxstatements: 30
   "use strict";
   _ = document.webL10n.get;
+  var hasPending = false;
   // Check if application is installed
 
   if (typeof navigator.mozHasPendingMessage === 'function' && typeof navigator.mozSetMessageHandler === 'function') {
     if (navigator.mozHasPendingMessage('alarm')) {
       utils.notify('Pending alarms');
+      hasPending = true;
       navigator.mozSetMessageHandler("alarm", window.feeds.handleAlarmMessage);
+    }
+    if (navigator.mozHasPendingMessage('activity')) {
+      utils.notify('Pending activity');
+      hasPending = true;
+      navigator.mozSetMessageHandler("activity", window.activityHandler);
+    }
+    if (navigator.mozHasPendingMessage('notification')) {
+      utils.notify('Pending notification');
+      hasPending = true;
+      navigator.mozSetMessageHandler("notification", function (notification) {
+        utils.log(notification, "debug");
+      });
     }
   } else {
     utils.notify('Not installed');

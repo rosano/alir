@@ -36,7 +36,7 @@ tests:
 	xvfb-run casperjs --engine=slimerjs test tests/suites/
 
 watch:
-	while true; do inotifywait -e close_write,moved_to,create,modify js/* css/alir.css; make build; done
+	while true; do inotifywait -e close_write,moved_to,create,modify js/* css/alir.css lib/remotestorage.js; make build; done
 
 clean:
 	git checkout alir.zip VERSION build.js.map css/build.css lib/build.js

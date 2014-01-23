@@ -65,45 +65,46 @@ function saveScraped(article) {
     utils.log(utils.format("Error saving %s : %s", article.title, e), 'error');
   }
 }
-if (navigator.mozSetMessageHandler) {
-  navigator.mozSetMessageHandler('activity', function onActivity(activity) {
-    'use strict';
-    utils.log("Handling activity");
-    try {
-      var data;
-      switch (activity.source.name) {
-      case 'save-bookmark':
-      case 'share':
+function activityHandler(activity) {
+  'use strict';
+  utils.log("Handling activity");
+  try {
+    var data;
+    switch (activity.source.name) {
+    case 'save-bookmark':
+    case 'share':
 
-        data = activity.source.data;
-        if (data.type === 'url') {
-          try {
-            utils.log("Scraping " + data.url);
-            scrap(data.url, function (err, res) {
-              if (err) {
-                utils.log(err, 'error');
-                saveScraped({url: data.url, title: '???', html: '???'});
-                activity.postError(err);
-              } else {
-                saveScraped(res);
-                activity.postResult('saved');
-              }
-            });
-          } catch (e) {
-            activity.postError('cancelled');
-            utils.log(e.toString(), "error");
-          }
-        } else {
-          activity.postError('type not supported');
-          utils.log('Activity type not supported: ' + activity.source.data.type, 'error');
+      data = activity.source.data;
+      if (data.type === 'url') {
+        try {
+          utils.log("Scraping " + data.url);
+          scrap(data.url, function (err, res) {
+            if (err) {
+              utils.log(err.toString(), 'error');
+              saveScraped({url: data.url, title: '???', html: '???'});
+              activity.postError(err);
+            } else {
+              saveScraped(res);
+              activity.postResult('saved');
+            }
+          });
+        } catch (e) {
+          activity.postError('cancelled');
+          utils.log(e.toString(), "error");
         }
-        break;
-      default:
-        activity.postError('name not supported');
-        utils.log('Activity name not supported: ' + activity.source.name, 'error');
+      } else {
+        activity.postError('type not supported');
+        utils.log('Activity type not supported: ' + activity.source.data.type, 'error');
       }
-    } catch (e) {
-      utils.log("Error handling activity: " + e, 'error');
+      break;
+    default:
+      activity.postError('name not supported');
+      utils.log('Activity name not supported: ' + activity.source.name, 'error');
     }
-  });
+  } catch (e) {
+    utils.log("Error handling activity: " + e, 'error');
+  }
+}
+if (navigator.mozSetMessageHandler) {
+  navigator.mozSetMessageHandler('activity', activityHandler);
 }
