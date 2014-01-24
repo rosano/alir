@@ -3,20 +3,7 @@
 function Feeds() {
   "use strict";
   var _cache = {},
-      self = this,
-      plan,
-      notify;
-  if (window.alarms && window.alarms.plan) {
-    console.log("[ERROR] alarms not defined");
-    plan = window.alarms.plan;
-  } else {
-    plan = function () {};
-  }
-  if (window.utils) {
-    notify = window.utils.notify;
-  } else {
-    notify = function () {};
-  }
+      self = this;
   this.cache = function (obj) {
     _cache[obj.url] = obj;
   };
@@ -146,7 +133,15 @@ function Feeds() {
           }
           if (typeof cache.articles[itemId] === 'undefined') {
             utils.log('New article "%s" in "%s"', itemTitle, cache.title, "info");
-            utils.notify('New article', utils.format('"%s" in "%s"', itemTitle, cache.title));
+            utils.notify('New article', utils.format('"%s" in "%s"', itemTitle, cache.title), function () {
+              navigator.mozApps.getSelf().onsuccess = function gotSelf(evt) {
+                var app = evt.target.result;
+                if (app !== null) {
+                  app.launch();
+                }
+                self.showArticle(itemUrl);
+              };
+            });
           } else {
             utils.log('Article Updated : "%s" "%s" < "%s"', itemTitle, cache.articles[itemId].updated, itemUpdated, "info");
           }
@@ -178,7 +173,7 @@ function Feeds() {
           if (test !== true && (cache.short || !!!itemContent)) {
             window.scrap(itemUrl, function (err, res) {
               if (err) {
-                utils.log(err, 'error');
+                utils.log(err.toString(), 'error');
                 doSave(err.toString());
               } else {
                 doSave(res.html);
@@ -251,14 +246,19 @@ function Feeds() {
     }
   };
   this.update = function () {
-    var feeds = Object.keys(_cache),
-        toFetch = feeds.length;
-    feeds.forEach(function (url) {
-      window.feeds.fetch(url, false, function () {
-        toFetch--;
-        if (toFetch === 0) {
-          utils.log("Feeds updated", "debug");
-        }
+    // Note: when app is awake by alarm, cache may be empty, so
+    // we can't rely on it here
+    remoteStorage.alir.private.getAll('feed/').then(function (feeds) {
+      var keys    = Object.keys(feeds),
+          toFetch = keys.length;
+      keys.forEach(function (key) {
+        window.feeds.fetch(feeds[key].url, false, function () {
+          self.cache(feeds[key]);
+          toFetch--;
+          if (toFetch === 0) {
+            utils.log("Feeds updated", "debug");
+          }
+        });
       });
     });
   };
@@ -272,7 +272,7 @@ function Feeds() {
         window.scrap(url, function (err, article) {
           var obj;
           if (err) {
-            utils.log(err, 'error');
+            utils.log(err.toString(), 'error');
             article = {
               url: url,
               title: '???',
@@ -324,13 +324,13 @@ function Feeds() {
       try {
         self.update();
       } catch (e) {
-        notify("Error in updating", e.toString());
+        utils.notify("Error in updating", e.toString());
         console.log(e);
       }
       try {
-        plan();
+        window.alarms.plan();
       } catch (e) {
-        notify("Error in planning", e.toString());
+        utils.notify("Error in planning", e.toString());
         console.log(e);
       }
     }

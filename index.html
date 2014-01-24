@@ -45,8 +45,6 @@
           <div class="toolbar">
             <a class="icon-chevron-left" data-object="articles" data-method="hide" ></a>
             <a class="icon-trash" data-action="delete" ></a>
-            <a class="icon-pencil compose" data-action="compose" ></a>
-            <a class="icon-share ifInstalled" data-action="share" ></a>
           </div>
           <div class="content">
             <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
@@ -61,8 +59,6 @@
           <div class="toolbar">
             <a class="icon-chevron-left" data-object="articles" data-method="hide" ></a>
             <a class="icon-trash" data-action="delete" ></a>
-            <a class="icon-pencil compose" data-action="compose" ></a>
-            <a class="icon-share ifInstalled" data-action="share" ></a>
           </div>
         </li>
       </ul>
@@ -87,7 +83,7 @@
           <p class="toolbar">
             <a class="icon-pencil"  data-object="feeds" data-method="edit"   data-params="{{=url}}"></a>
             <a class="icon-trash"   data-object="feeds" data-method="delete" data-params="{{=url}}"></a>
-            <a class="icon-refresh" data-object="feeds" data-method="update" data-params="{{=url}}"></a>
+            <a class="icon-refresh" data-object="feeds" data-method="fetch" data-params="{{=url}}"></a>
           </p>
           <p class="col2">
             <button data-l10n-id="feedTest" data-object="feeds" data-method="test" data-params="{{=url}}"></button>
@@ -96,10 +92,6 @@
           <ul>
             {{#tmpl-feed-item items}}
           </ul>
-          <p class="col2">
-            <button data-l10n-id="feedTest" data-object="feeds" data-method="test" data-params="{{=url}}"></button>
-            <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
-          </p>
         </div>
       </div>
       <ul id="tmpl-feed-item">

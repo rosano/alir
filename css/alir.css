@@ -233,12 +233,21 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   font-size: 1rem;
   background-color: rgba(255, 255, 255, 1);
   z-index: 1000;
+  border-width: 0 0 1px 1px;
+  border-radius: 0 0 0 .5rem;
+  border-style: solid;
+  border-color: #888;
+  box-shadow: 0 0 .5rem #888;
 }
 #list .current .articleMenu > p {
   position: fixed;
   background-color: rgba(255, 255, 255, .9);
   margin: -0.7rem;
   padding: .8rem;
+}
+#list .current .articleMenu.folded {
+  border-width: 0;
+  box-shadow: none;
 }
 #list .current .articleMenu.folded > p {
   background-color: rgba(255, 255, 255, .5);
@@ -270,7 +279,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   border-radius: 0 1.5em 1.5em 0 / 0 50% 50% 0;
   margin: 0px 5px;
 }
-#list .toolbar .compose {
+#list .articleActions .compose {
   display: none;
 }
 #list [data-flags*=",editable,"] .compose {
