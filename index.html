@@ -284,11 +284,21 @@
             </fieldset>
           </div>
         </section>
-        <fieldset class="ifInstalled">
-          <legend data-l10n-id="alarmsLegend"></legend>
-          <label for="alarmInterval" data-l10n-id="alarmInterval"></label>
-          <input type="text" name="alarmInterval" id="alarmInterval" size="5" data-target="alarm" />
-        </fieldset>
+        <section class="container folded ifInstalled">
+          <header class="header"><h2 data-l10n-id="settingsReader"></h3></header>
+          <div>
+            <fieldset id="settingsAlarm">
+              <legend data-l10n-id="alarmInterval"></legend>
+              <input type="range" name="alarmInterval" id="alarmInterval" min="5" max="120" step="5" />
+              <p><span id="alarmIntervalValue" ></span>min</p>
+            </fieldset>
+            <p class="col2">
+              <button data-object="alarms" data-method="display" data-l10n-id="alarmsDisplay"></button>
+              <button data-object="alarms" data-method="plan" data-l10n-id="alarmsPlan"></button>
+              <button data-object="alarms" data-method="reset" data-l10n-id="alarmsReset"></button>
+            </p>
+          </div>
+        </section>
         <p>
           <button data-method="tileGo"   data-params="credits"  data-l10n-id="settingsCredits">Credits</button>
           <button data-method="tileGo"   data-params="advanced" data-l10n-id="settingsAdvanced" data-method="tileGo">Advanced</button>
@@ -320,12 +330,6 @@
         <button data-method="getAll" data-l10n-id="settingsReload">Reload</button>
         <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
       </p>
-      <fieldset class="ifInstalled">
-        <legend data-l10n-id="alarmsLegend"></legend>
-        <button data-object="alarms" data-method="display" data-l10n-id="alarmsDisplay"></button>
-        <button data-object="alarms" data-method="plan" data-l10n-id="alarmsPlan"></button>
-        <button data-object="alarms" data-method="reset" data-l10n-id="alarmsReset"></button>
-      </fieldset>
     </div>
     <section id="noteView" data-tile="noteView" class="">
       <header><h2 data-l10n-id="noteViewHeader">View note</h2></header>

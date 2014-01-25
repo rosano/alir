@@ -674,7 +674,24 @@ function initUI() {
         document.body.classList.remove('menu-left');
         document.body.classList.add('menu-right');
       }
-      $('#alarmInterval').value    = conf.alarmInterval;
+      (function () {
+        var alarm = $('#alarmInterval'),
+            alarmValue = $('#alarmIntervalValue');
+        function onIntervalChanged(event) {
+          var value = event.target.value;
+          conf.alarmInterval     = value;
+          alarmValue.textContent = value;
+          if (event.type === 'change' && typeof window.alarms !== "undefined") {
+            window.alarms.reset(function () {
+              window.alarms.plan();
+            });
+          }
+        }
+        alarm.value            = conf.alarmInterval;
+        alarmValue.textContent = conf.alarmInterval;
+        alarm.addEventListener('change', onIntervalChanged);
+        alarm.addEventListener('input', onIntervalChanged);
+      }());
       $('#settingsLoglevel').value = conf.logLevel;
       if (typeof conf.bookmarks === 'undefined') {
         conf.bookmarks = {};

@@ -458,6 +458,13 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #settings .container > .header > * {
   margin: 0.5rem;
 }
+#settingsAlarm {
+  text-align: center;
+}
+#settingsAlarm p {
+  margin: .5rem;
+}
+/** }} **/
 /** Credits {{ **/
 #credits .title {
   text-align: center;
