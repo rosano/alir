@@ -138,6 +138,7 @@ function Article() {
     if (key === currentId) {
       return;
     }
+    var elmt = document.getElementById(key);
     function doShow() {
       var clItem  = $('[data-key="' + key + '"]').classList,
           clMenu  = $('#menu').classList,
@@ -153,20 +154,29 @@ function Article() {
       currentId = key;
       self.onShown();
     }
-    var elmt = document.getElementById(key);
+    function displayArticle(article) {
+      elmt.parentNode.removeChild(elmt);
+      article.id = key;
+      article.doLoad = true;
+      window.displayItem(article);
+      doShow();
+    }
     if (elmt) {
       if (elmt.dataset.loaded === "true") {
         doShow();
       } else {
         remoteStorage.alir.private.getObject('article/' + key).then(function (article) {
           if (article) {
-            elmt.parentNode.removeChild(elmt);
-            article.id = key;
-            article.doLoad = true;
-            window.displayItem(article);
-            doShow();
+            displayArticle(article);
           } else {
-            utils.log("Unable to load article " + key, "error");
+            utils.log("Unable to load article article/" + key, "error");
+            remoteStorage.alir.private.getObject('/article/' + key).then(function (article) {
+              if (article) {
+                displayArticle(article);
+              } else {
+                utils.log("Unable to load article " + key, "error");
+              }
+            });
           }
         });
       }
@@ -374,11 +384,11 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
     exports: {
       saveArticle: function (article) {
         article.type = 'article';
-        return privateClient.storeObject('article', '/article/' + article.id, article);
+        return privateClient.storeObject('article', 'article/' + article.id, article);
       },
       saveFeed: function (feed) {
         feed.type = 'feed';
-        return privateClient.storeObject('feed', '/feed/' + feed.id, feed);
+        return privateClient.storeObject('feed', 'feed/' + feed.id, feed);
       },
       goOffline: function () {
         remoteStorage.stopSync();
@@ -999,7 +1009,7 @@ function initUI() {
         window.articles.hide();
         break;
       case 'compose':
-        //remoteStorage.alir[ce.context].getObject('/article/' + ce.key).then(function (object) {
+        //remoteStorage.alir[ce.context].getObject('article/' + ce.key).then(function (object) {
         remoteStorage.get('/alir/article/' + ce.key).then(function (err, article, contentType, revision) {
           if (err !== 200) {
             window.alert(err);
@@ -1059,7 +1069,7 @@ function initUI() {
         break;
       case 'deleteArticles':
         (function () {
-          var toDel = $$('#list h2 .delitem:checked');
+          var toDel = $$('#list h2 .delitem input:checked');
           if (toDel.length > 0) {
             if (window.confirm(_('articlesDelete', {nb: toDel.length}))) {
               toDel.forEach(function (elmt) {
@@ -1214,7 +1224,6 @@ function initUI() {
           article.html  = new Showdown.converter().makeHtml(article.text);
           article.date  = Date.now();
           remoteStorage.alir.saveArticle(article);
-          article.doLoad = true;
           displayItem(article);
           tiles.show('list');
         }
@@ -1234,7 +1243,6 @@ function initUI() {
         tags: ['note']
       };
       remoteStorage.alir.saveArticle(obj);
-      obj.doLoad = true;
       displayItem(obj);
       tiles.show('list');
     }
@@ -1384,12 +1392,6 @@ function initUI() {
     var val = ev.target.value;
     if (ev.target.dataset.target) {
       switch (ev.target.dataset.target) {
-      case 'alarm':
-        config.alarmInterval = val;
-        window.alarms.reset(function () {
-          window.alarms.plan();
-        });
-        break;
       case 'gesture':
         config.gesture = document.getElementById('prefGesture').checked;
         break;
@@ -1554,6 +1556,9 @@ window.addEventListener('load', function () {
       if (typeof ev.newValue.id === 'undefined') {
         ev.newValue.id = id;
       }
+      if (id === window.articles.getCurrentId()) {
+        ev.newValue.doLoad = true;
+      }
       displayItem(ev.newValue);
     } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue === 'undefined') {
       console.log("Delete " + ev.relativePath);
@@ -1566,6 +1571,9 @@ window.addEventListener('load', function () {
       console.log("Update " + ev.relativePath);
       if (typeof ev.newValue.id === 'undefined') {
         ev.newValue.id = id;
+      }
+      if (id === window.articles.getCurrentId()) {
+        ev.newValue.doLoad = true;
       }
       item = displayItem(ev.newValue);
     }
