@@ -6,10 +6,30 @@ function scrap(url, cb) {
   function onComplete() {
     try {
       var readable = new window.Readability(),
-          article;
+          article,
+          root;
       readable.setSkipLevel(3);
-      window.saxParser(xhr.responseXML.childNodes[xhr.responseXML.childNodes.length - 1], readable);
-      article = readable.getArticle();
+      window.remote = xhr.responseXML;
+      root = xhr.responseXML.getElementsByTagName('html');
+      if (root.length === 1) {
+        root = root[0];
+      } else {
+        root = xhr.responseXML.getElementsByTagName('0');
+        if (root.length > 1) {
+          root = root[0];
+        } else {
+          root = false;
+        }
+      }
+      if (root !== false) {
+        window.saxParser(root, readable);
+        article = readable.getArticle();
+      } else {
+        article = {
+          title: '???',
+          html:  '???'
+        };
+      }
       article.url = url;
       cb(null, article);
     } catch (e) {
