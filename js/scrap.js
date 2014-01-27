@@ -2,11 +2,15 @@
 /* global utils: true, remoteStorage: true */
 function scrap(url, cb) {
   "use strict";
-  var options, xhr;
+  var options, xhr, status, article;
+  article = {
+    url: url,
+    title: '???',
+    html:  '???'
+  };
   function onComplete() {
     try {
       var readable = new window.Readability(),
-          article,
           root;
       readable.setSkipLevel(3);
       window.remote = xhr.responseXML;
@@ -23,17 +27,13 @@ function scrap(url, cb) {
       }
       if (root !== false) {
         window.saxParser(root, readable);
-        article = readable.getArticle();
-      } else {
-        article = {
-          title: '???',
-          html:  '???'
-        };
+        parsed = readable.getArticle();
+        article.title = parsed.title;
+        article.html  = parsed.html;
       }
-      article.url = url;
       cb(null, article);
     } catch (e) {
-      cb(e);
+      cb(e, article);
     }
   }
   function onFailed(e) {
@@ -41,10 +41,19 @@ function scrap(url, cb) {
     utils.log("Request failed : " + e.target, "error");
     utils.log("Request failed : " + e.target.status, "error");
     utils.log("Request failed : " + e.target.statusText, "error");
-    cb('Request Failed');
+    cb('Request Failed', article);
   }
   function onCanceled(e) {
-    cb("Canceled");
+    cb("Canceled", article);
+  }
+  status = window.alir.getStatus();
+  if (status.installed !== true) {
+    cb(_('scrapNotInstalled'), article);
+    return;
+  }
+  if (status.online !== true) {
+    cb(_('scrapOffline'), article);
+    return;
   }
   try {
     options = {
@@ -54,14 +63,15 @@ function scrap(url, cb) {
     xhr = new XMLHttpRequest(options);
     xhr.open("GET", url, true);
     xhr.responseType = "document";
-    xhr.onload = onComplete;
+    xhr.timeout = 20000;
+    xhr.onload  = onComplete;
     xhr.onerror = onFailed;
     //xhr.addEventListener("error", onFailed, false);
     xhr.addEventListener("abort", onCanceled, false);
     xhr.send(null);
   } catch (e) {
     utils.log(utils.format("Error getting %s : %s", url, e));
-    cb('Failed');
+    cb('Failed ' + e.toString(), article);
   }
 }
 function saveScraped(article) {

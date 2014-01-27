@@ -72,6 +72,9 @@ var utils = {
       ui = document.getElementById('debugLog');
       ui.innerHTML = utils.format('<span class="%s">[%s][%s]</span> %s\n', level, curDate, level + new Array(10 - level.length).join(' '), message) + ui.innerHTML;
       console.log(utils.format('=====> [%s][%s] %s\n', curDate, level + new Array(10 - level.length).join(' '), message));
+      if (level === 'error') {
+        window.alert(message);
+      }
     }
   },
   notify: function (title, body, cb) {
@@ -185,11 +188,8 @@ window.Tiles = function (global) {
       } else {
         e.classList.remove('shown');
       }
-      document.getElementById('menu').classList.remove("show");
-      document.body.classList.remove("menu");
     });
     document.getElementById('menu').classList.remove('show');
-    document.body.classList.remove("menu");
     this._emit('shown', name);
   };
   this.go = function (name, cb) {
@@ -203,14 +203,11 @@ window.Tiles = function (global) {
           current = name;
         }
       });
-      document.getElementById('menu').classList.remove("show");
-      document.body.classList.remove("menu");
       this._emit('shown', name);
     } else {
       this.show(name);
     }
     document.getElementById('menu').classList.remove('show');
-    document.body.classList.remove("menu");
   };
   this.back = function (res) {
     var popupElmt, next;
@@ -231,7 +228,6 @@ window.Tiles = function (global) {
       }
     }
     document.getElementById('menu').classList.remove('show');
-    document.body.classList.remove("menu");
   };
   this.$ = function (name) {
     var root = document.querySelector('[data-tile="' + name + '"]');
@@ -283,13 +279,13 @@ window.template = function template(sel, data) {
             res = res.join(',');
             break;
           case "tolocal":
-            res = new Date(res).toLocaleString();
+            res = new Date(res).toLocaleString(undefined, {day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", "minute": "2-digit"});
             break;
           case "tolowercase":
             res = res.toLowerCase();
             break;
           default:
-            console.log("Unknown template function " + fct);
+            utils.log("Unknown template function " + fct, "error");
           }
         }
       }

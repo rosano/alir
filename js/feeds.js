@@ -273,11 +273,6 @@ function Feeds() {
           var obj;
           if (err) {
             utils.log(err.toString(), 'error');
-            article = {
-              url: url,
-              title: '???',
-              html: '???'
-            };
           }
           obj = {
             id: utils.uuid(),

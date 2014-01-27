@@ -29,7 +29,6 @@ var config,
     comment,
     tags = [],
     config,
-    isInstalled,
     _;
 var $  = function (sel, root) { "use strict"; root = root || document; return root.querySelector(sel); },
     $$ = function (sel, root) { "use strict"; root = root || document; return [].slice.call(root.querySelectorAll(sel)); },
@@ -94,6 +93,7 @@ function Alir() {
   (function () {
     var status;
     status = {
+      installed: false,
       online: navigator.onLine,
       user: true,
       visible: !document.hidden,
@@ -140,6 +140,21 @@ function Alir() {
       status.rs = true;
       self._emit('statusUpdated', status);
     });
+    if (window.navigator.mozApps) {
+      (function () {
+        var request = window.navigator.mozApps.getSelf();
+        request.onsuccess = function () {
+          if (request.result) {
+            status.installed = true;
+            document.body.classList.remove('hosted');
+            document.body.classList.add('installed');
+          }
+        };
+        request.onerror = function () {
+          alert("Error: " + request.error.name);
+        };
+      }());
+    }
     self.onoff = function () {
       if (document.body.classList.contains('online')) {
         userOnline(false);
@@ -164,7 +179,7 @@ function Alir() {
     (function () {
       var request = window.navigator.mozApps.installPackage("https://alir.5apps.com/package.manifest");
       request.onerror = function () {
-        window.alert("Install Error : " + this.error.name);
+        utils.log("Install Error : " + this.error.name, "error");
         console.log(this.error, 'error');
       };
       request.onsuccess = function () {
@@ -184,7 +199,7 @@ function Alir() {
         }
       };
       request.onerror = function () {
-        alert("Error: " + request.error.name);
+        utils.log("Error: " + request.error.name, "error");
       };
     }());
   };
@@ -284,6 +299,7 @@ function Article() {
                 displayArticle(article);
               } else {
                 utils.log("Unable to load article " + key, "error");
+                doShow();
               }
             });
           }
@@ -317,7 +333,6 @@ function Article() {
     clMenu.remove('show');
     clMain.remove("detail");
     clMain.add("list");
-    document.body.classList.remove("menu");
     window.articles.setCurrentId();
     location.hash = '';
   };
@@ -329,7 +344,7 @@ window.link = {
     "use strict";
     var href = document.getElementById('linkRef').textContent,
         openURL;
-    if (isInstalled) {
+    if (window.alir.getStatus().installed) {
       openURL = new window.MozActivity({
         name: "view",
         data: {
@@ -350,14 +365,11 @@ window.link = {
       scrap(href, function (err, res) {
         if (err) {
           utils.log(err.toString(), 'error');
-          window.alert(err);
-        } else {
-          saveScraped(res);
         }
+        saveScraped(res);
       });
     } catch (e) {
       utils.log(e.toString(), "error");
-      window.alert(e);
     }
     tiles.back();
   },
@@ -1018,9 +1030,9 @@ function initUI() {
         tags.splice(1, 0, tag);
         ce.keyNode.dataset.tags = ',' + tags.join(',').replace(',,,', ',,') + ',';
       }
-      remoteStorage.get('/alir/article/' + ce.key).then(function (err, article, contentType, revision) {
-        if (err !== 200) {
-          window.alert(err);
+      remoteStorage.alir.private.getObject('article/' + ce.key).then(function (article) {
+        if (typeof article === "undefined") {
+          utils.log("Article not found", "error");
         } else {
           article.id   = ce.key;
           article.tags = tags.filter(function (t) {return t !== ''; });
@@ -1065,10 +1077,9 @@ function initUI() {
         window.articles.hide();
         break;
       case 'compose':
-        //remoteStorage.alir[ce.context].getObject('article/' + ce.key).then(function (object) {
-        remoteStorage.get('/alir/article/' + ce.key).then(function (err, article, contentType, revision) {
-          if (err !== 200) {
-            window.alert(err);
+        remoteStorage.alir.private.getObject('article/' + ce.key).then(function (article) {
+          if (typeof article === 'undefined') {
+            utils.log("Article not found", "error");
           } else {
             $('#input [name="id"]').value    = ce.key;
             $('#input [name="title"]').value = article.title;
@@ -1093,9 +1104,9 @@ function initUI() {
         }());
         break;
       case 'note':
-        remoteStorage.get('/alir/article/' + ce.key).then(function (err, article, contentType, revision) {
-          if (err !== 200) {
-            window.alert(err);
+        remoteStorage.alir.private.getObject('article/' + ce.key).then(function (article) {
+          if (typeof article === 'undefined') {
+            utils.log("Article not found", "error");
           } else {
             // @TODO: sanitize
             $('#noteView .content').textContent     = article.notes[ce.noteId].content;
@@ -1148,11 +1159,10 @@ function initUI() {
         window.scrap(ce.keyNode.dataset.url, function (err, res) {
           if (err) {
             utils.log(err.toString(), 'error');
-            window.alert("Error reloading content");
           } else {
-            remoteStorage.get('/alir/article/' + ce.key).then(function (err, article, contentType, revision) {
-              if (err !== 200) {
-                window.alert(err);
+            remoteStorage.alir.private.getObject('article/' + ce.key).then(function (article) {
+              if (typeof article === 'undefined') {
+                utils.log("Article not found", "error");
               } else {
                 article.id    = ce.key;
                 article.title = res.title;
@@ -1270,10 +1280,9 @@ function initUI() {
 
     if (id) {
       // update
-      remoteStorage.get('/alir/article/' + id).then(function (err, article, contentType, revision) {
-        if (err !== 200) {
-          window.alert(err);
-          tiles.show('list');
+      remoteStorage.alir.private.getObject('article/' + id).then(function (article) {
+        if (typeof article === 'undefined') {
+          utils.log("Article not found", "error");
         } else {
           article.id    = id;
           article.url   = $('#input [name="url"]').value;
@@ -1446,7 +1455,6 @@ function initUI() {
     if (action === 'toggleMenu') {
       clicked(target);
       $('#menu').classList.toggle("show");
-      document.body.classList.toggle("menu");
     }
   });
   // }}
@@ -1556,21 +1564,6 @@ window.addEventListener('load', function () {
     utils.notify('Not installed');
   }
 
-  if (window.navigator.mozApps) {
-    (function () {
-      var request = window.navigator.mozApps.getSelf();
-      request.onsuccess = function () {
-        if (request.result) {
-          isInstalled = true;
-          document.body.classList.remove('hosted');
-          document.body.classList.add('installed');
-        }
-      };
-      request.onerror = function () {
-        alert("Error: " + request.error.name);
-      };
-    }());
-  }
   //remoteStorage.enableLog();
   remoteStorage.setSyncInterval(60000);
   remoteStorage.setBackgroundSyncInterval(300000);
