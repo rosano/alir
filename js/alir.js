@@ -82,6 +82,76 @@ function Alir() {
   });
   slider.addEventListener('change',  onSizeChanged);
   slider.addEventListener('input',  onSizeChanged);
+  // status {{
+  (function () {
+    var status;
+    status = {
+      online: navigator.onLine,
+      user: true,
+      visible: !document.hidden,
+      rs: remoteStorage.connected
+    };
+    // when navigator goes online / offline
+    function windowOnline(e) {
+      status.online = navigator.onLine;
+      self._emit('statusUpdated', status);
+    }
+    // when visibility of application change
+    function documentVisibility() {
+      status.visible = !document.hidden;
+      self._emit('statusUpdated', status);
+    }
+    // when user toggle online / offline state
+    function userOnline(online) {
+      if (online) {
+        remoteStorage.alir.goOnline();
+        document.body.classList.add('online');
+        status.user = true;
+      } else {
+        remoteStorage.alir.goOffline();
+        document.body.classList.remove('online');
+        document.body.classList.remove('sync');
+        status.user = false;
+      }
+      self._emit('statusUpdated', status);
+    }
+    window.addEventListener("offline", windowOnline, false);
+    window.addEventListener("online", windowOnline, false);
+    document.addEventListener("visibilitychange", documentVisibility, false);
+    if (!remoteStorage.connected) {
+      document.body.classList.remove('online');
+    }
+    remoteStorage.on("disconnected", function (e) {
+      document.body.classList.remove('online');
+      status.rs = false;
+      self._emit('statusUpdated', status);
+    });
+    remoteStorage.remote.on("connected", function (e) {
+      document.getElementById('prefToken').value = remoteStorage.remote.token;
+      document.body.classList.add('online');
+      status.rs = true;
+      self._emit('statusUpdated', status);
+    });
+    self.onoff = function () {
+      if (document.body.classList.contains('online')) {
+        userOnline(false);
+      } else {
+        if (remoteStorage.connected) {
+          userOnline(true);
+        } else {
+          if (document.getElementById('rsLogin').value !== '') {
+            remoteStorage.widget.view.events.connect(new Event(""));
+          } else {
+            window.alert(_('notConnected'));
+          }
+        }
+      }
+    };
+    self.getStatus = function () {
+      return status;
+    };
+  }());
+  // }}
   this.install = function () {
     (function () {
       var request = window.navigator.mozApps.installPackage("https://alir.5apps.com/package.manifest");
@@ -1614,9 +1684,4 @@ window.addEventListener('load', function () {
 window.addEventListener('unload', function () {
   "use strict";
   localStorage.setItem('config', JSON.stringify(config));
-});
-remoteStorage.remote.on("connected", function (e) {
-  "use strict";
-  document.getElementById('prefToken').value = remoteStorage.remote.token;
-  document.body.classList.add('online');
 });
