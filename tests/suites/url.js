@@ -3,26 +3,14 @@
 
 require.paths.push(require('fs').workingDirectory + '/tests/');
 
-var options = require("options").options,
-    utils   = require("utils");
+var options = require("options").options;
 
 casper.test.begin('Create and update articles', 6, function suite(test) {
   "use strict";
-  //casper.options.verbose = true;
-  //casper.options.logLevel = 'debug';
-  casper.on('exit', function () {
-    casper.capture("last.png");
-  });
-  casper.on("remote.message", function (msg) {
-    casper.echo("Message: " + msg, "INFO");
-  });
-  casper.on("page.error", function (msg, trace) {
-    casper.echo("Error: " + msg, "ERROR");
-    utils.dump(trace);
-  });
+  require("common").init(casper);
   casper.start(options.startUrl, function () {
     casper.click("#menu [data-action=toggleMenu]");
-    casper.click("#menu [data-action=create]");
+    casper.click("#menu [data-method=create]");
     casper.waitUntilVisible("#input.shown", function () {
       casper.fill("#input > form", {
         "title": "Todo",

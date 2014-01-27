@@ -185,6 +185,8 @@ window.Tiles = function (global) {
       } else {
         e.classList.remove('shown');
       }
+      document.getElementById('menu').classList.remove("show");
+      document.body.classList.remove("menu");
     });
     document.getElementById('menu').classList.remove('show');
     document.body.classList.remove("menu");
@@ -201,6 +203,8 @@ window.Tiles = function (global) {
           current = name;
         }
       });
+      document.getElementById('menu').classList.remove("show");
+      document.body.classList.remove("menu");
       this._emit('shown', name);
     } else {
       this.show(name);

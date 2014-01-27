@@ -3,23 +3,11 @@
 
 require.paths.push(require('fs').workingDirectory + '/tests/');
 
-var options = require("options").options,
-    utils   = require("utils");
+var options = require("options").options;
 
 casper.test.begin('Reload config', 3, function suite(test) {
   "use strict";
-  //casper.options.verbose = true;
-  //casper.options.logLevel = 'debug';
-  casper.on('exit', function () {
-    casper.capture("last.png");
-  });
-  casper.on("remote.message", function (msg) {
-    casper.echo("Message: " + msg, "INFO");
-  });
-  casper.on("page.error", function (msg, trace) {
-    casper.echo("Error: " + msg, "ERROR");
-    utils.dump(trace);
-  });
+  require("common").init(casper);
   casper.start(options.startUrl, function () {
     var config = casper.getGlobal("config"),
         rs = config.rs;

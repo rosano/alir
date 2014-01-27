@@ -3,30 +3,18 @@
 
 require.paths.push(require('fs').workingDirectory + '/tests/');
 
-var options = require("options").options,
-    utils   = require("utils");
+var options = require("options").options;
 
 casper.test.begin('Create and update articles', function suite(test) {
   "use strict";
-  //casper.options.verbose = true;
-  //casper.options.logLevel = 'debug';
-  casper.on('exit', function () {
-    casper.capture("last.png");
-  });
-  casper.on("remote.message", function (msg) {
-    casper.echo("Message: " + msg, "INFO");
-  });
-  casper.on("page.error", function (msg, trace) {
-    casper.echo("Error: " + msg, "ERROR");
-    utils.dump(trace);
-  });
+  require("common").init(casper);
   casper.start(options.startUrl, function () {
     test.assertExists('#menu', "Menu exists");
     test.assertVisible('#main', "Main is visible");
     test.assertVisible('#listFilter', "listFilter is visible");
     test.assertElementCount("#list > li", 0, "No article");
     casper.click("#menu [data-action=toggleMenu]");
-    casper.click("#menu [data-action=create]");
+    casper.click("#menu [data-method=create]");
     casper.waitUntilVisible("#input.shown", function () {
       casper.test.pass("Input field displayed");
       casper.fill("#input > form", {
@@ -50,7 +38,7 @@ casper.test.begin('Create and update articles', function suite(test) {
   });
 
   casper.then(function () {
-    casper.click("#list > li:nth-of-type(1) .actions .compose");
+    casper.click("#list > li:nth-of-type(1) .articleActions .compose");
     casper.waitUntilVisible('#input', function () {
       test.assertEquals(casper.getFormValues("#input > form").text, " - First\n - Second\n");
       casper.fill("#input > form", {

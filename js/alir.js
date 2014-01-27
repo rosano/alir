@@ -3,7 +3,7 @@
 /*exported: alir */
 /**
     Alir
-    Copyright (C) {2013}  {Clochix}
+    Copyright (C) 2013  Clochix
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,23 +65,31 @@ function Alir() {
   var self = this,
       dynamicSheet = document.getElementById('userCss').sheet,
       slider = $('#styleFontSize');
-  RemoteStorage.eventHandling(this, "configLoaded");
-  function updateStyle(conf) {
-    while (dynamicSheet.cssRules[0]) {
-      dynamicSheet.deleteRule(0);
+  RemoteStorage.eventHandling(this, "configLoaded", "statusUpdated");
+  // style {{
+  (function () {
+    function updateStyle(conf) {
+      while (dynamicSheet.cssRules[0]) {
+        dynamicSheet.deleteRule(0);
+      }
+      $('#styleFontSize').value = conf.fontSize;
+      dynamicSheet.insertRule("#list .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; }", 0);
     }
-    $('#styleFontSize').value = conf.fontSize;
-    dynamicSheet.insertRule("#list .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; }", 0);
-  }
-  function onSizeChanged(event) {
-    window.config.style.fontSize = slider.value;
-    updateStyle(window.config.style);
-  }
-  self.on('configLoaded', function (conf) {
-    updateStyle(conf.style);
-  });
-  slider.addEventListener('change',  onSizeChanged);
-  slider.addEventListener('input',  onSizeChanged);
+    function onSizeChanged(event) {
+      window.config.style.fontSize = slider.value;
+      updateStyle(window.config.style);
+    }
+    self.on('configLoaded', function (conf) {
+      updateStyle(conf.style);
+    });
+    slider.addEventListener('change',  onSizeChanged);
+    slider.addEventListener('input',  onSizeChanged);
+    self.styleReset = function () {
+      window.config.style.fontSize = 1;
+      updateStyle(window.config.style.fontSize);
+    };
+  }());
+  // }}
   // status {{
   (function () {
     var status;
@@ -180,12 +188,36 @@ function Alir() {
       };
     }());
   };
-  this.styleReset = function () {
-    window.config.style.fontSize = 1;
-    updateStyle(window.config.style.fontSize);
+  this.rs = {
+    "connect": function () {
+      remoteStorage.widget.view.form.userAddress.value = $('#rsLogin').value;
+      remoteStorage.widget.view.events.connect(new Event(""));
+    },
+    "connectDropbox": function () {
+      remoteStorage.widget.view.connectDropbox();
+    },
+    "connectDrive": function () {
+      remoteStorage.widget.view.connectGdrive();
+    },
+    "sync": function () {
+      remoteStorage.widget.view.events.sync(new Event(""));
+    },
+    "reset": function () {
+      remoteStorage.widget.view.events.reset(new Event(""));
+    },
+    "disconnect": function () {
+      remoteStorage.widget.view.events.disconnect(new Event(""));
+    },
+    "cacheReset": function () {
+      remoteStorage.caching.reset();
+    }
   };
 }
 window.alir = new Alir();
+window.alir.on('statusUpdated', function (status) {
+  "use strict";
+  console.log(status);
+});
 
 function Article() {
   "use strict";
@@ -203,6 +235,13 @@ function Article() {
   };
   this.getCurrentId = function getCurrentId() {
     return currentId;
+  };
+  this.create = function () {
+    $('#input [name="id"]').value    = "";
+    $('#input [name="url"]').value   = "";
+    $('#input [name="title"]').value = "";
+    $('#input [name="text"]').value  = "";
+    tiles.show('input');
   };
   this.show = function show(key) {
     if (key === currentId) {
@@ -375,18 +414,6 @@ function createXPathFromElement(elm) {
   }
   return segs.length ? '/' + segs.join('/') : null;
 }
-/*
-(function () {
-  "use strict";
-  var l = console.log;
-  console.log = function log() {
-    l.apply(console, arguments);
-    if (Notification && Notification.permission === "granted") {
-      var n = new Notification(arguments[0]);
-    }
-  };
-})();
-*/
 
 RemoteStorage.defineModule('alir', function module(privateClient, publicClient) {
   "use strict";
@@ -693,8 +720,12 @@ function getAll() {
       utils.log(utils.format("All %s got in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
       if (objects) {
         Object.keys(objects).forEach(function (key) {
-          objects[key].id = key;
-          displayItem(objects[key]);
+          try {
+            objects[key].id = key;
+            displayItem(objects[key]);
+          } catch (e) {
+            utils.log(utils.format("Error on %s for key %s : %s / %s", type, key, objects[key], e.toString(), "error"));
+          }
         });
       }
       utils.log(utils.format("All %s displayed in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
@@ -704,8 +735,7 @@ function getAll() {
 function initUI() {
   // jshint maxstatements: 60
   "use strict";
-  var UI = {},
-      menuActions = {};
+  var UI = {};
   UI = {
     input: $('#input'),
     list: $('#list'),
@@ -723,7 +753,7 @@ function initUI() {
       window.navigator.vibrate(50);
     }
   }
-  // reload configuration
+  // configuration {{
   (function () {
     var conf = localStorage.getItem('config');
     if (conf) {
@@ -781,6 +811,7 @@ function initUI() {
       window.alir._emit('configLoaded', conf);
     }
   }());
+  // }}
 
   $$('form').forEach(function (form) {
     form.addEventListener('submit', function (e) {
@@ -801,12 +832,6 @@ function initUI() {
       inspect: function () {
         remoteStorage.inspect();
       },
-      tileGo: function (name) {
-        tiles.go(name);
-      },
-      tileShow: function (name) {
-        tiles.show(name);
-      },
       widgetShow: function () {
         $('#rsWidget').classList.toggle("hidden");
       }
@@ -818,7 +843,8 @@ function initUI() {
       var params = [],
           target  = ev.target,
           dataset = target.dataset,
-          listeners;
+          listeners,
+          obj, path;
 
       listeners = [
         {
@@ -874,9 +900,23 @@ function initUI() {
         if (typeof dataset.params !== "undefined") {
           params = dataset.params.split(',');
         }
-        if (typeof dataset.object !== 'undefined' && typeof window[dataset.object] !== 'undefined' && typeof window[dataset.object][dataset.method] === 'function') {
-          clicked(target);
-          window[dataset.object][dataset.method].apply(window[dataset.object], params);
+        if (typeof dataset.object !== 'undefined') {
+          path = dataset.object.split('.');
+          obj = window;
+          do {
+            obj = obj[path.shift()];
+          } while (typeof obj !== 'undefined' && path.length > 0);
+          if (typeof obj === 'undefined') {
+            utils.log("Unknown data object " + dataset.object, "error");
+          } else {
+            if (typeof obj[dataset.method] !== 'function') {
+              utils.log(utils.format("Object %s has no method %s", dataset.object, dataset.method), "error");
+            } else {
+              clicked(target);
+              obj[dataset.method].apply(obj, params);
+            }
+          }
+
         } else {
           if (typeof actions[dataset.method] === "undefined") {
             utils.log("Unknown method " + dataset.method);
@@ -896,65 +936,9 @@ function initUI() {
   })();
   // }}
 
-  // left menu actions
-  menuActions = {
-    create: function doCreate() {
-      menuActions.toggleMenu();
-      $('#input [name="id"]').value    = "";
-      $('#input [name="url"]').value   = "";
-      $('#input [name="title"]').value = "";
-      $('#input [name="text"]').value  = "";
-      tiles.show('input');
-    },
-    toggleMenu: function doToggleMenu() {
-      $('#menu').classList.toggle("show");
-      document.body.classList.toggle("menu");
-    },
-    sync: function doSync() {
-      remoteStorage.sync().then(function onSyncDone() {
-        window.alert(_('syncOk'));
-      }, function onSynFail() {
-        window.alert(_('syncKo'));
-      });
-    },
-    settings: function doMenu() {
-      menuActions.toggleMenu();
-      tiles.show('settings');
-    },
-    offline: function doOffline() {
-      remoteStorage.alir.goOffline();
-      document.body.classList.remove('online');
-      document.body.classList.remove('sync');
-    },
-    online: function doOnline() {
-      remoteStorage.alir.goOnline();
-      document.body.classList.add('online');
-    },
-    onoff: function doOnOff() {
-      if (document.body.classList.contains('online')) {
-        menuActions.offline();
-      } else {
-        if (remoteStorage.connected) {
-          menuActions.online();
-        } else {
-          if ($('#rsLogin').value !== '') {
-            remoteStorage.widget.view.events.connect(new Event(""));
-          } else {
-            window.alert(_('notConnected'));
-          }
-        }
-      }
-    },
-  };
   $$('#menu .content [data-action]').forEach(function () {
     var elmt = arguments[0];
     UI.menu[elmt.dataset.action] = elmt;
-  });
-  if (!remoteStorage.connected) {
-    document.body.classList.remove('online');
-  }
-  remoteStorage.on("disconnected", function (e) {
-    document.body.classList.remove('online');
   });
   remoteStorage.on("wire-busy", function (e) {
     document.body.classList.add('sync');
@@ -1069,7 +1053,9 @@ function initUI() {
         break;
       case 'delete':
         if (window.confirm(_('confirmDelete'))) {
+          //@FIXME
           remoteStorage.alir[ce.context].remove('/article/' + ce.key);
+          remoteStorage.alir[ce.context].remove('article/' + ce.key);
           delete config.bookmarks[ce.key];
           elmt = document.getElementById(ce.key);
           if (elmt) {
@@ -1147,7 +1133,9 @@ function initUI() {
                 if (key) {
                   key.classList.add('hidden');
                   key = key.dataset.key;
+                  //@FIXME
                   remoteStorage.alir.private.remove('/article/' + key);
+                  remoteStorage.alir.private.remove('article/' + key);
                   delete config.bookmarks[key];
                 }
               });
@@ -1372,40 +1360,12 @@ function initUI() {
     config.rs.login = this.value;
     remoteStorage.widget.view.form.userAddress.value = this.value;
   });
-  $('#settings').addEventListener('click', function (event) {
-    if (event.target.dataset && event.target.dataset.action) {
-      switch (event.target.dataset.action) {
-      case "connect":
-        remoteStorage.widget.view.form.userAddress.value = $('#rsLogin').value;
-        remoteStorage.widget.view.events.connect(new Event(""));
-        break;
-      case "connectDropbox":
-        remoteStorage.widget.view.connectDropbox();
-        break;
-      case "connectDrive":
-        remoteStorage.widget.view.connectGdrive();
-        break;
-      case "sync":
-        remoteStorage.widget.view.events.sync(new Event(""));
-        break;
-      case "reset":
-        remoteStorage.widget.view.events.reset(new Event(""));
-        break;
-      case "disconnect":
-        remoteStorage.widget.view.events.disconnect(new Event(""));
-        break;
-      case "cacheReset":
-        remoteStorage.caching.reset();
-        break;
-      }
-    }
-  });
   function setState(state) {
     var actions = {
-      "connect": $("#prefRS [data-action=connect]").classList,
-      "disconnect": $("#settings [data-action=disconnect]").classList,
-      "sync": $("#settings [data-action=sync]").classList,
-      "reset": $("#settings [data-action=reset]").classList
+      "connect": $("#prefRS [data-method=connect]").classList,
+      "disconnect": $("#settings [data-method=disconnect]").classList,
+      "sync": $("#settings [data-method=sync]").classList,
+      "reset": $("#settings [data-method=reset]").classList
     };
     switch (state) {
     case "initial":
@@ -1483,9 +1443,10 @@ function initUI() {
   $('#menu').addEventListener('click', function (event) {
     var target = event.target,
         action = target.dataset.action;
-    if (action && menuActions[action]) {
+    if (action === 'toggleMenu') {
       clicked(target);
-      menuActions[action]();
+      $('#menu').classList.toggle("show");
+      document.body.classList.toggle("menu");
     }
   });
   // }}
@@ -1670,16 +1631,6 @@ window.addEventListener('load', function () {
   */
   getAll();
 
-/*
-  if (Notification && Notification.permission !== "granted") {
-    Notification.requestPermission(function (status) {
-      // This allows to use Notification.permission with Chrome/Safari
-      if (Notification.permission !== status) {
-        Notification.permission = status;
-      }
-    });
-  }
-*/
 });
 window.addEventListener('unload', function () {
   "use strict";

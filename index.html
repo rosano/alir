@@ -106,14 +106,14 @@
     <div id="rsWidget" class="hidden"></div>
     <div id="menu" class="list">
       <div class="content">
-        <p><a class="icon-plus new main" data-action="create"></a></p>
+        <p><a class="icon-plus new main" data-object="articles" data-method="create"></a></p>
         <p><a class="icon-chevron-up top detail" href="#list"></a></p>
         <p><a class="icon-chevron-left back detail" data-object="articles" data-method="hide"></a></p>
         <p><a class="icon-chevron-right back detail" data-object="articles" data-method="hide"></a></p>
-        <p><a class="icon-refresh sync" data-action="sync"></a></p>
-        <p><a class="icon-cog settings main" data-action="settings"></a></p>
-        <p><a class="icon-off onoff" data-action="onoff"></a></p>
-        <p><a class="icon-rss ifInstalled main" data-method="tileShow" data-params="feeds" ></a></p>
+        <p><a class="icon-refresh sync" data-object="alir.rs" data-method="sync"></a></p>
+        <p><a class="icon-cog settings main" data-object="tiles" data-method="show" data-params="settings"></a></p>
+        <p><a class="icon-off onoff" data-object="alir" data-method="onoff"></a></p>
+        <p><a class="icon-rss ifInstalled main" data-object="tiles" data-method="show" data-params="feeds" ></a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
         <span class="icon-refresh syncInProgress"></span>
@@ -146,14 +146,14 @@
         </fieldset>
         <p class="col2">
           <button data-action="articleSave" data-l10n-id="articleSave">Save</button>
-          <button data-method="tileShow" data-params="list" data-l10n-id="cancel">Cancel</button>
+          <button data-object="tiles" data-method="show" data-params="list" data-l10n-id="cancel">Cancel</button>
         </p>
         <fieldset class="inline text">
           <textarea rows="10" cols="40" name="text" placeholder="Content" data-l10n-id="articleContent"></textarea>
         </fieldset>
         <p class="col2">
           <button data-action="articleSave" data-l10n-id="articleSave">Save</button>
-          <button data-method="tileShow" data-params="list" data-l10n-id="cancel">Cancel</button>
+          <button data-object="tiles" data-method="show" data-params="list" data-l10n-id="cancel">Cancel</button>
         </p>
       </form>
     </div>
@@ -233,11 +233,11 @@
               </fieldset>
               <fieldset>
                 <p class="col2">
-                  <button data-l10n-id="rsConnect" data-action="connect"></button>
-                  <button data-l10n-id="rsDisconnect" data-action="disconnect"></button>
-                  <button data-l10n-id="rsSync"  data-action="sync"></button>
-                  <button data-l10n-id="rsReset" data-action="reset"></button>
-                  <button data-l10n-id="rsCache" data-action="cacheReset"></button>
+                  <button data-l10n-id="rsConnect" data-object="alir.rs" data-method="connect"></button>
+                  <button data-l10n-id="rsDisconnect" data-object="alir.rs" data-method="disconnect"></button>
+                  <button data-l10n-id="rsSync"  data-object="alir.rs" data-method="sync"></button>
+                  <button data-l10n-id="rsReset" data-object="alir.rs" data-method="reset"></button>
+                  <button data-l10n-id="rsCache" data-object="alir.rs" data-method="cacheReset"></button>
                 </p>
               </fieldset>
               <fieldset class="inline text">
@@ -258,7 +258,7 @@
               </fieldset>
               <fieldset>
                 <p>
-                  <button data-l10n-id="rsConnect" data-action="connectDropbox"></button>
+                  <button data-l10n-id="rsConnect" data-object="alir.rs" data-method="connectDropbox"></button>
                 <p>
               </fieldset>
             </fieldset>
@@ -280,7 +280,7 @@
               </fieldset>
               <fieldset>
                 <p>
-                  <button data-l10n-id="rsConnect" data-action="connectDrive"></button>
+                  <button data-l10n-id="rsConnect" data-object="alir.rs" data-method="connectDrive"></button>
                 <p>
               </fieldset>
             </fieldset>
@@ -302,9 +302,9 @@
           </div>
         </section>
         <p>
-          <button data-method="tileGo"   data-params="credits"  data-l10n-id="settingsCredits">Credits</button>
-          <button data-method="tileGo"   data-params="advanced" data-l10n-id="settingsAdvanced" data-method="tileGo">Advanced</button>
-          <button data-method="tileShow" data-params="list"     data-l10n-id="settingsDone">Ok</button>
+          <button data-object="tiles" data-method="go"   data-params="credits"  data-l10n-id="settingsCredits">Credits</button>
+          <button data-object="tiles" data-method="go"   data-params="advanced" data-l10n-id="settingsAdvanced" data-method="tileGo">Advanced</button>
+          <button data-object="tiles" data-method="show" data-params="list"     data-l10n-id="settingsDone">Ok</button>
         </p>
         <section>
           <button name="clearLog" data-l10n-id="settingsClearLog" data-method="clearLogs">Clear Log</button>
@@ -424,8 +424,8 @@
     <section data-tile="feeds">
       <header><h2 data-l10n-id="feeds">Feeds</h2></header>
       <p class="toolbar">
-        <a class="icon-chevron-left" data-method="tileShow" data-params="list"></a>
-        <a class="icon-plus" data-method="tileShow" data-params="feedEdit" ></a>
+        <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="list"></a>
+        <a class="icon-plus" data-object="tiles" data-method="show" data-params="feedEdit" ></a>
         <a class="icon-refresh" data-object="feeds" data-method="update"></a>
       </p>
       <ul id="feeds">
@@ -463,7 +463,7 @@
         </fieldset>
         <p class="col2">
           <button data-object="feeds" data-method="save" data-l10n-id="feedSave">Save</button>
-          <button data-method="tileShow" data-params="feeds" data-l10n-id="cancel">Cancel</button>
+          <button data-object="tiles" data-method="show" data-params="feeds" data-l10n-id="cancel">Cancel</button>
         </p>
         <p class="col2">
           <button data-object="feeds" data-method="test" data-l10n-id="feedTest">Test</button>
