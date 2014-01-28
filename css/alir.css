@@ -257,7 +257,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   margin-top: 3rem;
 }
 #list .current .articleMenu.folded .articleActions {
-  margin-top: calc(-100vh + 17rem);
+  margin-top: calc(-100vh + 9rem);
 }
 #list .current .content .note {
   padding: 10px;

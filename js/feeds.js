@@ -160,6 +160,9 @@ function Feeds() {
               },
               tags: ['feed', cache.title]
             };
+            if (typeof content === 'undefined') {
+              article.loaded = false;
+            }
             if (test !== true) {
               remoteStorage.alir.saveArticle(article);
             }
@@ -174,7 +177,7 @@ function Feeds() {
             window.scrap(itemUrl, function (err, res) {
               if (err) {
                 utils.log(err.toString(), 'error');
-                doSave(err.toString());
+                doSave();
               } else {
                 doSave(res.html);
               }
@@ -271,9 +274,6 @@ function Feeds() {
       if (window.confirm(_('feedShowReload'))) {
         window.scrap(url, function (err, article) {
           var obj;
-          if (err) {
-            utils.log(err.toString(), 'error');
-          }
           obj = {
             id: utils.uuid(),
             url: article.url,
@@ -285,6 +285,10 @@ function Feeds() {
             },
             tags: ['feed']
           };
+          if (err) {
+            utils.log(err.toString(), 'error');
+            obj.loaded = false;
+          }
           remoteStorage.alir.saveArticle(obj).then(function () {
             utils.log('Created : ' + obj.title, "info");
             // Hack: Article may not be really created yet, so we display it

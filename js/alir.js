@@ -29,7 +29,8 @@ var config,
     comment,
     tags = [],
     config,
-    _;
+    _,
+    displayItem;
 var $  = function (sel, root) { "use strict"; root = root || document; return root.querySelector(sel); },
     $$ = function (sel, root) { "use strict"; root = root || document; return [].slice.call(root.querySelectorAll(sel)); },
     forEvent = function (sel, event, fct) { "use strict"; Array.prototype.forEach.call(document.querySelectorAll(sel), function (elmt) { elmt.addEventListener(event, fct); }); };
@@ -258,6 +259,50 @@ function Article() {
     $('#input [name="text"]').value  = "";
     tiles.show('input');
   };
+  this.reload = function (key) {
+    remoteStorage.alir.private.getObject('article/' + key).then(function (article) {
+      if (typeof article === 'undefined') {
+        utils.log("Article not found", "error");
+      } else {
+        window.scrap(article.url, function (err, res) {
+          if (err) {
+            utils.log(err.toString(), 'error');
+          } else {
+            article.id    = key;
+            article.title = res.title;
+            article.html  = res.html;
+            remoteStorage.alir.saveArticle(article);
+          }
+        });
+      }
+    });
+  };
+  this.getAll = function () {
+    var startTime = {},
+        status = window.alir.getStatus(),
+        canReload = status.installed && status.online;
+
+    ['article', 'feed'].forEach(function (type) {
+      startTime[type] = window.performance.now();
+      remoteStorage.alir.private.getAll(type + '/').then(function (objects) {
+        utils.log(utils.format("All %s got in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
+        if (objects) {
+          Object.keys(objects).forEach(function (key) {
+            try {
+              objects[key].id = key;
+              if (type === 'article' && canReload && (objects[key].loaded === false || objects[key].title === '???')) {
+                self.reload(key);
+              }
+              displayItem(objects[key]);
+            } catch (e) {
+              utils.log(utils.format("Error on %s for key %s : %s / %s", type, key, objects[key], e.toString(), "error"));
+            }
+          });
+        }
+        utils.log(utils.format("All %s displayed in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
+      });
+    });
+  };
   this.show = function show(key) {
     if (key === currentId) {
       return;
@@ -365,6 +410,7 @@ window.link = {
       scrap(href, function (err, res) {
         if (err) {
           utils.log(err.toString(), 'error');
+          res.loaded = false;
         }
         saveScraped(res);
       });
@@ -456,6 +502,9 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
       },
       "flags": {
         "type": "object"
+      },
+      "loaded": {
+        "type": "boolean"
       }
     }
   });
@@ -594,7 +643,7 @@ function insertInList(list, selector, item, comp) {
  * @param {Object} obj
  *
  */
-function displayItem(obj) {
+displayItem = function displayItem(obj) {
   //jshint maxstatements: 35, debug: true, maxcomplexity: 20
   "use strict";
   var title = obj.title || obj.id,
@@ -635,6 +684,9 @@ function displayItem(obj) {
       flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : '',
       loaded: obj.doLoad === true
     };
+    if (data.title === '???' && data.url !== '#') {
+      data.title = data.url.replace(/\/$/, '').split('/').pop().replace(/[\W]/g, ' ');
+    }
     if (utils.trim(data.title) === '') {
       data.title = _("noTitle");
     }
@@ -722,28 +774,7 @@ function displayItem(obj) {
   }
 
   return item;
-}
-function getAll() {
-  "use strict";
-  var startTime = {};
-  ['article', 'feed'].forEach(function (type) {
-    startTime[type] = window.performance.now();
-    remoteStorage.alir.private.getAll(type + '/').then(function (objects) {
-      utils.log(utils.format("All %s got in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
-      if (objects) {
-        Object.keys(objects).forEach(function (key) {
-          try {
-            objects[key].id = key;
-            displayItem(objects[key]);
-          } catch (e) {
-            utils.log(utils.format("Error on %s for key %s : %s / %s", type, key, objects[key], e.toString(), "error"));
-          }
-        });
-      }
-      utils.log(utils.format("All %s displayed in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
-    });
-  });
-}
+};
 function initUI() {
   // jshint maxstatements: 60
   "use strict";
@@ -837,9 +868,6 @@ function initUI() {
     var actions = {
       clearLogs: function () {
         document.getElementById('debugLog').innerHTML =  "";
-      },
-      getAll: function () {
-        getAll();
       },
       inspect: function () {
         remoteStorage.inspect();
@@ -1155,24 +1183,6 @@ function initUI() {
           $('#main').classList.remove('edit');
         }());
         break;
-      case 'reload':
-        window.scrap(ce.keyNode.dataset.url, function (err, res) {
-          if (err) {
-            utils.log(err.toString(), 'error');
-          } else {
-            remoteStorage.alir.private.getObject('article/' + ce.key).then(function (article) {
-              if (typeof article === 'undefined') {
-                utils.log("Article not found", "error");
-              } else {
-                article.id    = ce.key;
-                article.title = res.title;
-                article.html  = res.html;
-                remoteStorage.alir.saveArticle(article);
-              }
-            });
-          }
-        });
-        break;
       }
     }
   });
@@ -1403,17 +1413,14 @@ function initUI() {
   setState('initial');
   $('#dropboxApiKey').addEventListener('change', function () {
     remoteStorage.setApiKeys('dropbox', {api_key: this.value});
-    //remoteStorage.widget.view.reload();
     config.dropBox.apiKey = this.value;
   });
   $('#driveClientId').addEventListener('change', function () {
     remoteStorage.setApiKeys('googledrive', {client_id: this.value, api_key: $('#driveApiKey').value});
-    //remoteStorage.widget.view.reload();
     config.google.clientId = this.value;
   });
   $('#driveApiKey').addEventListener('change', function () {
     remoteStorage.setApiKeys('googledrive', {client_id: $('#driveClientId').value, api_key: this.value});
-    //remoteStorage.widget.view.reload();
     config.google.apiKey = this.value;
   });
   $('#prefMenuLeft').addEventListener('click', function () {
@@ -1622,7 +1629,7 @@ window.addEventListener('load', function () {
     });
   }());
   */
-  getAll();
+  window.articles.getAll();
 
 });
 window.addEventListener('unload', function () {

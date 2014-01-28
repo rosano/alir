@@ -1,17 +1,18 @@
 //jshint browser: true
-/* global utils: true, remoteStorage: true */
+/* global utils: true, remoteStorage: true, _: true */
 function scrap(url, cb) {
+  //jshint maxstatements: 25
   "use strict";
   var options, xhr, status, article;
   article = {
     url: url,
     title: '???',
-    html:  '???'
+    html:  '???',
   };
   function onComplete() {
     try {
       var readable = new window.Readability(),
-          root;
+          root, parsed;
       readable.setSkipLevel(3);
       window.remote = xhr.responseXML;
       root = xhr.responseXML.getElementsByTagName('html');
@@ -38,9 +39,6 @@ function scrap(url, cb) {
   }
   function onFailed(e) {
     utils.log("Request failed : " + e, "error");
-    utils.log("Request failed : " + e.target, "error");
-    utils.log("Request failed : " + e.target.status, "error");
-    utils.log("Request failed : " + e.target.statusText, "error");
     cb('Request Failed', article);
   }
   function onCanceled(e) {
@@ -66,7 +64,7 @@ function scrap(url, cb) {
     xhr.timeout = 20000;
     xhr.onload  = onComplete;
     xhr.onerror = onFailed;
-    //xhr.addEventListener("error", onFailed, false);
+    xhr.addEventListener("error", onFailed, false);
     xhr.addEventListener("abort", onCanceled, false);
     xhr.send(null);
   } catch (e) {
@@ -88,6 +86,9 @@ function saveScraped(article) {
       },
       tags: []
     };
+    if (article.title === '???') {
+      article.loaded = false;
+    }
     remoteStorage.alir.saveArticle(obj);
     window.alert('"' + article.title + '" has been successfully saved');
     utils.log('Created : ' + article.title);
@@ -109,12 +110,11 @@ function activityHandler(activity) {
         try {
           utils.log("Scraping " + data.url);
           scrap(data.url, function (err, res) {
+            saveScraped(res);
             if (err) {
               utils.log(err.toString(), 'error');
-              saveScraped({url: data.url, title: '???', html: '???'});
               activity.postError(err);
             } else {
-              saveScraped(res);
               activity.postResult('saved');
             }
           });
