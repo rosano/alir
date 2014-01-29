@@ -90,6 +90,7 @@ function saveScraped(article) {
       article.loaded = false;
     }
     remoteStorage.alir.saveArticle(obj);
+    window.displayItem(obj);
     window.alert('"' + article.title + '" has been successfully saved');
     utils.log('Created : ' + article.title);
   } catch (e) {

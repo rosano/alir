@@ -370,6 +370,7 @@ window.Comment = function () {
           content: $('#noteEdit [name="text"]').value
         };
         remoteStorage.alir.saveArticle(article);
+        window.displayItem(article);
         tiles.back();
       }
     });
@@ -390,6 +391,7 @@ window.Comment = function () {
         } else {
           delete article.notes[noteId];
           remoteStorage.alir.saveArticle(article);
+          window.displayItem(article);
         }
       });
     }

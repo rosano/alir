@@ -272,6 +272,7 @@ function Article() {
             article.title = res.title;
             article.html  = res.html;
             remoteStorage.alir.saveArticle(article);
+            displayItem(article);
           }
         });
       }
@@ -672,6 +673,9 @@ displayItem = function displayItem(obj) {
         console.log("Wrong date : " + obj.date);
       }
     }
+    if (obj.id === window.articles.getCurrentId()) {
+      obj.doLoad = true;
+    }
     data = {
       key: obj.id,
       context: 'private',
@@ -1065,6 +1069,7 @@ function initUI() {
           article.id   = ce.key;
           article.tags = tags.filter(function (t) {return t !== ''; });
           remoteStorage.alir.saveArticle(article);
+          displayItem(article);
         }
       });
     }
@@ -1587,9 +1592,6 @@ window.addEventListener('load', function () {
       if (typeof ev.newValue.id === 'undefined') {
         ev.newValue.id = id;
       }
-      if (id === window.articles.getCurrentId()) {
-        ev.newValue.doLoad = true;
-      }
       displayItem(ev.newValue);
     } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue === 'undefined') {
       console.log("Delete " + ev.relativePath);
@@ -1602,9 +1604,6 @@ window.addEventListener('load', function () {
       console.log("Update " + ev.relativePath);
       if (typeof ev.newValue.id === 'undefined') {
         ev.newValue.id = id;
-      }
-      if (id === window.articles.getCurrentId()) {
-        ev.newValue.doLoad = true;
       }
       item = displayItem(ev.newValue);
     }

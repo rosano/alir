@@ -18,7 +18,7 @@
   <body class="online menu-left hosted">
     <div id="templates">
       <ul id="tmpl-article">
-        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags|join}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}" data-loaded="{{=loaded}}">
+        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags|join|tolowercase}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}" data-loaded="{{=loaded}}">
           <h2>
             <label class="delitem">
               <input type="checkbox" name="delitem" data-action="none" />

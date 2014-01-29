@@ -14,6 +14,7 @@ function Feeds() {
 
     function doSave(feed) {
       remoteStorage.alir.saveFeed(feed);
+      window.displayItem(feed);
       window.feeds.cache(feed);
       tiles.show('feeds');
       $('[name="url"]').value   = '';
@@ -65,7 +66,8 @@ function Feeds() {
         console.log(e);
         cb("Error : " + xhr.status + " " + e + " on " + url, {url: url});
       };
-      xhr.open('GET', url, true);
+      // Add a timestamp to bypass the cache
+      xhr.open('GET', url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), true);
       xhr.responseType = "document";
       xhr.send();
     }
@@ -165,6 +167,7 @@ function Feeds() {
             }
             if (test !== true) {
               remoteStorage.alir.saveArticle(article);
+              window.displayItem(article);
             }
             return article.id;
           }
@@ -192,6 +195,7 @@ function Feeds() {
               obj.articles = cache.articles;
               obj.date     = Date.now();
               remoteStorage.alir.saveFeed(obj);
+              window.displayItem(obj);
             }
           });
         }
