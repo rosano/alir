@@ -23,12 +23,8 @@ function Feeds() {
     }
     if (id) {
       // update
-      remoteStorage.get('/alir/feed/' + id).then(function (err, obj, contentType, revision) {
-        if (err !== 200) {
-          window.alert(err);
-          tiles.show('feeds');
-        } else {
-          obj.id    = id;
+      remoteStorage.alir.getFeed(id, function (obj) {
+        if (obj) {
           obj.url   = $('[name="url"]').value;
           obj.title = $('[name="title"]').value;
           obj.short = $('[name="feedShort"]').checked;
@@ -63,7 +59,7 @@ function Feeds() {
         cb(null, xhr.responseXML);
       };
       xhr.onerror = function (e) {
-        console.log(e);
+        utils.log(e, "warning");
         cb("Error : " + xhr.status + " " + e + " on " + url, {url: url});
       };
       // Add a timestamp to bypass the cache
@@ -87,7 +83,7 @@ function Feeds() {
       cache = _cache[url];
       utils.log('Updating feed ' + cache.title, "debug");
       if (err) {
-        console.log(err);
+        utils.log(err, "warning");
       } else {
         root = doc.getElementsByTagName('rss');
         if (root.length > 0) {
@@ -190,8 +186,8 @@ function Feeds() {
           }
         });
         if (test !== true) {
-          remoteStorage.get('/alir/feed/' + _cache[url].id).then(function (err, obj, contentType, revision) {
-            if (err === 200) {
+          remoteStorage.alir.getFeed(_cache[url].id, function (obj) {
+            if (obj) {
               obj.articles = cache.articles;
               obj.date     = Date.now();
               remoteStorage.alir.saveFeed(obj);
@@ -320,7 +316,7 @@ function Feeds() {
     try {
       utils.log("alarm fired: " + JSON.stringify(mozAlarm.data), "debug");
     } catch (e) {
-      console.log(e);
+      utils.log(e, "warning");
     }
     switch (mozAlarm.data.action) {
     case 'feedUpdate':
@@ -328,13 +324,13 @@ function Feeds() {
         self.update();
       } catch (e) {
         utils.notify("Error in updating", e.toString());
-        console.log(e);
+        utils.log(e, "warning");
       }
       try {
         window.alarms.plan();
       } catch (e) {
         utils.notify("Error in planning", e.toString());
-        console.log(e);
+        utils.log(e, "warning");
       }
     }
   };
@@ -400,11 +396,12 @@ if (navigator.mozAlarms) {
       var alarm, request;
       alarm = {
         date: date,
-        respectTimezone: 'ignoreTimezone',
+        respectTimezone: 'honorTimezone',
         data: {
           action: 'feedUpdate'
         }
       };
+      utils.log("Planning alarm at " + date, "debug");
       request = navigator.mozAlarms.add(alarm.date, alarm.respectTimezone, alarm.data);
 
       request.onsuccess = function () {

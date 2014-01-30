@@ -334,17 +334,6 @@ window.Comment = function () {
     content: $('#noteEdit [name="text"]')
   };
 
-  function load(cb) {
-    var articleId = $('#noteEdit [name="articleId"]').value;
-
-    remoteStorage.get('/alir/article/' + articleId).then(function (err, article) {
-      if (err === 200) {
-        article.id = articleId;
-      }
-      cb(err, article);
-    });
-  }
-
   this.create = function (article, path) {
     UI.article.value = article;
     UI.path.value    = path;
@@ -353,15 +342,13 @@ window.Comment = function () {
   };
 
   this.save = function () {
-    var noteId    = $('#noteEdit [name="noteId"]').value;
+    var noteId    = $('#noteEdit [name="noteId"]').value,
+        articleId = $('#noteEdit [name="articleId"]').value;
     if (!noteId) {
       noteId = utils.uuid();
     }
-    load(function (err, article) {
-      if (err !== 200) {
-        window.alert(err);
-        tiles.back();
-      } else {
+    window.articles.read(articleId, function (article) {
+      if (article) {
         if (typeof article.notes !== 'object') {
           article.notes = {};
         }
@@ -371,8 +358,8 @@ window.Comment = function () {
         };
         remoteStorage.alir.saveArticle(article);
         window.displayItem(article);
-        tiles.back();
       }
+      tiles.back();
     });
   };
   this.edit = function () {
@@ -382,16 +369,16 @@ window.Comment = function () {
     window.tiles.show('noteEdit');
   };
   this.delete = function () {
-    var noteId    = $('#noteView [name="noteId"]').value;
+    var noteId    = $('#noteView [name="noteId"]').value,
+        articleId = $('#noteEdit [name="articleId"]').value;
     if (window.confirm(_('noteConfirmDelete'))) {
-      load(function (err, article) {
-        if (err !== 200) {
-          window.alert(err);
-          tiles.back();
-        } else {
+      window.articles.read(articleId, function (article) {
+        if (article) {
           delete article.notes[noteId];
           remoteStorage.alir.saveArticle(article);
           window.displayItem(article);
+        } else {
+          tiles.back();
         }
       });
     }

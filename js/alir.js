@@ -181,7 +181,7 @@ function Alir() {
       var request = window.navigator.mozApps.installPackage("https://alir.5apps.com/package.manifest");
       request.onerror = function () {
         utils.log("Install Error : " + this.error.name, "error");
-        console.log(this.error, 'error');
+        utils.log(this.error, 'error');
       };
       request.onsuccess = function () {
         window.alert("Install successful");
@@ -259,11 +259,12 @@ function Article() {
     $('#input [name="text"]').value  = "";
     tiles.show('input');
   };
+  this.read = function (key, cb) {
+    remoteStorage.alir.getArticle(key, cb);
+  };
   this.reload = function (key) {
-    remoteStorage.alir.private.getObject('article/' + key).then(function (article) {
-      if (typeof article === 'undefined') {
-        utils.log("Article not found", "error");
-      } else {
+    window.articles.read(key, function (article) {
+      if (typeof article !== 'undefined') {
         window.scrap(article.url, function (err, res) {
           if (err) {
             utils.log(err.toString(), 'error');
@@ -324,31 +325,17 @@ function Article() {
       currentId = key;
       self.onShown();
     }
-    function displayArticle(article) {
-      elmt.parentNode.removeChild(elmt);
-      article.id = key;
-      article.doLoad = true;
-      window.displayItem(article);
-      doShow();
-    }
     if (elmt) {
       if (elmt.dataset.loaded === "true") {
         doShow();
       } else {
-        remoteStorage.alir.private.getObject('article/' + key).then(function (article) {
+        window.articles.read(key, function (article) {
           if (article) {
-            displayArticle(article);
-          } else {
-            utils.log("Unable to load article article/" + key, "error");
-            remoteStorage.alir.private.getObject('/article/' + key).then(function (article) {
-              if (article) {
-                displayArticle(article);
-              } else {
-                utils.log("Unable to load article " + key, "error");
-                doShow();
-              }
-            });
+            elmt.parentNode.removeChild(elmt);
+            article.doLoad = true;
+            window.displayItem(article);
           }
+          doShow();
         });
       }
     }
@@ -539,11 +526,37 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
     }
   });
 
+  function getObject(type, key, cb) {
+    var path = type + '/' + key;
+    remoteStorage.alir.private.getObject(path).then(function (obj) {
+      if (obj) {
+        obj.id = key;
+        cb(obj);
+      } else {
+        utils.log("Unable to load " + path, "error");
+        path = '/' + path;
+        remoteStorage.alir.private.getObject(path).then(function (obj) {
+          if (obj) {
+            obj.id = key;
+          } else {
+            utils.log("Unable to load " + path, "error");
+          }
+          cb(obj);
+        });
+      }
+    });
+  }
   return {
     exports: {
+      getArticle: function (key, cb) {
+        getObject('article', key, cb);
+      },
       saveArticle: function (article) {
         article.type = 'article';
         return privateClient.storeObject('article', 'article/' + article.id, article);
+      },
+      getFeed: function (key, cb) {
+        getObject('feed', key, cb);
       },
       saveFeed: function (feed) {
         feed.type = 'feed';
@@ -645,7 +658,7 @@ function insertInList(list, selector, item, comp) {
  *
  */
 displayItem = function displayItem(obj) {
-  //jshint maxstatements: 35, debug: true, maxcomplexity: 20
+  //jshint maxstatements: 35, debug: true, maxcomplexity: 22
   "use strict";
   var title = obj.title || obj.id,
       data  = {},
@@ -768,7 +781,7 @@ displayItem = function displayItem(obj) {
     window.feeds.cache(obj);
     break;
   default:
-    console.log("Unknown item type: " + obj.type);
+    utils.log("Unknown item type: " + obj.type, "warning");
   }
 
   if (classes.length !== 0) {
@@ -1062,11 +1075,8 @@ function initUI() {
         tags.splice(1, 0, tag);
         ce.keyNode.dataset.tags = ',' + tags.join(',').replace(',,,', ',,') + ',';
       }
-      remoteStorage.alir.private.getObject('article/' + ce.key).then(function (article) {
-        if (typeof article === "undefined") {
-          utils.log("Article not found", "error");
-        } else {
-          article.id   = ce.key;
+      window.articles.read(ce.key, function (article) {
+        if (article) {
           article.tags = tags.filter(function (t) {return t !== ''; });
           remoteStorage.alir.saveArticle(article);
           displayItem(article);
@@ -1110,10 +1120,8 @@ function initUI() {
         window.articles.hide();
         break;
       case 'compose':
-        remoteStorage.alir.private.getObject('article/' + ce.key).then(function (article) {
-          if (typeof article === 'undefined') {
-            utils.log("Article not found", "error");
-          } else {
+        window.articles.read(ce.key, function (article) {
+          if (typeof article !== 'undefined') {
             $('#input [name="id"]').value    = ce.key;
             $('#input [name="title"]').value = article.title;
             $('#input [name="url"]').value   = article.url;
@@ -1137,10 +1145,8 @@ function initUI() {
         }());
         break;
       case 'note':
-        remoteStorage.alir.private.getObject('article/' + ce.key).then(function (article) {
-          if (typeof article === 'undefined') {
-            utils.log("Article not found", "error");
-          } else {
+        window.article.read(ce.key, function (article) {
+          if (article) {
             // @TODO: sanitize
             $('#noteView .content').textContent     = article.notes[ce.noteId].content;
             $('#noteView [name="articleId"]').value = ce.key;
@@ -1295,11 +1301,8 @@ function initUI() {
 
     if (id) {
       // update
-      remoteStorage.alir.private.getObject('article/' + id).then(function (article) {
-        if (typeof article === 'undefined') {
-          utils.log("Article not found", "error");
-        } else {
-          article.id    = id;
+      window.articles.read(id, function (article) {
+        if (article) {
           article.url   = $('#input [name="url"]').value;
           article.title = $('#input [name="title"]').value;
           article.text  = $('#input [name="text"]').value;
@@ -1405,7 +1408,7 @@ function initUI() {
       actions.reset.remove("hidden");
       break;
     default:
-      console.log("unknown state " + state);
+      utils.log("unknown state " + state, "warning");
     }
   }
   remoteStorage.on('ready', function () {
@@ -1588,20 +1591,20 @@ window.addEventListener('load', function () {
     var elmt, item, id;
     id = ev.relativePath.split('/').pop();
     if (typeof ev.oldValue === 'undefined' && typeof ev.newValue !== 'undefined') {
-      console.log("Create " + ev.relativePath);
+      //console.log("Create " + ev.relativePath);
       if (typeof ev.newValue.id === 'undefined') {
         ev.newValue.id = id;
       }
       displayItem(ev.newValue);
     } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue === 'undefined') {
-      console.log("Delete " + ev.relativePath);
+      //console.log("Delete " + ev.relativePath);
       elmt = document.getElementById(id);
       if (elmt) {
         elmt.parentNode.removeChild(elmt);
       }
       delete config.bookmarks[ev.relativePath];
     } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue !== 'undefined') {
-      console.log("Update " + ev.relativePath);
+      //console.log("Update " + ev.relativePath);
       if (typeof ev.newValue.id === 'undefined') {
         ev.newValue.id = id;
       }
