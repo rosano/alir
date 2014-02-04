@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, RemoteStorage: true, HTMLtoXML: true, Gesture: true, template: true, Tiles: true, utils: true, Showdown: true, Event: true, scrap: true, saveScraped: true */
+/*global remoteStorage: true, RemoteStorage: true, Gesture: true, tiles: true, utils: true, Event: true, scrap: true, saveScraped: true, $:true, $$: true */
 /*exported: alir */
 /**
     Alir
@@ -25,15 +25,7 @@
  */
 
 var config,
-    tiles,
-    comment,
-    tags = [],
-    config,
-    _,
-    displayItem;
-var $  = function (sel, root) { "use strict"; root = root || document; return root.querySelector(sel); },
-    $$ = function (sel, root) { "use strict"; root = root || document; return [].slice.call(root.querySelectorAll(sel)); },
-    forEvent = function (sel, event, fct) { "use strict"; Array.prototype.forEach.call(document.querySelectorAll(sel), function (elmt) { elmt.addEventListener(event, fct); }); };
+    _;
 config = {
   gesture: false,
   vibrate: false,
@@ -56,10 +48,22 @@ config = {
     fontSize: 1
   }
 };
-
-tiles = new Tiles();
-comment = new window.Comment();
-
+function displayItem(item) {
+  "use strict";
+  if (typeof item !== 'object') {
+    utils.log("Trying to display undefined item", "error");
+  }
+  switch (item.type) {
+  case 'article':
+    window.articles.display(item);
+    break;
+  case 'feed':
+    window.feeds.display(item);
+    break;
+  default:
+    utils.log(utils.format("Unable to display item %s of type %s", item.id, item.type), "error");
+  }
+}
 function Alir() {
   "use strict";
   var self = this,
@@ -204,6 +208,33 @@ function Alir() {
       };
     }());
   };
+  this.getAll = function () {
+    var startTime = {},
+        status = window.alir.getStatus(),
+        canReload = status.installed && status.online;
+
+    ['article', 'feed'].forEach(function (type) {
+      startTime[type] = window.performance.now();
+      remoteStorage.alir.private.getAll(type + '/').then(function (objects) {
+        utils.log(utils.format("All %s got in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
+        if (objects) {
+          Object.keys(objects).forEach(function (key) {
+            try {
+              objects[key].id   = key;
+              objects[key].type = type;
+              if (type === 'article' && canReload && (objects[key].loaded === false || objects[key].title === '???')) {
+                self.reload(key);
+              }
+              displayItem(objects[key]);
+            } catch (e) {
+              utils.log(utils.format("Error on %s for key %s : %s / %s", type, key, objects[key], e.toString(), "error"));
+            }
+          });
+        }
+        utils.log(utils.format("All %s displayed in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
+      });
+    });
+  };
   this.rs = {
     "connect": function () {
       remoteStorage.widget.view.form.userAddress.value = $('#rsLogin').value;
@@ -232,145 +263,8 @@ function Alir() {
 window.alir = new Alir();
 window.alir.on('statusUpdated', function (status) {
   "use strict";
-  console.log(status);
+  //console.log(status);
 });
-
-function Article() {
-  "use strict";
-  var self = this,
-      currentId/*,
-      currentElmt*/;
-
-  window.tiles.on('shown', function (tile, name) {
-    if (name === 'list' && typeof currentId !== 'undefined') {
-      self.onShown(currentId());
-    }
-  });
-  this.setCurrentId = function setCurrentId(current) {
-    currentId = current;
-  };
-  this.getCurrentId = function getCurrentId() {
-    return currentId;
-  };
-  this.create = function () {
-    $('#input [name="id"]').value    = "";
-    $('#input [name="url"]').value   = "";
-    $('#input [name="title"]').value = "";
-    $('#input [name="text"]').value  = "";
-    tiles.show('input');
-  };
-  this.read = function (key, cb) {
-    remoteStorage.alir.getArticle(key, cb);
-  };
-  this.reload = function (key) {
-    window.articles.read(key, function (article) {
-      if (typeof article !== 'undefined') {
-        window.scrap(article.url, function (err, res) {
-          if (err) {
-            utils.log(err.toString(), 'error');
-          } else {
-            article.id    = key;
-            article.title = res.title;
-            article.html  = res.html;
-            remoteStorage.alir.saveArticle(article);
-            displayItem(article);
-          }
-        });
-      }
-    });
-  };
-  this.getAll = function () {
-    var startTime = {},
-        status = window.alir.getStatus(),
-        canReload = status.installed && status.online;
-
-    ['article', 'feed'].forEach(function (type) {
-      startTime[type] = window.performance.now();
-      remoteStorage.alir.private.getAll(type + '/').then(function (objects) {
-        utils.log(utils.format("All %s got in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
-        if (objects) {
-          Object.keys(objects).forEach(function (key) {
-            try {
-              objects[key].id = key;
-              if (type === 'article' && canReload && (objects[key].loaded === false || objects[key].title === '???')) {
-                self.reload(key);
-              }
-              displayItem(objects[key]);
-            } catch (e) {
-              utils.log(utils.format("Error on %s for key %s : %s / %s", type, key, objects[key], e.toString(), "error"));
-            }
-          });
-        }
-        utils.log(utils.format("All %s displayed in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
-      });
-    });
-  };
-  this.show = function show(key) {
-    if (key === currentId) {
-      return;
-    }
-    var elmt = document.getElementById(key);
-    function doShow() {
-      var clItem  = $('[data-key="' + key + '"]').classList,
-          clMenu  = $('#menu').classList,
-          clList  = $('#main').classList;
-      clMenu.add("detail");
-      clMenu.remove("list");
-      clList.add("detail");
-      clList.remove("list");
-      clList.remove("edit");
-      clItem.add('current');
-      clItem.add('read');
-
-      currentId = key;
-      self.onShown();
-    }
-    if (elmt) {
-      if (elmt.dataset.loaded === "true") {
-        doShow();
-      } else {
-        window.articles.read(key, function (article) {
-          if (article) {
-            elmt.parentNode.removeChild(elmt);
-            article.doLoad = true;
-            window.displayItem(article);
-          }
-          doShow();
-        });
-      }
-    }
-  };
-  this.onShown = function onShown() {
-    document.querySelector('li.current .articleMenu').classList.add('folded');
-    $('#menu .content .top').href = '#' + currentId;
-    if (config.bookmarks[currentId]) {
-      window.setTimeout(function () {
-        window.scrollTo(0, config.bookmarks[currentId] * $('#list').clientHeight);
-      }, 100);
-    } else {
-      window.scrollTo(0, 0);
-    }
-    location.hash = currentId;
-  };
-  this.hide = function hide() {
-    var clMenu  = $('#menu').classList,
-        clMain  = $('#main').classList,
-        current = $('#list > .current');
-    if (current && current.id) {
-      config.bookmarks[current.id] = window.scrollY / $('#list').clientHeight;
-      current.classList.remove('current');
-      current.scrollIntoView();
-    }
-    clMenu.remove("detail");
-    clMenu.add("list");
-    clMenu.remove('show');
-    clMain.remove("detail");
-    clMain.add("list");
-    window.articles.setCurrentId();
-    location.hash = '';
-  };
-}
-window.articles = new Article();
 
 window.link = {
   open: function () {
@@ -573,225 +467,6 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
     }
   };
 });
-/**
- * Convert a string into a DOM tree
- *
- * @param {String} str
- *
- * @return {DOMNode}
- *
- * @TODO Improve sanitizing
- */
-function toDom(str, fullUrl) {
-  /*jshint newcap: false*/
-  "use strict";
-  var fragment = document.createDocumentFragment(),
-      sandbox  = document.createElement('div'),
-      domain   = new RegExp("((http.?://[^/]+).*/)([^?]*).?(.*$)").exec(fullUrl),
-      domainUrl, baseUrl;
-  if (domain !== null) {
-    domainUrl = domain[2];
-    baseUrl   = domain[1];
-  } else {
-    domainUrl = '';
-    baseUrl   = '';
-  }
-  fragment.appendChild(sandbox);
-  try {
-    sandbox.innerHTML = HTMLtoXML(str);
-  } catch (e) {
-    //console.log('Error sanityzing: ', e);
-    //@FIXME Unsecure !
-    sandbox.innerHTML = str;
-    //return _('contentError');
-  }
-  Array.prototype.forEach.call(sandbox.querySelectorAll('script, style', 'frame', 'iframe'), function (e) {
-    e.parentNode.removeChild(e);
-  });
-  ['class', 'id', 'style', 'onclick', 'onload'].forEach(function (attr) {
-    Array.prototype.forEach.call(sandbox.querySelectorAll('* [' + attr + ']'), function (e) {
-      e.removeAttribute(attr);
-    });
-  });
-  Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]'), function (e) {
-    e.setAttribute('target', '_blank');
-  });
-  Array.prototype.forEach.call(sandbox.querySelectorAll('* img:not([src^=http])'), function (e) {
-    var src = e.getAttribute('src');
-    if (src.substr(0, 1) === '/') {
-      e.setAttribute('src', domainUrl + src);
-    } else {
-      e.setAttribute('src', baseUrl + src);
-    }
-  });
-  Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]:not([href^=http])'), function (e) {
-    var src = e.getAttribute('href');
-    if (src) {
-      if (src.substr(0, 1) === '/') {
-        e.setAttribute('href', domainUrl + src);
-      } else {
-        e.setAttribute('href', baseUrl + src);
-      }
-    }
-  });
-  return sandbox.innerHTML;
-}
-function insertInList(list, selector, item, comp) {
-  "use strict";
-  var nextNode;
-  Array.prototype.slice.call(list.querySelectorAll(selector)).some(function (e) {
-    if (comp(e)) {
-      nextNode = e;
-      return true;
-    }
-  });
-  if (typeof nextNode === 'undefined') {
-    list.appendChild(item);
-  } else {
-    list.insertBefore(item, nextNode);
-  }
-}
-/**
- * Add an item to the content list
- *
- * @param {Object} obj
- *
- */
-displayItem = function displayItem(obj) {
-  //jshint maxstatements: 35, debug: true, maxcomplexity: 22
-  "use strict";
-  var title = obj.title || obj.id,
-      data  = {},
-      item,
-      classes = [];
-  if (typeof obj.type === "undefined") {
-    obj.type = "article";
-  }
-  item = document.getElementById(obj.id);
-  if (item) {
-    classes = [].slice.call(item.classList);
-    item.parentNode.removeChild(item);
-  }
-  switch (obj.type) {
-  case 'article':
-    if (typeof obj.notes !== 'object') {
-      obj.notes = {};
-    }
-    if (typeof obj.date === 'undefined') {
-      obj.date = utils.getDate();
-    } else {
-      try {
-        obj.date = utils.getDate(obj.date);
-      } catch (e) {
-        console.log("Wrong date : " + obj.date);
-      }
-    }
-    if (obj.id === window.articles.getCurrentId()) {
-      obj.doLoad = true;
-    }
-    data = {
-      key: obj.id,
-      context: 'private',
-      hasNotes: Object.keys(obj.notes).length > 0 ? 'hasNotes' : '',
-      title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-      url: obj.url || '#',
-      date: obj.date,
-      tags: Array.isArray(obj.tags) ? obj.tags : [],
-      notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
-      flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : '',
-      loaded: obj.doLoad === true
-    };
-    if (data.title === '???' && data.url !== '#') {
-      data.title = data.url.replace(/\/$/, '').split('/').pop().replace(/[\W]/g, ' ');
-    }
-    if (utils.trim(data.title) === '') {
-      data.title = _("noTitle");
-    }
-    // in order not to create huge DOM, we only display article content
-    // when explicitely asked
-    if (obj.doLoad === true) {
-      if (obj.html) {
-        data.type = 'html';
-        data.content = toDom(obj.html, obj.url);
-      } else {
-        data.type = 'text';
-        data.content = obj.text;
-      }
-    } else {
-      data.type = 'none';
-      data.content = '';
-    }
-    item = template('tmpl-article', data);
-    // Notes {{
-    if (typeof obj.notes === 'object') {
-      Object.keys(obj.notes).forEach(function (noteId, i) {
-        var note = obj.notes[noteId],
-            target,
-            container,
-            a;
-        container = document.createElement('div');
-        container.appendChild(item);
-        try {
-          target = document.evaluate(note.xpath, container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        } catch (e) {
-          console.log("Unable to evaluate XPath " + note.xpath + ' : ' + e);
-        }
-        if (target) {
-          a = document.createElement('a');
-          a.setAttribute('class', 'note icon-tag');
-          a.setAttribute('data-note', noteId);
-          a.setAttribute('href', '#' + obj.id + '/' + noteId);
-          target.insertBefore(a, target.firstChild);
-        } else {
-          console.log("Unable to evaluate XPath " + note.xpath);
-        }
-      });
-    }
-    // }}
-    // Tags {{
-    if (Array.isArray(obj.tags) && obj.tags.length > 0) {
-      obj.tags.forEach(function (tag) {
-        if (tags.indexOf(tag) === -1) {
-          tags.push(tag);
-          (function (tag) {
-            var elmt = document.createElement('li');
-            elmt.dataset.tag = tag;
-            elmt.textContent = tag;
-            insertInList(document.getElementById('tagList'), "li", elmt, function (e) { return (e.dataset.tag.toLowerCase() > tag.toLowerCase()); });
-          })(tag);
-        }
-      });
-    }
-    // }}
-    // Sort items by date {{
-    // @TODO allow multiple sorts
-    insertInList(document.getElementById('list'), "[data-key]", item, function (e) { return (e.dataset.date < obj.date); });
-    // }}
-    break;
-  case 'feed':
-    data = {
-      key: obj.id,
-      context: 'private',
-      title: title,
-      url: obj.url
-    };
-    item = template('tmpl-feed', data);
-    insertInList(document.getElementById('feeds'), "[data-key]", item, function (e) { return (e.dataset.title.toLowerCase() > title.toLowerCase()); });
-    // update feed cache
-    window.feeds.cache(obj);
-    break;
-  default:
-    utils.log("Unknown item type: " + obj.type, "warning");
-  }
-
-  if (classes.length !== 0) {
-    classes.forEach(function (cl) {
-      item.classList.add(cl);
-    });
-  }
-
-  return item;
-};
 function initUI() {
   // jshint maxstatements: 60
   "use strict";
@@ -934,13 +609,6 @@ function initUI() {
             }
           }
         }
-        /*,
-        {
-          sel: "",
-          action: function (elmt) {
-          }
-        }
-        */
       ];
       listeners.forEach(function (listener) {
         if (utils.match(ev.target, listener.sel)) {
@@ -993,10 +661,6 @@ function initUI() {
   })();
   // }}
 
-  $$('#menu .content [data-action]').forEach(function () {
-    var elmt = arguments[0];
-    UI.menu[elmt.dataset.action] = elmt;
-  });
   remoteStorage.on("wire-busy", function (e) {
     document.body.classList.add('sync');
   });
@@ -1032,178 +696,13 @@ function initUI() {
     }
 
   });
-  function onContentEvent(event) {
-    var target = event.target,
-        ce, parent;
-    ce = {
-      action: target.dataset.action,
-      actionTarget: target.dataset.target,
-      keyNode: target
-    };
-    while (ce.keyNode.id !== 'main' && typeof ce.keyNode.dataset.key === 'undefined' && ce.keyNode.parentNode) {
-      if (typeof ce.action === 'undefined' && typeof ce.keyNode.action !== 'undefined' && typeof ce.dataset !== 'undefined') {
-        ce.action       = ce.dataset.action;
-        ce.actionTarget = ce.dataset.target;
-      }
-      ce.keyNode = ce.keyNode.parentNode;
-    }
-    if (typeof ce.keyNode.dataset.key !== 'undefined') {
-      ce.key = ce.keyNode.dataset.key;
-    }
-    parent = target;
-    while (parent.id !== 'main' && (typeof parent.dataset === 'undefined' || typeof parent.dataset.context === 'undefined') && parent.parentNode) {
-      parent = parent.parentNode;
-    }
-    ce.context = parent.dataset.context;
-    if (target.dataset.note) {
-      ce.action = 'note';
-      ce.noteId = target.dataset.note;
-    }
-    return ce;
-  }
-  UI.main.addEventListener('click', function onClick(event) {
-    //jshint maxcomplexity: 20
-    var ce = onContentEvent(event),
-        elmt;
-    function switchTag(tag) {
-      var tags = ce.keyNode.dataset.tags.split(',').filter(function (e) { return e !== ''; }),
-          i    = tags.indexOf(tag);
-      if (i !== -1) {
-        tags.splice(i, 1);
-        ce.keyNode.dataset.tags = ',' + tags.join(',') + ',';
-      } else {
-        tags.splice(1, 0, tag);
-        ce.keyNode.dataset.tags = ',' + tags.join(',').replace(',,,', ',,') + ',';
-      }
-      window.articles.read(ce.key, function (article) {
-        if (article) {
-          article.tags = tags.filter(function (t) {return t !== ''; });
-          remoteStorage.alir.saveArticle(article);
-          displayItem(article);
-        }
-      });
-    }
-    if (ce.action) {
-      clicked(event.target);
-      switch (ce.action) {
-      case 'none':
-        break;
-      case 'menu':
-        $('li.current .articleMenu').classList.toggle('folded');
-        break;
-      case 'archive':
-        switchTag('archive');
-        break;
-      case 'star':
-        switchTag('star');
-        break;
-      case 'filterArchive':
-        $('#main').classList.toggle('archives');
-        break;
-      case 'filterFeed':
-        $('#main').classList.toggle('feeds');
-        break;
-      case 'filterStar':
-        $('#main').classList.toggle('stars');
-        break;
-      case 'delete':
-        if (window.confirm(_('confirmDelete'))) {
-          //@FIXME
-          remoteStorage.alir[ce.context].remove('/article/' + ce.key);
-          remoteStorage.alir[ce.context].remove('article/' + ce.key);
-          delete config.bookmarks[ce.key];
-          elmt = document.getElementById(ce.key);
-          if (elmt) {
-            elmt.classList.add('hidden');
-          }
-        }
-        window.articles.hide();
-        break;
-      case 'compose':
-        window.articles.read(ce.key, function (article) {
-          if (typeof article !== 'undefined') {
-            $('#input [name="id"]').value    = ce.key;
-            $('#input [name="title"]').value = article.title;
-            $('#input [name="url"]').value   = article.url;
-            $('#input [name="text"]').value  = article.text;
-            tiles.show('input');
-          }
-        });
-        break;
-      case 'share':
-        (function () {
-          var request = new window.MozActivity({
-            name: "share",
-            data: {
-              type: "url",
-              url: ce.keyNode.dataset.url
-            }
-          });
-          request.onerror = function () {
-            window.alert("Error sharing : " + request.error.name);
-          };
-        }());
-        break;
-      case 'note':
-        window.article.read(ce.key, function (article) {
-          if (article) {
-            // @TODO: sanitize
-            $('#noteView .content').textContent     = article.notes[ce.noteId].content;
-            $('#noteView [name="articleId"]').value = ce.key;
-            $('#noteView [name="noteId"]').value    = ce.noteId;
-            $('#noteView [name="xpath"]').value     = article.notes[ce.noteId].xpath;
-            tiles.go('noteView');
-          }
-        });
-        break;
-      case 'addTag':
-        (function () {
-          tiles.go('tagTile', function (tag) {
-            if (typeof tag !== 'undefined') {
-              if (tag !== null) {
-                switchTag(tag);
-              }
-            }
-          });
-        })();
-        break;
-      case 'deleteTag':
-        switchTag(ce.actionTarget);
-        break;
-      case 'editArticles':
-        $('#main').classList.toggle('edit');
-        break;
-      case 'deleteArticles':
-        (function () {
-          var toDel = $$('#list h2 .delitem input:checked');
-          if (toDel.length > 0) {
-            if (window.confirm(_('articlesDelete', {nb: toDel.length}))) {
-              toDel.forEach(function (elmt) {
-                var key = utils.parent(elmt, function (e) { return typeof e.dataset.key !== 'undefined'; });
-                if (key) {
-                  key.classList.add('hidden');
-                  key = key.dataset.key;
-                  //@FIXME
-                  remoteStorage.alir.private.remove('/article/' + key);
-                  remoteStorage.alir.private.remove('article/' + key);
-                  delete config.bookmarks[key];
-                }
-              });
-            }
-          }
-          $('#main').classList.remove('edit');
-        }());
-        break;
-      }
-    }
-  });
   /**
    * Display the tile to add a note
    */
   function doNote(event) {
-    var ce = onContentEvent(event);
-    if (ce.key) {
-      comment.create(ce.key, createXPathFromElement(event.target));
+    var res = utils.parent(event.target, function (el) { return typeof el.dataset.key !== 'undefined'; });
+    if (res !== null) {
+      window.comment.create(res.dataset.key, createXPathFromElement(event.target));
     }
   }
   if ("ontouchstart" in window) {
@@ -1294,44 +793,6 @@ function initUI() {
       }
     });
   }());
-  // input {{
-  forEvent('#input [data-action="articleSave"]', 'click', function () {
-    var id = $('#input [name="id"]').value,
-        obj;
-
-    if (id) {
-      // update
-      window.articles.read(id, function (article) {
-        if (article) {
-          article.url   = $('#input [name="url"]').value;
-          article.title = $('#input [name="title"]').value;
-          article.text  = $('#input [name="text"]').value;
-          article.html  = new Showdown.converter().makeHtml(article.text);
-          article.date  = Date.now();
-          remoteStorage.alir.saveArticle(article);
-          displayItem(article);
-          tiles.show('list');
-        }
-      });
-    } else {
-      // create
-      obj = {
-        id: utils.uuid(),
-        url:   $('#input [name="url"]').value,
-        title: $('#input [name="title"]').value,
-        text:  $('#input [name="text"]').value,
-        html:  new Showdown.converter().makeHtml($('#input [name="text"]').value),
-        date:  Date.now(),
-        flags: {
-          editable: true
-        },
-        tags: ['note']
-      };
-      remoteStorage.alir.saveArticle(obj);
-      displayItem(obj);
-      tiles.show('list');
-    }
-  });
   // }}
   // Tags {{
   (function () {
@@ -1351,33 +812,12 @@ function initUI() {
   // }}
   // Filters {{
   (function () {
-    var dynamicSheet = document.getElementById('dynamicCss').sheet,
-        filter = document.getElementById('listFilter');
-    function onFilterChange() {
-      var filterVal = filter.value.toLowerCase();
-      while (dynamicSheet.cssRules[0]) {
-        dynamicSheet.deleteRule(0);
-      }
-      if (utils.trim(filterVal) !== '') {
-        dynamicSheet.insertRule("#main.list #list > li[data-tags] { display: none !important; }", 0);
-        dynamicSheet.insertRule('#main.list #list > li[data-tags*="' + filterVal + '"], #main.list #list > li[data-title*="' + filterVal + '"] { display: block !important; }', 1);
-      }
-    }
-    filter.addEventListener("keyup", onFilterChange);
-    filter.addEventListener("change", onFilterChange);
+    var filter = document.getElementById('listFilter');
+    filter.addEventListener("input", window.articles.ui.updateFilter);
+    filter.addEventListener("change", window.articles.ui.updateFilter);
     document.querySelector("#listFilter + button").addEventListener("click", function () {
       filter.value = '';
-      onFilterChange();
-    });
-    document.querySelector("#main .filters [data-action=addFilterTag]").addEventListener("click", function () {
-      tiles.go('tagTile', function (tag) {
-        if (typeof tag !== 'undefined') {
-          if (tag !== null) {
-            filter.value = tag;
-            onFilterChange();
-          }
-        }
-      });
+      window.articles.ui.updateFilter();
     });
   }());
   // }}
@@ -1595,6 +1035,9 @@ window.addEventListener('load', function () {
       if (typeof ev.newValue.id === 'undefined') {
         ev.newValue.id = id;
       }
+      if (typeof ev.newValue.type === 'undefined') {
+        ev.newValue.type = ev.relativePath.split('/').shift();
+      }
       displayItem(ev.newValue);
     } else if (typeof ev.oldValue !== 'undefined' && typeof ev.newValue === 'undefined') {
       //console.log("Delete " + ev.relativePath);
@@ -1607,6 +1050,9 @@ window.addEventListener('load', function () {
       //console.log("Update " + ev.relativePath);
       if (typeof ev.newValue.id === 'undefined') {
         ev.newValue.id = id;
+      }
+      if (typeof ev.newValue.type === 'undefined') {
+        ev.newValue.type = ev.relativePath.split('/').shift();
       }
       item = displayItem(ev.newValue);
     }
@@ -1631,7 +1077,7 @@ window.addEventListener('load', function () {
     });
   }());
   */
-  window.articles.getAll();
+  window.alir.getAll();
 
 });
 window.addEventListener('unload', function () {

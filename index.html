@@ -21,7 +21,7 @@
         <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags|join|tolowercase}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}" data-loaded="{{=loaded}}">
           <h2>
             <label class="delitem">
-              <input type="checkbox" name="delitem" data-action="none" />
+              <input type="checkbox" name="delitem" />
             </label>
             <a data-object="articles" data-method="show" data-params="{{=key}}">
               <span class="icon-comment hasNotes"></span>
@@ -31,22 +31,22 @@
               <span class="title">{{=title}}</span>
             </a>
           </h2>
-          <div class="articleMenu">
-            <p><a class="icon-reorder" data-action="menu"></a></p>
+          <div class="articleMenu folded">
+            <p><a class="icon-reorder" data-object="articles.ui" data-method="menu"></a></p>
             <div class="articleActions">
-              <p><a class="icon-chevron-left" data-object="articles" data-method="hide" ></a></p>
-              <p><a class="icon-inbox archive" data-action="archive" ></a></p>
-              <p><a class="icon-star star" data-action="star" ></a></p>
-              <p><a class="icon-trash" data-action="delete" ></a></p>
-              <p><a class="icon-tags" data-action="addTag" ></a></p>
-              <p><a class="icon-pencil compose" data-action="compose" ></a></p>
-              <p><a class="icon-share ifInstalled" data-action="share" ></a></p>
-              <p><a class="icon-refresh ifInstalled" data-object="articles" data-method="reload" data-params="{{=key}}"></a></p>
+              <p><a class="icon-chevron-left"        data-object="articles" data-method="hide"      data-params="{{=key}}"></a></p>
+              <p><a class="icon-inbox archive"       data-object="articles" data-method="switchTag" data-params="{{=key}},archive" ></a></p>
+              <p><a class="icon-star star"           data-object="articles" data-method="switchTag" data-params="{{=key}},star" ></a></p>
+              <p><a class="icon-trash"               data-object="articles" data-method="delete"    data-params="{{=key}}"></a></p>
+              <p><a class="icon-tags"                data-object="articles" data-method="addTag"    data-params="{{=key}}"></a></p>
+              <p><a class="icon-pencil compose"      data-object="articles" data-method="edit"      data-params="{{=key}}"></a></p>
+              <p><a class="icon-refresh ifInstalled" data-object="articles" data-method="reload"    data-params="{{=key}}"></a></p>
+              <p><a class="icon-share ifInstalled"   data-object="articles" data-method="share"     data-params="{{=key}}"></a></p>
             </div>
           </div>
           <div class="toolbar">
             <a class="icon-chevron-left" data-object="articles" data-method="hide" ></a>
-            <a class="icon-trash" data-action="delete" ></a>
+            <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}}"></a>
           </div>
           <div class="content">
             <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
@@ -60,13 +60,13 @@
           </div>
           <div class="toolbar">
             <a class="icon-chevron-left" data-object="articles" data-method="hide" ></a>
-            <a class="icon-trash" data-action="delete" ></a>
+            <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}}" ></a>
           </div>
         </li>
       </ul>
       <div id="tmpl-tag">
         <div class="tag">
-          <span class="icon-remove" data-action="deleteTag" data-target="{{=tags}}"></span>
+          <span class="icon-remove" data-object="articles" data-method="switchTag" data-params="{{=../key}},{{=tags}}"></span>
           <span>{{=tags}}</span>
         </div>
       </div>
@@ -145,26 +145,26 @@
           </p>
         </fieldset>
         <p class="col2">
-          <button data-action="articleSave" data-l10n-id="articleSave">Save</button>
+          <button data-object="articles" data-method="save" data-l10n-id="articleSave">Save</button>
           <button data-object="tiles" data-method="show" data-params="list" data-l10n-id="cancel">Cancel</button>
         </p>
         <fieldset class="inline text">
           <textarea rows="10" cols="40" name="text" placeholder="Content" data-l10n-id="articleContent"></textarea>
         </fieldset>
         <p class="col2">
-          <button data-action="articleSave" data-l10n-id="articleSave">Save</button>
+          <button data-object="articles" data-method="save" data-l10n-id="articleSave">Save</button>
           <button data-object="tiles" data-method="show" data-params="list" data-l10n-id="cancel">Cancel</button>
         </p>
       </form>
     </div>
     <div id="main" class="list" data-tile="list">
       <form class="filters">
-        <a class="icon-inbox archive" data-action="filterArchive" ></a>
-        <a class="icon-rss feed" data-action="filterFeed" ></a>
-        <a class="icon-star star" data-action="filterStar" ></a>
-        <a class="icon-tags tags" data-action="addFilterTag" ></a>
-        <a class="icon-pencil edit" data-action="editArticles" ></a>
-        <a class="icon-trash delete" data-action="deleteArticles" ></a>
+        <a class="icon-inbox archive" data-object="articles.ui" data-method="filterArchive" ></a>
+        <a class="icon-rss feed"      data-object="articles.ui" data-method="filterFeed" ></a>
+        <a class="icon-star star"     data-object="articles.ui" data-method="filterStar" ></a>
+        <a class="icon-tags tags"     data-object="articles.ui" data-method="addFilterTag" ></a>
+        <a class="icon-pencil edit"   data-object="articles.ui" data-method="editArticles" ></a>
+        <a class="icon-trash delete"  data-object="articles.ui" data-method="deleteArticles" ></a>
         <fieldset class="inline text compact">
           <p>
             <input type="text" name="listFilter" id="listFilter" placeholder="Filter" data-l10n-id="listFilter" />
@@ -329,7 +329,7 @@
         <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
         <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
         <button data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
-        <button data-object="articles" data-method="getAll" data-l10n-id="settingsReload">Reload</button>
+        <button data-object="alir" data-method="getAll" data-l10n-id="settingsReload">Reload</button>
         <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
       </p>
     </div>
@@ -339,6 +339,7 @@
         <input type="hidden" name="articleId" />
         <input type="hidden" name="noteId" />
         <input type="hidden" name="xpath" />
+        <input type="hidden" name="text" />
       </form>
       <div class="content">
       </div>
@@ -480,7 +481,6 @@
     <script type="text/javascript" src="js/utils.js"></script>
     <script type="text/javascript" src="js/touch.js"></script>
     -->
-    <script type="text/javascript" src="js/feeds.js"></script>
     <script type="text/javascript" src="js/alir.js"></script>
   </body>
 </html>

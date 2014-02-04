@@ -1,11 +1,47 @@
 //jshint browser: true
-/* global remoteStorage: true, template: true, tiles: true, utils: true, _: true, $:true */
+/* global remoteStorage: true, tiles: true, utils: true, _: true, View: true, $:true */
 function Feeds() {
   "use strict";
   var _cache = {},
       self = this;
   this.cache = function (obj) {
     _cache[obj.url] = obj;
+  };
+  /**
+   * Display feed item
+   *
+   * @param {Object} obj
+   *
+   */
+  this.display = function (obj) {
+    //jshint maxstatements: 35, debug: true, maxcomplexity: 22
+    var title = obj.title || obj.id,
+        data  = {},
+        item,
+        classes = [];
+    item = document.getElementById(obj.id);
+    if (item) {
+      classes = [].slice.call(item.classList);
+      item.parentNode.removeChild(item);
+    }
+    data = {
+      key: obj.id,
+      context: 'private',
+      title: title,
+      url: obj.url
+    };
+    item = View.template('tmpl-feed', data);
+    View.insertInList(document.getElementById('feeds'), "[data-key]", item, function (e) { return (e.dataset.title.toLowerCase() > title.toLowerCase()); });
+    // update feed cache
+    window.feeds.cache(obj);
+
+    if (classes.length !== 0) {
+      classes.forEach(function (cl) {
+        item.classList.add(cl);
+      });
+    }
+
+    return item;
   };
   this.save = function () {
     var $  = tiles.$('feedEdit'),
@@ -14,7 +50,7 @@ function Feeds() {
 
     function doSave(feed) {
       remoteStorage.alir.saveFeed(feed);
-      window.displayItem(feed);
+      window.feeds.display(feed);
       window.feeds.cache(feed);
       tiles.show('feeds');
       $('[name="url"]').value   = '';
@@ -74,6 +110,7 @@ function Feeds() {
           format = 'atom',
           cache;
       if (typeof _cache[url] === 'undefined') {
+        // @FIXME we should load the cache instead
         _cache[url] = {
           'articles': {},
           'short': false,
@@ -163,7 +200,7 @@ function Feeds() {
             }
             if (test !== true) {
               remoteStorage.alir.saveArticle(article);
-              window.displayItem(article);
+              window.articles.display(article);
             }
             return article.id;
           }
@@ -191,7 +228,7 @@ function Feeds() {
               obj.articles = cache.articles;
               obj.date     = Date.now();
               remoteStorage.alir.saveFeed(obj);
-              window.displayItem(obj);
+              window.feeds.display(obj);
             }
           });
         }
@@ -237,7 +274,7 @@ function Feeds() {
     });
     feed.items.sort(function (a, b) {return a.updated > b.updated ? -1 : 1; });
     parent.innerHTML = '';
-    parent.appendChild(template('tmpl-feed-detail', feed));
+    parent.appendChild(View.template('tmpl-feed-detail', feed));
     tiles.go('feedShow');
   };
   this.delete = function (url) {
@@ -293,7 +330,7 @@ function Feeds() {
             utils.log('Created : ' + obj.title, "info");
             // Hack: Article may not be really created yet, so we display it
             obj.doLoad = true;
-            window.displayItem(obj);
+            window.articles.display(obj);
             tiles.go('list');
             window.articles.show(obj.id);
           });

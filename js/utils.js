@@ -1,5 +1,5 @@
 //jshint browser: true
-/*global $:true, RemoteStorage: true */
+/*global RemoteStorage: true */
 var matchesSelector = document.documentElement.matches ||
                       document.documentElement.matchesSelector ||
                       document.documentElement.webkitMatchesSelector ||
@@ -173,7 +173,7 @@ var utils = {
   }
 };
 
-window.Tiles = function (global) {
+var Tiles = function (global) {
   "use strict";
   RemoteStorage.eventHandling(this, "shown");
   var current,
@@ -234,154 +234,4 @@ window.Tiles = function (global) {
     return function (sel) { return root.querySelector(sel); };
   };
 };
-
-/**
- * My own mini-templating system
- *
- * @param {String} sel  selector of the template
- * @param {Object} data data to populate the template
- *
- * @return {DOMDocumentFragment}
- */
-window.template = function template(sel, data) {
-  "use strict";
-  var re  = new RegExp("{{([=#].*?)}}", 'g'),
-      frag,
-      xpathResult,
-      i, elmt, attr/*,
-      startTime = window.performance.now()*/;
-  function getData(path, val) {
-    var res = val, expr;
-    if (path !== '.') {
-      expr = path.split('.');
-      while (res && expr.length > 0) {
-        res = res[expr.shift()];
-      }
-    }
-    if (typeof res === 'undefined') {
-      console.log("UNDEFINED", path, val);
-    }
-    return res;
-  }
-  function repl(match) {
-    var res, tmp, fct, type, value;
-    type = match[2];
-    match = match.substr(3, match.length - 5);
-    switch (type) {
-    case '=':
-      // Value
-      tmp = match.split('|');
-      res = getData(utils.trim(tmp.shift()), data);
-      if (tmp.length > 0) {
-        while ((fct = tmp.shift()) !== undefined) {
-          switch (utils.trim(fct).toLowerCase()) {
-          case "join":
-            res = res.join(',');
-            break;
-          case "tolocal":
-            res = new Date(res).toLocaleString(undefined, {day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", "minute": "2-digit"});
-            break;
-          case "tolowercase":
-            res = res.toLowerCase();
-            break;
-          default:
-            utils.log("Unknown template function " + fct, "error");
-          }
-        }
-      }
-      break;
-    case '#':
-      // Sub template
-      tmp = match.split(' ');
-      value = getData(tmp[1], data);
-      if (Array.isArray(value)) {
-        res = value.reduce(function (p, c) {
-          var val = {};
-          val[tmp[1]] = c;
-          return p + window.template(tmp[0], val).outerHTML;
-        }, '');
-      } else {
-        res = window.template(tmp[0], data).outerHTML;
-      }
-      break;
-    }
-    return res;
-  }
-  frag = document.getElementById(sel).cloneNode(true);
-  xpathResult = document.evaluate('//@*[contains(., "{{=")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-  for (i = 0; i < xpathResult.snapshotLength; i++) {
-    attr = xpathResult.snapshotItem(i);
-    attr.nodeValue = attr.nodeValue.replace(re, repl);
-  }
-  xpathResult = document.evaluate('//*[contains(text(),"{{")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-  for (i = 0; i < xpathResult.snapshotLength; i++) {
-    elmt = xpathResult.snapshotItem(i);
-    elmt.innerHTML = elmt.innerHTML.replace(re, repl);
-  }
-//  utils.log(utils.format("Template %s rendered in %s", sel, Math.round((window.performance.now() - startTime))), "debug");
-  return frag.children[0];
-};
-/**
- * Article comment
- */
-window.Comment = function () {
-  "use strict";
-  /*global remoteStorage: true, tiles: true, _: true */
-  var UI;
-  UI = {
-    article: $('#noteEdit [name="articleId"]'),
-    path:    $('#noteEdit [name="xpath"]'),
-    content: $('#noteEdit [name="text"]')
-  };
-
-  this.create = function (article, path) {
-    UI.article.value = article;
-    UI.path.value    = path;
-    UI.content.value = '';
-    window.tiles.go('noteEdit');
-  };
-
-  this.save = function () {
-    var noteId    = $('#noteEdit [name="noteId"]').value,
-        articleId = $('#noteEdit [name="articleId"]').value;
-    if (!noteId) {
-      noteId = utils.uuid();
-    }
-    window.articles.read(articleId, function (article) {
-      if (article) {
-        if (typeof article.notes !== 'object') {
-          article.notes = {};
-        }
-        article.notes[noteId] = {
-          xpath: $('#noteEdit [name="xpath"]').value,
-          content: $('#noteEdit [name="text"]').value
-        };
-        remoteStorage.alir.saveArticle(article);
-        window.displayItem(article);
-      }
-      tiles.back();
-    });
-  };
-  this.edit = function () {
-    ["articleId", "noteId", "xpath", "text"].forEach(function (field) {
-      $('#noteEdit [name="' + field + '"]').value = $('#noteEdit [name="' + field + '"]').value;
-    });
-    window.tiles.show('noteEdit');
-  };
-  this.delete = function () {
-    var noteId    = $('#noteView [name="noteId"]').value,
-        articleId = $('#noteEdit [name="articleId"]').value;
-    if (window.confirm(_('noteConfirmDelete'))) {
-      window.articles.read(articleId, function (article) {
-        if (article) {
-          delete article.notes[noteId];
-          remoteStorage.alir.saveArticle(article);
-          window.displayItem(article);
-        } else {
-          tiles.back();
-        }
-      });
-    }
-    tiles.back();
-  };
-};
+window.tiles = new Tiles();
