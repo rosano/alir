@@ -45,7 +45,8 @@ config = {
   logLevel: 'info',
   bookmarks: {},
   style: {
-    fontSize: 1
+    fontSize: 1,
+    'font-size': 'sans-serif'
   }
 };
 function displayItem(item) {
@@ -68,7 +69,8 @@ function Alir() {
   "use strict";
   var self = this,
       dynamicSheet = document.getElementById('userCss').sheet,
-      slider = $('#styleFontSize');
+      slider = document.getElementById('styleFontSize'),
+      family = document.getElementById('styleFontFamily');
   RemoteStorage.eventHandling(this, "configLoaded", "statusUpdated");
   // style {{
   (function () {
@@ -76,21 +78,28 @@ function Alir() {
       while (dynamicSheet.cssRules[0]) {
         dynamicSheet.deleteRule(0);
       }
-      $('#styleFontSize').value = conf.fontSize;
-      dynamicSheet.insertRule("#list .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; }", 0);
+      slider.value = conf.fontSize;
+      family.value = conf.fontFamily;
+      dynamicSheet.insertRule("#list .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; font-family: " + conf.fontFamily  + " }", 0);
     }
     function onSizeChanged(event) {
       window.config.style.fontSize = slider.value;
       updateStyle(window.config.style);
     }
+    function onFamilyChanged(event) {
+      window.config.style.fontFamily = family.value;
+      updateStyle(window.config.style);
+    }
     self.on('configLoaded', function (conf) {
       updateStyle(conf.style);
     });
-    slider.addEventListener('change',  onSizeChanged);
+    slider.addEventListener('change', onSizeChanged);
     slider.addEventListener('input',  onSizeChanged);
+    family.addEventListener('change', onFamilyChanged);
     self.styleReset = function () {
       window.config.style.fontSize = 1;
-      updateStyle(window.config.style.fontSize);
+      window.config.style.fontFamily = 'sans-serif';
+      updateStyle(window.config.style);
     };
   }());
   // }}
@@ -899,6 +908,7 @@ function initUI() {
       case 'logLevel':
         config.logLevel = val;
         utils.logLevel  = val;
+        break;
       }
     }
   });
@@ -916,19 +926,19 @@ function initUI() {
 
   // Manage scroll
   (function () {
-    var height = UI.list.clientHeight,
+    var height = document.querySelector("[data-tile].shown").clientHeight,
         scroll = $("#menu .scrollbar");
-    scroll.style.height = (window.innerHeight / UI.list.clientHeight * 100) + '%';
+    scroll.style.height = (window.innerHeight / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
     setInterval(function checkSize() {
-      var h = UI.list.clientHeight;
+      var h = document.querySelector("[data-tile].shown").clientHeight;
       if (h !== height) {
         height = h;
-        scroll.style.height = (window.innerHeight / UI.list.clientHeight * 100) + '%';
-        scroll.style.top = (window.scrollY / UI.list.clientHeight * 100) + '%';
+        scroll.style.height = (window.innerHeight / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
+        scroll.style.top = (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
       }
     }, 250);
     window.onscroll = function () {
-      scroll.style.top = (window.scrollY / UI.list.clientHeight * 100) + '%';
+      scroll.style.top = (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
     };
   })();
 

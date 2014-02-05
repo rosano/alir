@@ -83,13 +83,13 @@
           <p>{{=url}}</p>
           <p>{{=date|tolocal}}</p>
           <p class="toolbar">
+            <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
             <a class="icon-pencil"  data-object="feeds" data-method="edit"   data-params="{{=url}}"></a>
             <a class="icon-trash"   data-object="feeds" data-method="delete" data-params="{{=url}}"></a>
             <a class="icon-refresh" data-object="feeds" data-method="fetch" data-params="{{=url}}"></a>
           </p>
-          <p class="col2">
+          <p class="col">
             <button data-l10n-id="feedTest" data-object="feeds" data-method="test" data-params="{{=url}}"></button>
-            <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
           </p>
           <ul>
             {{#tmpl-feed-item items}}
@@ -157,7 +157,7 @@
         </p>
       </form>
     </div>
-    <div id="main" class="list" data-tile="list">
+    <div id="main" class="list shown" data-tile="list">
       <form class="filters">
         <a class="icon-inbox archive" data-object="articles.ui" data-method="filterArchive" ></a>
         <a class="icon-rss feed"      data-object="articles.ui" data-method="filterFeed" ></a>
@@ -317,6 +317,12 @@
         <p>
           <input id="styleFontSize" type="range" min="0.3" max="3" step="0.1" />
         </p>
+        <fieldset class="inline text">
+          <select id="styleFontFamily" data-target="fontFamily">
+            <option value="sans-serif">Sans-Serif</option>
+            <option value="serif">Serif</option>
+          </select>
+        </fieldset>
         <p id="styleFontSizeSample">
           Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </p>
@@ -426,7 +432,7 @@
       <header><h2 data-l10n-id="feeds">Feeds</h2></header>
       <p class="toolbar">
         <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="list"></a>
-        <a class="icon-plus" data-object="tiles" data-method="show" data-params="feedEdit" ></a>
+        <a class="icon-plus" data-object="feeds" data-method="create" ></a>
         <a class="icon-refresh" data-object="feeds" data-method="update"></a>
       </p>
       <ul id="feeds">
@@ -466,7 +472,7 @@
           <button data-object="feeds" data-method="save" data-l10n-id="feedSave">Save</button>
           <button data-object="tiles" data-method="show" data-params="feeds" data-l10n-id="cancel">Cancel</button>
         </p>
-        <p class="col2">
+        <p class="col">
           <button data-object="feeds" data-method="test" data-l10n-id="feedTest">Test</button>
         </p>
       </form>

@@ -39,9 +39,9 @@ var utils = {
   },
   getDate: function (d) {
     "use strict";
-    d = (typeof d  === 'undefined' ? new Date() : (typeof d === 'object' ? d : new Date(d)));
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
-    return d.toISOString();
+    var date = (typeof d  === 'undefined' ? new Date() : new Date(d));
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+    return date.toISOString();
   },
   log: function log() {
     "use strict";

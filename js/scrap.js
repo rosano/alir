@@ -38,7 +38,7 @@ function scrap(url, cb) {
     }
   }
   function onFailed(e) {
-    utils.log("Request failed : " + e, "error");
+    utils.log("Request for %s failed: %s", url, e.target.status, "error");
     cb('Request Failed', article);
   }
   function onCanceled(e) {
