@@ -78,7 +78,10 @@
       <div id="tmpl-feed-detail">
         <div>
           <header>
-            <h2>{{=title}}</h2>
+            <h2>
+              <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
+              <span>{{=title}}</span>
+            </h2>
           </header>
           <p>{{=url}}</p>
           <p>{{=date|tolocal}}</p>
@@ -121,7 +124,12 @@
       </div>
     </div>
     <div id="input" class="" data-tile="input">
-      <header><h2 data-l10n-id="inputHeader">Note</h2></header>
+      <header>
+        <h2>
+          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="list"></a>
+          <span data-l10n-id="inputHeader">Note</span>
+        </h2>
+      </header>
       <form>
         <fieldset class="inline text hidden">
           <p>
@@ -176,7 +184,12 @@
       </ul>
     </div>
     <div id="settings" class="" data-tile="settings">
-      <header><h2 data-l10n-id="settings">Settings</h2></header>
+      <header>
+        <h2>
+          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="list"></a>
+          <span data-l10n-id="settings">Settings</span>
+        </h2>
+      </header>
       <form >
         <section class="container folded">
           <header class="header"><h2 data-l10n-id="settingsMisc"></h3></header>
@@ -304,10 +317,9 @@
         <p>
           <button data-object="tiles" data-method="go"   data-params="credits"  data-l10n-id="settingsCredits">Credits</button>
           <button data-object="tiles" data-method="go"   data-params="advanced" data-l10n-id="settingsAdvanced" data-method="tileGo">Advanced</button>
-          <button data-object="tiles" data-method="show" data-params="list"     data-l10n-id="settingsDone">Ok</button>
         </p>
         <section>
-          <button name="clearLog" data-l10n-id="settingsClearLog" data-method="clearLogs">Clear Log</button>
+          <button name="clearLog" data-l10n-id="settingsClearLog" data-object="alir.ui" data-method="clearLogs">Clear Log</button>
           <pre id="debugLog"></pre>
         </section>
       </form>
@@ -331,16 +343,21 @@
         </p>
       </fieldset>
       <p class="col2">
-        <button data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
+        <button data-object="alir.ui" data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
         <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
         <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
-        <button data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
+        <button data-object="alir.ui" data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
         <button data-object="alir" data-method="getAll" data-l10n-id="settingsReload">Reload</button>
         <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
       </p>
     </div>
     <section id="noteView" data-tile="noteView" class="">
-      <header><h2 data-l10n-id="noteViewHeader">View note</h2></header>
+      <header>
+        <h2>
+          <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
+          <span data-l10n-id="noteViewHeader"></span>
+        </h2>
+      </header>
       <form>
         <input type="hidden" name="articleId" />
         <input type="hidden" name="noteId" />
@@ -356,7 +373,12 @@
       </p>
     </section>
     <section id="noteEdit" data-tile="noteEdit" class="">
-      <header><h2 data-l10n-id="noteEditHeader">Edit note</h2></header>
+      <header>
+        <h2>
+          <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
+          <span data-l10n-id="noteEditHeader"></span>
+        </h2>
+      </header>
       <form>
         <input type="hidden" name="articleId" />
         <input type="hidden" name="noteId" />
@@ -371,7 +393,12 @@
       </form>
     </section>
     <section id="tagTile" data-tile="tagTile" class="">
-      <header><h2 data-l10n-id="tagHeader">Tags</h2></header>
+      <header>
+        <h2>
+          <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
+          <span data-l10n-id="tagHeader">Tags</span>
+        </h2>
+      </header>
       <form>
         <fieldset class="inline text">
           <p>
@@ -389,7 +416,12 @@
       </form>
     </section>
     <section id="credits" data-tile="credits" class="">
-      <header><h2 data-l10n-id="creditHeader">Credits</h2></header>
+      <header>
+        <h2>
+          <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
+          <span data-l10n-id="creditHeader">Credits</span>
+        </h2>
+      </header>
       <section class="title">
         <img src="img/icon-256.png" width="256" height="256" alt="Àlir icon" title="Àlir icon" />
       </section>
@@ -429,7 +461,12 @@
       <button data-l10n-id="linkCancel" data-object="tiles" data-method="back">Return</button>
     </section>
     <section data-tile="feeds">
-      <header><h2 data-l10n-id="feeds">Feeds</h2></header>
+      <header>
+        <h2>
+          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="list"></a>
+          <span data-l10n-id="feeds">Feeds</span>
+        </h2>
+      </header>
       <p class="toolbar">
         <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="list"></a>
         <a class="icon-plus" data-object="feeds" data-method="create" ></a>
@@ -439,7 +476,12 @@
       </ul>
     </section>
     <section data-tile="feedEdit">
-      <header><h2 data-l10n-id="feedEditHeader">Edit Feed</h2></header>
+      <header>
+        <h2>
+          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="feeds"></a>
+          <span data-l10n-id="feedEditHeader">Edit Feed</span>
+        </h2>
+      </header>
       <form>
         <fieldset class="inline text hidden">
           <p>

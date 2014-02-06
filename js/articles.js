@@ -264,7 +264,7 @@ function Article() {
     }
   };
   this.onShown = function onShown() {
-    document.querySelector('li.current .articleMenu').classList.add('folded');
+    self.ui.menu(false);
     $('#menu .content .top').href = '#' + currentId;
     if (config.bookmarks[currentId]) {
       window.setTimeout(function () {
@@ -334,8 +334,26 @@ function Article() {
     };
   };
   this.ui = {
-    menu: function () {
-      $('li.current .articleMenu').classList.toggle('folded');
+    menu: function (folded) {
+      var cl = $('li.current .articleMenu').classList,
+          actions = $('li.current .articleMenu .articleActions');
+      function style() {
+        if (cl.contains('folded')) {
+          actions.style.marginTop = -actions.clientHeight + 'px';
+        } else {
+          actions.style.marginTop = '';
+        }
+      }
+      if (typeof folded === 'undefined') {
+        cl.toggle('folded');
+        style();
+      } else if (folded) {
+        cl.remove('folded');
+        style();
+      } else {
+        cl.add('folded');
+        style();
+      }
     },
     filterArchive: function () {
       $('#main').classList.toggle('archives');

@@ -268,6 +268,17 @@ function Alir() {
       remoteStorage.caching.reset();
     }
   };
+  this.ui = {
+    clearLogs: function () {
+      document.getElementById('debugLog').innerHTML =  "";
+    },
+    inspect: function () {
+      remoteStorage.inspect();
+    },
+    widgetShow: function () {
+      $('#rsWidget').classList.toggle("hidden");
+    }
+  };
 }
 window.alir = new Alir();
 window.alir.on('statusUpdated', function (status) {
@@ -566,17 +577,6 @@ function initUI() {
 
   // Actions {{
   (function () {
-    var actions = {
-      clearLogs: function () {
-        document.getElementById('debugLog').innerHTML =  "";
-      },
-      inspect: function () {
-        remoteStorage.inspect();
-      },
-      widgetShow: function () {
-        $('#rsWidget').classList.toggle("hidden");
-      }
-    };
 
     // Generic event Listener
     document.body.addEventListener('click', function (ev) {
@@ -630,33 +630,23 @@ function initUI() {
         target  = ev.target.parentNode;
         dataset = ev.target.parentNode.dataset;
       }
-      if (dataset.method) {
+      if (dataset.method && typeof dataset.object !== 'undefined') {
         if (typeof dataset.params !== "undefined") {
           params = dataset.params.split(',');
         }
-        if (typeof dataset.object !== 'undefined') {
-          path = dataset.object.split('.');
-          obj = window;
-          do {
-            obj = obj[path.shift()];
-          } while (typeof obj !== 'undefined' && path.length > 0);
-          if (typeof obj === 'undefined') {
-            utils.log("Unknown data object " + dataset.object, "error");
-          } else {
-            if (typeof obj[dataset.method] !== 'function') {
-              utils.log(utils.format("Object %s has no method %s", dataset.object, dataset.method), "error");
-            } else {
-              clicked(target);
-              obj[dataset.method].apply(obj, params);
-            }
-          }
-
+        path = dataset.object.split('.');
+        obj = window;
+        do {
+          obj = obj[path.shift()];
+        } while (typeof obj !== 'undefined' && path.length > 0);
+        if (typeof obj === 'undefined') {
+          utils.log("Unknown data object " + dataset.object, "error");
         } else {
-          if (typeof actions[dataset.method] === "undefined") {
-            utils.log("Unknown method " + dataset.method);
+          if (typeof obj[dataset.method] !== 'function') {
+            utils.log(utils.format("Object %s has no method %s", dataset.object, dataset.method), "error");
           } else {
             clicked(target);
-            actions[dataset.method].apply(null, params);
+            obj[dataset.method].apply(obj, params);
           }
         }
       }
@@ -770,7 +760,7 @@ function initUI() {
               window.articles.show(items[2].dataset.key);
             }, 500);
           }
-          document.querySelector('li.current .articleMenu').classList.add('folded');
+          window.articles.ui.menu(false);
           break;
         case 'W':
           items = getItems();
@@ -785,7 +775,7 @@ function initUI() {
               window.articles.show(items[0].dataset.key);
             }, 500);
           }
-          document.querySelector('li.current .articleMenu').classList.add('folded');
+          window.articles.ui.menu(false);
           break;
         }
       }
