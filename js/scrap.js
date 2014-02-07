@@ -31,6 +31,15 @@ function scrap(url, cb) {
         parsed = readable.getArticle();
         article.title = parsed.title;
         article.html  = parsed.html;
+        article.alternates = [];
+        [].slice.apply(root.querySelectorAll("link[rel='alternate'][type*=xml][title][href]")).forEach(function (e) {
+          var alt = {
+            href: e.href,
+            title: e.title,
+            type: e.type
+          };
+          article.alternates.push(alt);
+        });
       }
       cb(null, article);
     } catch (e) {
@@ -76,15 +85,19 @@ function saveScraped(article) {
   "use strict";
   try {
     var obj;
+    if (typeof article.id === 'undefined') {
+      article.id = utils.uuid();
+    }
     obj = {
-      id: utils.uuid(),
+      id:    article.id,
       url: article.url,
       title: article.title,
       html: article.html,
       date: Date.now(),
       flags: {
       },
-      tags: []
+      tags: [],
+      alternates: article.alternates
     };
     if (article.title === '???') {
       article.loaded = false;

@@ -42,6 +42,7 @@
               <p><a class="icon-pencil compose"      data-object="articles" data-method="edit"      data-params="{{=key}}"></a></p>
               <p><a class="icon-refresh ifInstalled" data-object="articles" data-method="reload"    data-params="{{=key}}"></a></p>
               <p><a class="icon-share ifInstalled"   data-object="articles" data-method="share"     data-params="{{=key}}"></a></p>
+              <p><a class="icon-rss alternate ifInstalled" data-object="articles.ui" data-method="toggleAlternates" data-params="{{=key}}"></a></p>
             </div>
           </div>
           <div class="toolbar">
@@ -53,6 +54,12 @@
             <p class="date">{{=date|tolocal}}</p>
             <p class="notes">
             </p>
+            <div class="alternates hidden">
+              <h3>Subscribe to</h3>
+              <p class="alternatesButtons">
+              </p>
+              <p><button data-object="articles.ui" data-method="toggleAlternates" data-params="{{=key}}">Done</button></p>
+            </div>
             <p class="tags">
               {{#tmpl-tag tags}}
             </p>

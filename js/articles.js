@@ -25,10 +25,11 @@ function Article() {
    *
    */
   this.display = function (obj) {
-    //jshint maxstatements: 35, maxcomplexity: 20
+    //jshint maxstatements: 50, maxcomplexity: 20
     var title = obj.title || obj.id,
         data  = {},
         item,
+        topAlt,
         classes = [];
     item = document.getElementById(obj.id);
     if (item) {
@@ -58,6 +59,7 @@ function Article() {
       url: obj.url || '#',
       date: obj.date,
       tags: Array.isArray(obj.tags) ? obj.tags : [],
+      alternates: Array.isArray(obj.alternates) ? obj.alternates : [],
       notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
       flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : '',
       loaded: obj.doLoad === true
@@ -123,6 +125,21 @@ function Article() {
             View.insertInList(document.getElementById('tagList'), "li", elmt, function (e) { return (e.dataset.tag.toLowerCase() > tag.toLowerCase()); });
           })(tag);
         }
+      });
+    }
+    // }}
+    // Alternates {{
+    if (Array.isArray(obj.alternates) && obj.alternates.length > 0) {
+      topAlt = item.querySelector(".content > .alternates .alternatesButtons");
+      item.classList.add("hasAlternates");
+      obj.alternates.forEach(function (alt) {
+        var a = document.createElement('button');
+        a.setAttribute('type', 'button');
+        a.textContent = alt.title;
+        a.addEventListener('click', function () {
+          window.feeds.create(alt.href, alt.title);
+        });
+        topAlt.appendChild(a);
       });
     }
     // }}
@@ -218,11 +235,8 @@ function Article() {
           if (err) {
             utils.log(err.toString(), 'error');
           } else {
-            article.id    = key;
-            article.title = res.title;
-            article.html  = res.html;
-            remoteStorage.alir.saveArticle(article);
-            self.display(article);
+            res.id = key;
+            window.saveScraped(res);
           }
         });
       }

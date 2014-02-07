@@ -405,6 +405,9 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
       "flags": {
         "type": "object"
       },
+      "alternate": {
+        "type": "array"
+      },
       "loaded": {
         "type": "boolean"
       }

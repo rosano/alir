@@ -237,6 +237,12 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #list .content + .toolbar {
   margin-top: 2rem;
 }
+#list .articleActions .alternate {
+  display: none;
+}
+#list .hasAlternates .articleActions .alternate {
+  display: inline;
+}
 #list .current .articleMenu {
   position: fixed;
   top: 0;
@@ -279,9 +285,20 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   display: block;
   float: left;
 }
-#list .current .content .tags {
+#list .current .content > .notes,
+#list .current .content > .alternates,
+#list .current .content > .tags {
   display: table-row;
   vertical-align: middle;
+}
+#list .current .content > .alternates {
+  background-color: #444;
+  height: 100%;
+  left: 0;
+  margin: 0;
+  padding: 1rem 4rem;
+  position: absolute;
+  top: 0;
 }
 #list .current .content .tags * {
   padding: 2px;
