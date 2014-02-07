@@ -30,6 +30,7 @@ function Article() {
         data  = {},
         item,
         topAlt,
+        topNote,
         classes = [];
     item = document.getElementById(obj.id);
     if (item) {
@@ -87,6 +88,7 @@ function Article() {
     item = View.template('tmpl-article', data);
     // Notes {{
     if (typeof obj.notes === 'object') {
+      topNote = item.querySelector(".content > .notes");
       Object.keys(obj.notes).forEach(function (noteId, i) {
         var note = obj.notes[noteId],
             target,
@@ -100,13 +102,22 @@ function Article() {
           utils.log("Unable to evaluate XPath " + note.xpath + ' : ' + e, "error");
         }
         if (target) {
+          // Note
           a = document.createElement('a');
-          a.setAttribute('class', 'note icon-tag');
+          a.setAttribute('class', 'note icon-comment');
           a.dataset.object = "comment";
           a.dataset.method = "read";
           a.dataset.params = obj.id + ',' + noteId;
           a.setAttribute('href', '#' + obj.id + '/' + noteId);
+          a.setAttribute('name', noteId);
           target.insertBefore(a, target.firstChild);
+          // headnote
+          a = document.createElement('span');
+          a.setAttribute('class', 'note icon-comment');
+          a.dataset.object = "articles.ui";
+          a.dataset.method = "scrollToNote";
+          a.dataset.params = noteId;
+          topNote.appendChild(a);
         } else {
           utils.log("Unable to evaluate XPath " + note.xpath, "error");
         }
@@ -419,6 +430,18 @@ function Article() {
           }
         }
       });
+    },
+    scrollToNote: function (noteId) {
+      var note = document.querySelector('[name="' + noteId + '"]');
+      if (note) {
+        note.scrollIntoView(true);
+      } else {
+        utils.log("No note with id " + noteId, "warning");
+      }
+    },
+    // Toggle display of alternate subscription buttons
+    toggleAlternates: function () {
+      document.querySelector("li.current .content > .alternates").classList.toggle('hidden');
     }
   };
 }
