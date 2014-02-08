@@ -11,9 +11,12 @@ help:
 	@echo "watch  - build on file updated"
 	@echo "test   - run tests"
 
-all: build zip
+all: init build zip
 
-.PHONY: build zip tests watch clean debug
+.PHONY: build zip tests watch clean debug init
+
+init:
+	test -s lib/webL10n/.git || ( git submodule update --init --recursive && git submodule foreach git pull origin master )
 
 debug: 
 	echo -e "\n\n####################\nBuilding at" `date`

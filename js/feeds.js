@@ -95,7 +95,7 @@ function Feeds() {
         cb(null, xhr.responseXML);
       };
       xhr.onerror = function (e) {
-        utils.log(e, "warning");
+        utils.log("Request for %s failed: %s", url, e.target.status, "error");
         cb("Error : " + xhr.status + " " + e + " on " + url, {url: url});
       };
       // Add a timestamp to bypass the cache
@@ -169,13 +169,17 @@ function Feeds() {
           if (typeof cache.articles[itemId] === 'undefined') {
             utils.log('New article "%s" in "%s"', itemTitle, cache.title, "info");
             utils.notify('New article', utils.format('"%s" in "%s"', itemTitle, cache.title), function () {
-              navigator.mozApps.getSelf().onsuccess = function gotSelf(evt) {
-                var app = evt.target.result;
-                if (app !== null) {
-                  app.launch();
-                }
+              if (window.alir.getStatus().installed) {
+                navigator.mozApps.getSelf().onsuccess = function gotSelf(evt) {
+                  var app = evt.target.result;
+                  if (app !== null) {
+                    app.launch();
+                  }
+                  self.showArticle(itemUrl);
+                };
+              } else {
                 self.showArticle(itemUrl);
-              };
+              }
             });
           } else {
             utils.log('Article Updated : "%s" "%s" < "%s"', itemTitle, cache.articles[itemId].updated, itemUpdated, "info");
@@ -246,13 +250,19 @@ function Feeds() {
       window.alert("Found " + Object.keys(items).length + " item");
     });
   };
-  this.create = function () {
+  this.create = function (url, title) {
+    if (typeof title === 'undefined') {
+      title = '';
+    }
+    if (typeof url === 'undefined') {
+      url = '';
+    }
     var $   = tiles.$('feedEdit');
     $('[name="id"]').value    = '';
-    $('[name="url"]').value   = '';
-    $('[name="title"]').value = '';
+    $('[name="url"]').value   = url;
+    $('[name="title"]').value = title;
     $('[name="feedShort"]').checked = false;
-    tiles.show('feedEdit');
+    tiles.go('feedEdit');
   };
   this.edit = function (url) {
     var $    = tiles.$('feedEdit'),
@@ -261,7 +271,7 @@ function Feeds() {
     $('[name="url"]').value   = feed.url;
     $('[name="title"]').value = feed.title;
     $('[name="feedShort"]').checked = feed.short;
-    tiles.show('feedEdit');
+    tiles.go('feedEdit');
   };
   this.show = function (url) {
     var feed = _cache[url],

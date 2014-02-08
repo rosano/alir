@@ -352,8 +352,12 @@
       <p class="col2">
         <button data-object="alir.ui" data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
         <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
+      <p class="col2">
+      </p>
         <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
         <button data-object="alir.ui" data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
+      <p class="col2">
+      </p>
         <button data-object="alir" data-method="getAll" data-l10n-id="settingsReload">Reload</button>
         <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
       </p>
@@ -485,7 +489,7 @@
     <section data-tile="feedEdit">
       <header>
         <h2>
-          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="feeds"></a>
+          <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
           <span data-l10n-id="feedEditHeader">Edit Feed</span>
         </h2>
       </header>
@@ -519,7 +523,7 @@
         </fieldset>
         <p class="col2">
           <button data-object="feeds" data-method="save" data-l10n-id="feedSave">Save</button>
-          <button data-object="tiles" data-method="show" data-params="feeds" data-l10n-id="cancel">Cancel</button>
+          <button data-object="tiles" data-method="back" data-l10n-id="cancel">Cancel</button>
         </p>
         <p class="col">
           <button data-object="feeds" data-method="test" data-l10n-id="feedTest">Test</button>

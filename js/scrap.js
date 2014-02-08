@@ -29,8 +29,8 @@ function scrap(url, cb) {
       if (root !== false) {
         window.saxParser(root, readable);
         parsed = readable.getArticle();
-        article.title = parsed.title;
-        article.html  = parsed.html;
+        article.title      = parsed.title;
+        article.html       = parsed.html;
         article.alternates = [];
         [].slice.apply(root.querySelectorAll("link[rel='alternate'][type*=xml][title][href]")).forEach(function (e) {
           var alt = {
@@ -90,10 +90,10 @@ function saveScraped(article) {
     }
     obj = {
       id:    article.id,
-      url: article.url,
+      url:   article.url,
       title: article.title,
-      html: article.html,
-      date: Date.now(),
+      html:  article.html,
+      date:  Date.now(),
       flags: {
       },
       tags: [],
@@ -104,8 +104,20 @@ function saveScraped(article) {
     }
     remoteStorage.alir.saveArticle(obj);
     window.displayItem(obj);
-    window.alert('"' + article.title + '" has been successfully saved');
-    utils.log('Created : ' + article.title);
+    utils.notify('"' + article.title + '" has been successfully saved', '', function () {
+      if (window.alir.getStatus().installed) {
+        navigator.mozApps.getSelf().onsuccess = function gotSelf(evt) {
+          var app = evt.target.result;
+          if (app !== null) {
+            app.launch();
+          }
+          window.articles.show(article.id);
+        };
+      } else {
+        window.articles.show(article.id);
+      }
+    });
+    utils.log('Scraped : ' + article.title);
   } catch (e) {
     utils.log(utils.format("Error saving %s : %s", article.title, e), 'error');
   }

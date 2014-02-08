@@ -10,9 +10,13 @@ button {
   border: 1px solid #888;
   border-radius: 2px;
 }
+p.col2 {
+  display: flex;
+}
 p.col2 button {
   width: 49%;
   display: inline;
+  margin: .33rem;
 }
 fieldset {
   border: 1px solid #888;
