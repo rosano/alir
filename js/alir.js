@@ -116,6 +116,11 @@ function Alir() {
     // when navigator goes online / offline
     function windowOnline(e) {
       status.online = navigator.onLine;
+      if (status.online) {
+        document.body.classList.add('net');
+      } else {
+        document.body.classList.add('net');
+      }
       self._emit('statusUpdated', status);
     }
     // when visibility of application change
@@ -154,6 +159,7 @@ function Alir() {
       status.rs = true;
       self._emit('statusUpdated', status);
     });
+    // check if application is installed {
     if (window.navigator.mozApps) {
       (function () {
         var request = window.navigator.mozApps.getSelf();
@@ -168,7 +174,11 @@ function Alir() {
           alert("Error: " + request.error.name);
         };
       }());
+    } else {
+      status.installed = false;
     }
+    // }
+    // Toggle user online state {
     self.onoff = function () {
       if (document.body.classList.contains('online')) {
         userOnline(false);
@@ -184,6 +194,7 @@ function Alir() {
         }
       }
     };
+    // }
     self.getStatus = function () {
       return status;
     };

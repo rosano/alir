@@ -74,6 +74,7 @@ var utils = {
       console.log(utils.format('=====> [%s][%s] %s\n', curDate, level + new Array(10 - level.length).join(' '), message));
       if (level === 'error') {
         window.alert(message);
+        document.body.classList.add('error');
       }
     }
   },
@@ -171,6 +172,10 @@ var utils = {
     });
     return res;
   }
+};
+window.onerror = function (errorMsg, url, lineNumber) {
+  "use strict";
+  utils.log("%s on %s:%s", errorMsg, url, lineNumber, "error");
 };
 
 var Tiles = function (global) {
