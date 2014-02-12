@@ -20,50 +20,56 @@ View.toDom = function (str, fullUrl) {
       sandbox  = document.createElement('div'),
       domain   = new RegExp("((http.?://[^/]+).*/)([^?]*).?(.*$)").exec(fullUrl),
       domainUrl, baseUrl;
-  if (domain !== null) {
-    domainUrl = domain[2];
-    baseUrl   = domain[1];
-  } else {
-    domainUrl = '';
-    baseUrl   = '';
-  }
-  fragment.appendChild(sandbox);
   try {
-    sandbox.innerHTML = HTMLtoXML(str);
-  } catch (e) {
-    utils.log('Error sanityzing: ' + e.toString(), "error");
-    //@FIXME Unsecure !
-    sandbox.innerHTML = str;
-  }
-  Array.prototype.forEach.call(sandbox.querySelectorAll('script, style', 'frame', 'iframe'), function (e) {
-    e.parentNode.removeChild(e);
-  });
-  ['class', 'id', 'style', 'onclick', 'onload'].forEach(function (attr) {
-    Array.prototype.forEach.call(sandbox.querySelectorAll('* [' + attr + ']'), function (e) {
-      e.removeAttribute(attr);
-    });
-  });
-  Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]'), function (e) {
-    e.setAttribute('target', '_blank');
-  });
-  Array.prototype.forEach.call(sandbox.querySelectorAll('* img:not([src^=http])'), function (e) {
-    var src = e.getAttribute('src');
-    if (src.substr(0, 1) === '/') {
-      e.setAttribute('src', domainUrl + src);
+    if (domain !== null) {
+      domainUrl = domain[2];
+      baseUrl   = domain[1];
     } else {
-      e.setAttribute('src', baseUrl + src);
+      domainUrl = '';
+      baseUrl   = '';
     }
-  });
-  Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]:not([href^=http])'), function (e) {
-    var src = e.getAttribute('href');
-    if (src) {
-      if (src.substr(0, 1) === '/') {
-        e.setAttribute('href', domainUrl + src);
-      } else {
-        e.setAttribute('href', baseUrl + src);
+    fragment.appendChild(sandbox);
+    try {
+      sandbox.innerHTML = HTMLtoXML(str);
+    } catch (e) {
+      utils.log('Error sanityzing: ' + e.toString(), "error");
+      //@FIXME Unsecure !
+      sandbox.innerHTML = str;
+    }
+    Array.prototype.forEach.call(sandbox.querySelectorAll('script, style', 'frame', 'iframe'), function (e) {
+      e.parentNode.removeChild(e);
+    });
+    ['class', 'id', 'style', 'onclick', 'onload'].forEach(function (attr) {
+      Array.prototype.forEach.call(sandbox.querySelectorAll('* [' + attr + ']'), function (e) {
+        e.removeAttribute(attr);
+      });
+    });
+    Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]'), function (e) {
+      e.setAttribute('target', '_blank');
+    });
+    Array.prototype.forEach.call(sandbox.querySelectorAll('* img:not([src^=http])'), function (e) {
+      var src = e.getAttribute('src');
+      if (src) {
+        if (src.substr(0, 1) === '/') {
+          e.setAttribute('src', domainUrl + src);
+        } else {
+          e.setAttribute('src', baseUrl + src);
+        }
       }
-    }
-  });
+    });
+    Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]:not([href^=http])'), function (e) {
+      var src = e.getAttribute('href');
+      if (src) {
+        if (src.substr(0, 1) === '/') {
+          e.setAttribute('href', domainUrl + src);
+        } else {
+          e.setAttribute('href', baseUrl + src);
+        }
+      }
+    });
+  } catch (e) {
+    utils.log('Error displaying content: ' + e.toString(), "error");
+  }
   return sandbox.innerHTML;
 };
 View.insertInList = function (list, selector, item, comp) {
