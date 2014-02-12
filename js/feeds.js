@@ -81,6 +81,7 @@ function Feeds() {
       doSave(obj);
     }
   };
+  // @TODO Add CORS Proxy
   this.fetch = function (url, test, cb) {
     //jshint maxcomplexity: 15
     function getUrl(url, cb) {
@@ -474,14 +475,75 @@ if (navigator.mozAlarms) {
       request.onerror = function () {
         utils.log('Error getting alarms: ' + this.error);
       };
-    },
+    }
   };
-  window.feeds = new Feeds();
   if (navigator.mozSetMessageHandler) {
     navigator.mozSetMessageHandler("alarm", window.feeds.handleAlarmMessage);
   }
 
-  window.alarms.plan();
 } else {
-  window.feeds = new Feeds();
+  // @TODO
+  window.alarms = {
+    all: [],
+    display: function () {
+      "use strict";
+      if (this.all.length === 0) {
+        utils.log(_('alarmsNoAlarms'), 'warning');
+      } else {
+        this.all.forEach(function (alarm) {
+          utils.log(alarm.data.action + " at " + alarm.date, "debug");
+        });
+      }
+    },
+    plan: function () {
+      "use strict";
+      if (typeof window.utils !== 'object') {
+        window.utils = window.console;
+      }
+      var current  = new Date(),
+          nb       = this.all.length,
+          interval = window.config.alarmInterval || 60;
+      utils.log(this.all.length + " alarms planned", "debug");
+      if (nb === 0) {
+        current.setMinutes(current.getMinutes() + 1);
+        window.alarms.set(current);
+      }
+      this.all.forEach(function (alarm) {
+        if (alarm.date > current) {
+          current = alarm.date;
+        }
+      });
+      utils.log("Last alarm planned at " + utils.getDate(current), "debug");
+      while (nb < 10) {
+        current.setMinutes(current.getMinutes() + parseInt(interval, 10));
+        window.alarms.set(current);
+        nb++;
+      }
+    },
+    set: function (date) {
+      "use strict";
+      var alarm;
+      alarm = {
+        date: date,
+        data: {
+          action: 'feedUpdate'
+        }
+      };
+      utils.log("Planning alarm at " + date, "debug");
+      alarm.id = window.setTimeout(window.feeds.handleAlarmMessage, alarm.data - new Date());
+      this.all.push(alarm);
+    },
+    reset: function (cb) {
+      "use strict";
+      this.all.forEach(function (alarm) {
+        window.clearTimeout(alarm.id);
+      });
+      this.all = [];
+      if (cb) {
+        cb();
+      }
+    }
+  };
+
 }
+window.feeds = new Feeds();

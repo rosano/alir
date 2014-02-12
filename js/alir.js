@@ -298,6 +298,7 @@ window.alir.on('statusUpdated', function (status) {
 });
 
 window.link = {
+  // Open link in external browser
   open: function () {
     "use strict";
     var href = document.getElementById('linkRef').textContent,
@@ -336,14 +337,19 @@ window.link = {
     "use strict";
     var href = document.getElementById('linkRef').textContent,
         openURL;
-    openURL = new window.MozActivity({
-      name: "share",
-      data: {
-        type: "url",
-        url: href
-      }
-    });
-    tiles.back();
+    if (window.alir.getStatus().installed) {
+      openURL = new window.MozActivity({
+        name: "share",
+        data: {
+          type: "url",
+          url: href
+        }
+      });
+      tiles.back();
+    } else {
+      // @TODO How to share ???
+      utils.log("Sorry, share is not available", "error");
+    }
   }
 };
 
@@ -571,7 +577,7 @@ function initUI() {
         alarm.addEventListener('change', onIntervalChanged);
         alarm.addEventListener('input', onIntervalChanged);
       }());
-      $('#settingsLoglevel').value = conf.logLevel;
+      $('#settingsLoglevel select').value = conf.logLevel;
       if (typeof conf.bookmarks === 'undefined') {
         conf.bookmarks = {};
       }
@@ -1041,6 +1047,9 @@ window.addEventListener('load', function () {
   //remoteStorage.caching.enable('/public/alir/');
   remoteStorage.displayWidget("rsWidget");
   initUI();
+  window.alir.on('configLoaded', function () {
+    window.alarms.plan();
+  });
   remoteStorage.alir.private.on('change', function onChange(ev) {
     var elmt, item, id;
     id = ev.relativePath.split('/').pop();

@@ -346,17 +346,21 @@ function Article() {
     });
   };
   this.share = function (key) {
-    var node = document.getElementById(key),
-        request = new window.MozActivity({
-      name: "share",
-      data: {
-        type: "url",
-        url: node.dataset.url
-      }
-    });
-    request.onerror = function () {
-      window.alert("Error sharing : " + request.error.name);
-    };
+    if (window.alir.getStatus().installed) {
+      var node = document.getElementById(key),
+          request = new window.MozActivity({
+        name: "share",
+        data: {
+          type: "url",
+          url: node.dataset.url
+        }
+      });
+      request.onerror = function () {
+        window.alert("Error sharing : " + request.error.name);
+      };
+    //} else {
+    //  // @TODO What to do ???
+    }
   };
   this.ui = {
     menu: function (folded) {
