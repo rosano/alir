@@ -56,7 +56,7 @@ function displayItem(item) {
   }
   switch (item.type) {
   case 'article':
-    window.articles.display(item);
+    window.articles.addToList(item);
     break;
   case 'feed':
     window.feeds.display(item);
@@ -113,13 +113,18 @@ function Alir() {
       visible: !document.hidden,
       rs: remoteStorage.connected
     };
+    if (status.online) {
+      document.body.classList.add('net');
+    } else {
+      document.body.classList.remove('net');
+    }
     // when navigator goes online / offline
     function windowOnline(e) {
       status.online = navigator.onLine;
       if (status.online) {
         document.body.classList.add('net');
       } else {
-        document.body.classList.add('net');
+        document.body.classList.remove('net');
       }
       self._emit('statusUpdated', status);
     }
@@ -512,7 +517,6 @@ function initUI() {
   "use strict";
   var UI = {};
   UI = {
-    input: $('#input'),
     list: $('#list'),
     main: $('#main'),
     menu: {}
@@ -969,7 +973,7 @@ function initUI() {
     }
   }, false);
 
-  tiles.show('list');
+  tiles.show('articleList');
   if (typeof document.getElementById("authFrame").setVisible === "function") {
     // the application is installed, override auth methods
     (function () {
@@ -1046,10 +1050,11 @@ window.addEventListener('load', function () {
   remoteStorage.caching.enable('/alir/');
   //remoteStorage.caching.enable('/public/alir/');
   remoteStorage.displayWidget("rsWidget");
-  initUI();
+  // config is loaded during initUI, so this must be registered BEFORE
   window.alir.on('configLoaded', function () {
     window.alarms.plan();
   });
+  initUI();
   remoteStorage.alir.private.on('change', function onChange(ev) {
     var elmt, item, id;
     id = ev.relativePath.split('/').pop();
@@ -1080,6 +1085,11 @@ window.addEventListener('load', function () {
       item = displayItem(ev.newValue);
     }
   });
+  window.tiles.on('shown', function (tile, name) {
+    if (name === 'settings') {
+      document.body.classList.remove('error');
+    }
+  });
   //@TODO Remove this
   // This is just a migration step for previous contents
   /*
@@ -1100,7 +1110,7 @@ window.addEventListener('load', function () {
     });
   }());
   */
-  window.alir.getAll();
+  //window.alir.getAll();
 
 });
 window.addEventListener('unload', function () {

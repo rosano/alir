@@ -62,6 +62,7 @@ function scrap(url, cb) {
     cb(_('scrapOffline'), article);
     return;
   }
+  // @TODO Use CORS Proxy
   try {
     options = {
       mozAnon: true,

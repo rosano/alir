@@ -205,7 +205,7 @@ function Feeds() {
             }
             if (test !== true) {
               remoteStorage.alir.saveArticle(article);
-              window.articles.display(article);
+              window.articles.addToList(article);
             }
             return article.id;
           }
@@ -340,10 +340,7 @@ function Feeds() {
           remoteStorage.alir.saveArticle(obj).then(function () {
             utils.log('Created : ' + obj.title, "info");
             // Hack: Article may not be really created yet, so we display it
-            obj.doLoad = true;
             window.articles.display(obj);
-            tiles.go('list');
-            window.articles.show(obj.id);
           });
         });
       }
@@ -530,7 +527,7 @@ if (navigator.mozAlarms) {
         }
       };
       utils.log("Planning alarm at " + date, "debug");
-      alarm.id = window.setTimeout(window.feeds.handleAlarmMessage, alarm.data - new Date());
+      alarm.id = window.setTimeout(function () { window.feeds.handleAlarmMessage(alarm); }, alarm.date - new Date());
       this.all.push(alarm);
     },
     reset: function (cb) {

@@ -34,7 +34,6 @@ View.toDom = function (str, fullUrl) {
     utils.log('Error sanityzing: ' + e.toString(), "error");
     //@FIXME Unsecure !
     sandbox.innerHTML = str;
-    //return _('contentError');
   }
   Array.prototype.forEach.call(sandbox.querySelectorAll('script, style', 'frame', 'iframe'), function (e) {
     e.parentNode.removeChild(e);

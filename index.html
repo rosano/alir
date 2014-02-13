@@ -18,7 +18,7 @@
   <body class="online menu-left hosted">
     <div id="templates">
       <ul id="tmpl-article">
-        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" id="{{=key}}" data-tags=",{{=tags|join|tolowercase}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}" data-loaded="{{=loaded}}">
+        <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" data-tags=",{{=tags|join|tolowercase}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
           <h2>
             <label class="delitem">
               <input type="checkbox" name="delitem" />
@@ -31,6 +31,11 @@
               <span class="title">{{=title}}</span>
             </a>
           </h2>
+        </li>
+      </ul>
+      <div id="tmpl-article-detail">
+        <div id="{{=key}}">
+          <h2>{{=title}}</h2>
           <div class="articleMenu folded">
             <p><a class="icon-reorder" data-object="articles.ui" data-method="menu"></a></p>
             <div class="articleActions">
@@ -64,13 +69,16 @@
               {{#tmpl-tag tags}}
             </p>
             <div class="{{=type}}">{{=content}}</div>
+            <!--
+            <iframe sandbox="allow-same-origin" seamless srcdoc="{{=content}}"></iframe>
+            -->
           </div>
           <div class="toolbar">
             <a class="icon-chevron-left" data-object="articles" data-method="hide" ></a>
             <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}}" ></a>
           </div>
-        </li>
-      </ul>
+        </div>
+      </div>
       <div id="tmpl-tag">
         <div class="tag">
           <span class="icon-remove" data-object="articles" data-method="switchTag" data-params="{{=../key}},{{=tags}}"></span>
@@ -116,12 +124,12 @@
     <div id="rsWidget" class="hidden"></div>
     <div id="statusbar">
       <span class="icon-off onoff"></span>
-      <span class="error">E</span>
+      <span class="icon-exclamation error"></span>
     </div>
     <div id="menu" class="list">
       <div class="content">
         <p><a class="icon-plus new main" data-object="articles" data-method="create"></a></p>
-        <p><a class="icon-chevron-up top detail" href="#list"></a></p>
+        <p><a class="icon-chevron-up top detail" href="#articleList"></a></p>
         <p><a class="icon-chevron-left back detail" data-object="articles" data-method="hide"></a></p>
         <p><a class="icon-chevron-right back detail" data-object="articles" data-method="hide"></a></p>
         <p><a class="icon-refresh sync" data-object="alir.rs" data-method="sync"></a></p>
@@ -134,10 +142,11 @@
         <div class="scrollbar"></div>
       </div>
     </div>
-    <div id="input" class="" data-tile="input">
+    <!-- articleEdit {{ -->
+    <div id="articleEdit" class="" data-tile="articleEdit">
       <header>
         <h2>
-          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="list"></a>
+          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="articleList"></a>
           <span data-l10n-id="inputHeader">Note</span>
         </h2>
       </header>
@@ -165,18 +174,20 @@
         </fieldset>
         <p class="col2">
           <button data-object="articles" data-method="save" data-l10n-id="articleSave">Save</button>
-          <button data-object="tiles" data-method="show" data-params="list" data-l10n-id="cancel">Cancel</button>
+          <button data-object="tiles" data-method="show" data-params="articleList" data-l10n-id="cancel">Cancel</button>
         </p>
         <fieldset class="inline text">
           <textarea rows="10" cols="40" name="text" placeholder="Content" data-l10n-id="articleContent"></textarea>
         </fieldset>
         <p class="col2">
           <button data-object="articles" data-method="save" data-l10n-id="articleSave">Save</button>
-          <button data-object="tiles" data-method="show" data-params="list" data-l10n-id="cancel">Cancel</button>
+          <button data-object="tiles" data-method="show" data-params="articleList" data-l10n-id="cancel">Cancel</button>
         </p>
       </form>
     </div>
-    <div id="main" class="list shown" data-tile="list">
+    <!-- }} -->
+    <!-- articleList {{ -->
+    <div id="main" class="list shown" data-tile="articleList">
       <form class="filters">
         <a class="icon-inbox archive" data-object="articles.ui" data-method="filterArchive" ></a>
         <a class="icon-rss feed"      data-object="articles.ui" data-method="filterFeed" ></a>
@@ -194,10 +205,16 @@
       <ul id="list">
       </ul>
     </div>
+    <!-- }} -->
+    <!-- articleShow {{ -->
+    <section data-tile="articleShow" id="articleDetail">
+    </section>
+    <!-- }} -->
+    <!-- settings {{ -->
     <div id="settings" class="" data-tile="settings">
       <header>
         <h2>
-          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="list"></a>
+          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="articleList"></a>
           <span data-l10n-id="settings">Settings</span>
         </h2>
       </header>
@@ -335,7 +352,15 @@
         </section>
       </form>
     </div>
+    <!-- }} -->
+    <!-- advanced {{ -->
     <div data-tile="advanced">
+      <header>
+        <h2>
+          <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
+          <span data-l10n-id="settingsAdvanced"></span>
+        </h2>
+      </header>
       <fieldset>
         <p>
           <input id="styleFontSize" type="range" min="0.3" max="3" step="0.1" />
@@ -366,6 +391,8 @@
         <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
       </p>
     </div>
+    <!-- }} -->
+    <!-- noteView {{ -->
     <section id="noteView" data-tile="noteView" class="">
       <header>
         <h2>
@@ -387,6 +414,8 @@
         <button data-object="comment" data-method="delete" data-l10n-id="noteDelete"></button>
       </p>
     </section>
+    <!-- }} -->
+    <!-- noteEdit {{ -->
     <section id="noteEdit" data-tile="noteEdit" class="">
       <header>
         <h2>
@@ -407,6 +436,8 @@
         </p>
       </form>
     </section>
+    <!-- }} -->
+    <!-- tagTile {{ -->
     <section id="tagTile" data-tile="tagTile" class="">
       <header>
         <h2>
@@ -430,6 +461,8 @@
         </p>
       </form>
     </section>
+    <!-- }} -->
+    <!-- credit {{ -->
     <section id="credits" data-tile="credits" class="">
       <header>
         <h2>
@@ -464,10 +497,14 @@
       </section>
       <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
     </section>
+    <!-- }} -->
+    <!-- auth {{ -->
     <section id="auth" data-tile="auth" class="">
       <iframe id="authFrame" mozbrowser>
       </iframe>
     </section>
+    <!-- }} -->
+    <!-- link {{ -->
     <section id="link" data-tile="link" class="">
       <p id="linkRef"></p>
       <button data-object="link" data-method="scrap" data-l10n-id="linkScrap">Scrap</button>
@@ -475,21 +512,25 @@
       <button data-object="link" data-method="share" class="ifInstalled" data-l10n-id="linkShare">share</button>
       <button data-l10n-id="linkCancel" data-object="tiles" data-method="back">Return</button>
     </section>
+    <!-- }} -->
+    <!-- feeds {{ -->
     <section data-tile="feeds">
       <header>
         <h2>
-          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="list"></a>
+          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="articleList"></a>
           <span data-l10n-id="feeds">Feeds</span>
         </h2>
       </header>
       <p class="toolbar">
-        <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="list"></a>
+        <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="articleList"></a>
         <a class="icon-plus" data-object="feeds" data-method="create" ></a>
         <a class="icon-refresh" data-object="feeds" data-method="update"></a>
       </p>
       <ul id="feeds">
       </ul>
     </section>
+    <!-- }} -->
+    <!-- feedEdit {{ -->
     <section data-tile="feedEdit">
       <header>
         <h2>
@@ -534,8 +575,11 @@
         </p>
       </form>
     </section>
+    <!-- }} -->
+    <!-- feedShow {{ -->
     <section data-tile="feedShow" id="feedDetail">
     </section>
+    <!-- }} -->
     <script type="text/javascript" src="lib/build.js"></script>
     <!--
     <script type="text/javascript" src="lib/htmlparser.js"></script>
