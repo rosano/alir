@@ -5,17 +5,13 @@
     <title>À Lire</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="css/build.css" media="all" rel="stylesheet" type="text/css" />
-    <!--
-    <link href="css/alir.css" rel="stylesheet" type="text/css" />
-    <link href="css/font.css" rel="stylesheet" type="text/css">
-    <link href="css/widgetCss.css" rel="stylesheet" type="text/css">
-    -->
     <link href="css/dynamic.css"   rel="stylesheet" type="text/css" id="dynamicCss">
     <link href="css/user.css"   rel="stylesheet" type="text/css" id="userCss">
     <link rel="icon" type="image/png" href="/img/icon-32.png" />
     <link rel="prefetch" type="application/l10n" href="locales/locales.ini" />
   </head>
   <body class="online menu-left hosted">
+    <!-- templates {{ -->
     <div id="templates">
       <ul id="tmpl-article">
         <li data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" data-tags=",{{=tags|join|tolowercase}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
@@ -121,11 +117,13 @@
         </li>
       </ul>
     </div>
+    <!-- }} -->
     <div id="rsWidget" class="hidden"></div>
     <div id="statusbar">
       <span class="icon-off onoff"></span>
       <span class="icon-exclamation error"></span>
     </div>
+    <!-- Menu {{ -->
     <div id="menu" class="list">
       <div class="content">
         <p><a class="icon-plus new main" data-object="articles" data-method="create"></a></p>
@@ -142,6 +140,7 @@
         <div class="scrollbar"></div>
       </div>
     </div>
+    <!-- }} -->
     <!-- articleEdit {{ -->
     <div id="articleEdit" class="" data-tile="articleEdit">
       <header>
@@ -207,7 +206,7 @@
     </div>
     <!-- }} -->
     <!-- articleShow {{ -->
-    <section data-tile="articleShow" id="articleDetail">
+    <section data-tile="articleShow" id="articleShow">
     </section>
     <!-- }} -->
     <!-- settings {{ -->
@@ -581,13 +580,6 @@
     </section>
     <!-- }} -->
     <script type="text/javascript" src="lib/build.js"></script>
-    <!--
-    <script type="text/javascript" src="lib/htmlparser.js"></script>
-    <script type="text/javascript" src="lib/remotestorage.js"></script>
-    <script type="text/javascript" src="lib/webL10n/l10n.js"></script>
-    <script type="text/javascript" src="js/utils.js"></script>
-    <script type="text/javascript" src="js/touch.js"></script>
-    -->
     <script type="text/javascript" src="js/alir.js"></script>
   </body>
 </html>

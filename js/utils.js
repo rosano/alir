@@ -171,7 +171,46 @@ var utils = {
       res.push(item);
     });
     return res;
+  },
+  createXPathFromElement: function (elm) {
+    // source: http://stackoverflow.com/a/5178132
+    //jshint maxcomplexity: 12
+    "use strict";
+    var allNodes = document.getElementsByTagName('*'),
+    uniqueIdCount,
+    i, n,
+    sib, segs;
+    for (segs = []; elm && elm.nodeType === 1; elm = elm.parentNode) {
+      if (elm.hasAttribute('id')) {
+        uniqueIdCount = 0;
+        for (n = 0; n < allNodes.length; n++) {
+          if (allNodes[n].hasAttribute('id') && allNodes[n].id === elm.id) {
+            uniqueIdCount++;
+          }
+          if (uniqueIdCount > 1) {
+            break;
+          }
+        }
+        if (uniqueIdCount === 1) {
+          segs.unshift('//*[@id="' + elm.getAttribute('id') + '"]');
+          return segs.join('/');
+        } else {
+          segs.unshift(elm.localName.toLowerCase() + '[@id="' + elm.getAttribute('id') + '"]');
+        }
+      } else if (elm.hasAttribute('class')) {
+        segs.unshift(elm.localName.toLowerCase() + '[@class="' + elm.getAttribute('class') + '"]');
+      } else {
+        for (i = 1, sib = elm.previousSibling; sib; sib = sib.previousSibling) {
+          if (sib.localName === elm.localName) {
+            i++;
+          }
+        }
+        segs.unshift(elm.localName.toLowerCase() + '[' + i + ']');
+      }
+    }
+    return segs.length ? '/' + segs.join('/') : null;
   }
+
 };
 window.onerror = function (errorMsg, url, lineNumber) {
   "use strict";
@@ -180,11 +219,12 @@ window.onerror = function (errorMsg, url, lineNumber) {
 
 var Tiles = function (global) {
   "use strict";
-  RemoteStorage.eventHandling(this, "shown");
+  RemoteStorage.eventHandling(this, "leaving", "shown");
   var current,
       tiles = [],
       popup = (window.matchMedia("(min-width: 37rem) and (min-height: 37rem)").matches);
   this.show = function (name) {
+    this._emit('leaving', current);
     Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
       if (e.dataset.tile === name) {
         e.classList.add('shown');
@@ -198,6 +238,7 @@ var Tiles = function (global) {
     this._emit('shown', name);
   };
   this.go = function (name, cb) {
+    this._emit('leaving', current);
     tiles.push({name: current, y: window.scrollY, cb: cb});
     if (popup) {
       document.body.classList.add("popup");

@@ -80,7 +80,7 @@ function Alir() {
       }
       slider.value = conf.fontSize;
       family.value = conf.fontFamily;
-      dynamicSheet.insertRule("#list .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; font-family: " + conf.fontFamily  + " }", 0);
+      dynamicSheet.insertRule("#articleShow .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; font-family: " + conf.fontFamily  + " }", 0);
     }
     function onSizeChanged(event) {
       window.config.style.fontSize = slider.value;
@@ -358,45 +358,6 @@ window.link = {
   }
 };
 
-function createXPathFromElement(elm) {
-  // source: http://stackoverflow.com/a/5178132
-  //jshint maxcomplexity: 12
-  "use strict";
-  var allNodes = document.getElementsByTagName('*'),
-  uniqueIdCount,
-  i, n,
-  sib, segs;
-  for (segs = []; elm && elm.nodeType === 1; elm = elm.parentNode) {
-    if (elm.hasAttribute('id')) {
-      uniqueIdCount = 0;
-      for (n = 0; n < allNodes.length; n++) {
-        if (allNodes[n].hasAttribute('id') && allNodes[n].id === elm.id) {
-          uniqueIdCount++;
-        }
-        if (uniqueIdCount > 1) {
-          break;
-        }
-      }
-      if (uniqueIdCount === 1) {
-        segs.unshift('//*[@id="' + elm.getAttribute('id') + '"]');
-        return segs.join('/');
-      } else {
-        segs.unshift(elm.localName.toLowerCase() + '[@id="' + elm.getAttribute('id') + '"]');
-      }
-    } else if (elm.hasAttribute('class')) {
-      segs.unshift(elm.localName.toLowerCase() + '[@class="' + elm.getAttribute('class') + '"]');
-    } else {
-      for (i = 1, sib = elm.previousSibling; sib; sib = sib.previousSibling) {
-        if (sib.localName === elm.localName) {
-          i++;
-        }
-      }
-      segs.unshift(elm.localName.toLowerCase() + '[' + i + ']');
-    }
-  }
-  return segs.length ? '/' + segs.join('/') : null;
-}
-
 RemoteStorage.defineModule('alir', function module(privateClient, publicClient) {
   "use strict";
 
@@ -515,12 +476,6 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
 function initUI() {
   // jshint maxstatements: 60
   "use strict";
-  var UI = {};
-  UI = {
-    list: $('#list'),
-    main: $('#main'),
-    menu: {}
-  };
   function clicked(elmt) {
     if (typeof elmt !== 'undefined' && elmt instanceof Element) {
       elmt.classList.add('clicked');
@@ -626,7 +581,7 @@ function initUI() {
         },
         // Links inside content
         {
-          sel: "#list .content a[href][target]",
+          sel: "#articleShow .content a[href][target]",
           action: function (elmt) {
             document.getElementById("linkRef").textContent = elmt.href;
             tiles.go('link');
@@ -719,19 +674,6 @@ function initUI() {
     }
 
   });
-  /**
-   * Display the tile to add a note
-   */
-  function doNote(event) {
-    var res = utils.parent(event.target, function (el) { return typeof el.dataset.key !== 'undefined'; });
-    if (res !== null) {
-      window.comment.create(res.dataset.key, createXPathFromElement(event.target));
-    }
-  }
-  if ("ontouchstart" in window) {
-    UI.list.addEventListener('contextmenu', doNote);
-  }
-  UI.list.addEventListener('dblclick', doNote);
   // Gestures {{
   (function () {
     var checkbox, gestureEvents;
@@ -774,7 +716,7 @@ function initUI() {
         case 'E':
           items = getItems();
           if (items) {
-            config.bookmarks[items[1].dataset.key] = window.scrollY / UI.list.clientHeight;
+            config.bookmarks[items[1].dataset.key] = window.scrollY / document.querySelector("[data-tile].shown").clientHeight;
             items[1].classList.add('hideRight');
             items[2].classList.add('showLeft');
             window.setTimeout(function () {
@@ -789,7 +731,7 @@ function initUI() {
         case 'W':
           items = getItems();
           if (items) {
-            config.bookmarks[items[1].dataset.key] = window.scrollY / UI.list.clientHeight;
+            config.bookmarks[items[1].dataset.key] = window.scrollY / document.querySelector("[data-tile].shown").clientHeight;
             items[1].classList.add('hideLeft');
             items[0].classList.add('showRight');
             window.setTimeout(function () {
@@ -805,14 +747,14 @@ function initUI() {
       }
     };
     if (config.gesture) {
-      Gesture.attach(UI.list, gestureEvents);
+      Gesture.attach(document.getElementById('articleDetail'), gestureEvents);
     }
     checkbox = document.getElementById('prefGesture');
     checkbox.addEventListener('change', function () {
       if (checkbox.checked) {
-        Gesture.attach(UI.list, gestureEvents);
+        Gesture.attach(document.getElementById('articleDetail'), gestureEvents);
       } else {
-        Gesture.detach(UI.list, gestureEvents);
+        Gesture.detach(document.getElementById('articleDetail'), gestureEvents);
       }
     });
   }());
@@ -1085,7 +1027,7 @@ window.addEventListener('load', function () {
       item = displayItem(ev.newValue);
     }
   });
-  window.tiles.on('shown', function (tile, name) {
+  window.tiles.on('shown', function (name) {
     if (name === 'settings') {
       document.body.classList.remove('error');
     }

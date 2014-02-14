@@ -380,6 +380,7 @@ function Feeds() {
     }
   };
 }
+window.feeds = new Feeds();
 // Manage alarms
 if (navigator.mozAlarms) {
   window.alarms = {
@@ -543,4 +544,3 @@ if (navigator.mozAlarms) {
   };
 
 }
-window.feeds = new Feeds();

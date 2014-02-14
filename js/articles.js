@@ -1,11 +1,26 @@
 /*jshint browser: true, devel: true */
 /*global _: true, $:true, config: true, remoteStorage: true, tiles: true, View: true, utils: true, Showdown: true */
 function Article() {
+  //jshint maxstatements: 25
   "use strict";
   var self = this,
       currentId,
       tags = [],
       dynamicSheet = document.getElementById('dynamicCss').sheet;
+
+  /**
+   * Display the tile to add a note
+   */
+  function doNote(event) {
+    var res = utils.parent(event.target, function (el) { return typeof el.dataset.key !== 'undefined'; });
+    if (res !== null) {
+      window.comment.create(res.dataset.key, utils.createXPathFromElement(event.target));
+    }
+  }
+  if ("ontouchstart" in window) {
+    document.getElementById("articleShow").addEventListener('contextmenu', doNote);
+  }
+  document.getElementById("articleShow").addEventListener('dblclick', doNote);
 
   /**
    * prepare an article for display
@@ -47,7 +62,12 @@ function Article() {
 
     return data;
   }
-  window.tiles.on('shown', function (tile, name) {
+  window.tiles.on('leaving', function (name) {
+    if (name === 'articleShow' && typeof currentId !== 'undefined') {
+      self.hide();
+    }
+  });
+  window.tiles.on('shown', function (name) {
     if (name === 'articleList' && typeof currentId !== 'undefined') {
       self.onShown(currentId);
     }
@@ -171,7 +191,7 @@ function Article() {
         topAlt.appendChild(a);
       });
     }
-    tile = document.getElementById('articleDetail');
+    tile = document.getElementById('articleShow');
     tile.innerHTML = '';
     tile.appendChild(item);
     tiles.go('articleShow');
@@ -292,7 +312,7 @@ function Article() {
     });
   };
   this.onShown = function onShown() {
-    var iframe = document.getElementById('articleDetail').querySelector('iframe');
+    var iframe = document.getElementById('articleShow').querySelector('iframe');
     if (iframe) {
       iframe.contentDocument.body.style.margin  = "0px";
       iframe.contentDocument.body.style.padding = "0px";
@@ -302,7 +322,7 @@ function Article() {
     $('#menu .content .top').href = '#' + currentId;
     if (config.bookmarks[currentId]) {
       window.setTimeout(function () {
-        window.scrollTo(0, config.bookmarks[currentId] * $('#articleDetail').clientHeight);
+        window.scrollTo(0, config.bookmarks[currentId] * $('#articleShow').clientHeight);
       }, 100);
     } else {
       window.scrollTo(0, 0);
@@ -314,7 +334,7 @@ function Article() {
         clMain  = document.getElementById('main').classList,
         current = $('#list > [data-key="' + currentId + '"]');
     if (current) {
-      config.bookmarks[currentId] = window.scrollY / $('#articleDetail').clientHeight;
+      config.bookmarks[currentId] = window.scrollY / $('#articleShow').clientHeight;
       current.classList.remove('current');
       current.scrollIntoView();
     }
@@ -374,8 +394,8 @@ function Article() {
   };
   this.ui = {
     menu: function (folded) {
-      var cl = $('#articleDetail .articleMenu').classList,
-          actions = $('#articleDetail .articleMenu .articleActions');
+      var cl = $('#articleShow .articleMenu').classList,
+          actions = $('#articleShow .articleMenu .articleActions');
       function style() {
         if (cl.contains('folded')) {
           actions.style.marginTop = -actions.clientHeight + 'px';
@@ -455,7 +475,7 @@ function Article() {
     },
     // Toggle display of alternate subscription buttons
     toggleAlternates: function () {
-      document.querySelector("#articleDetail .content > .alternates").classList.toggle('hidden');
+      document.querySelector("#articleShow .content > .alternates").classList.toggle('hidden');
     }
   };
 }
