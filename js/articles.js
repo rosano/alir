@@ -85,7 +85,7 @@ function Article() {
    *
    */
   this.addToList = function (obj) {
-    var data, item, classes;
+    var data, item, classes = [];
     item = $('#list > [data-key="' + obj.id + '"]');
     if (item) {
       classes = [].slice.call(item.classList);
@@ -539,7 +539,7 @@ window.Comment = function () {
     ["articleId", "noteId", "xpath", "text"].forEach(function (field) {
       $('#noteEdit [name="' + field + '"]').value = $('#noteView [name="' + field + '"]').value;
     });
-    window.tiles.show('noteEdit');
+    window.tiles.go('noteEdit');
   };
   this.delete = function () {
     var noteId    = $('#noteView [name="noteId"]').value,

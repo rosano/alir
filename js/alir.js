@@ -886,11 +886,15 @@ function initUI() {
         scroll = $("#menu .scrollbar");
     scroll.style.height = (window.innerHeight / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
     setInterval(function checkSize() {
-      var h = document.querySelector("[data-tile].shown").clientHeight;
-      if (h !== height) {
-        height = h;
-        scroll.style.height = (window.innerHeight / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
-        scroll.style.top = (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
+      var tile, h;
+      tile = document.querySelector("[data-tile].shown");
+      if (tile) {
+        h = tile.clientHeight;
+        if (h !== height) {
+          height = h;
+          scroll.style.height = (window.innerHeight / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
+          scroll.style.top = (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
+        }
       }
     }, 250);
     window.onscroll = function () {

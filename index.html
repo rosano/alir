@@ -30,8 +30,14 @@
         </li>
       </ul>
       <div id="tmpl-article-detail">
-        <div id="{{=key}}">
-          <h2>{{=title}}</h2>
+        <div id="{{=key}}" data-key="{{=key}}" data-context="{{=context}}" class="{{=context}} {{=hasNotes}}" data-tags=",{{=tags|join|tolowercase}}," data-flags=",{{=flags}}," data-date="{{=date}}" data-title="{{=title|toLowerCase}}" data-url="{{=url}}">
+          <header>
+            <h2>
+              <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
+              <span>{{=title}}</span>
+            </h2>
+          </header>
+          <h3>{{=title}}</h3>
           <div class="articleMenu folded">
             <p><a class="icon-reorder" data-object="articles.ui" data-method="menu"></a></p>
             <div class="articleActions">
@@ -47,7 +53,6 @@
             </div>
           </div>
           <div class="toolbar">
-            <a class="icon-chevron-left" data-object="articles" data-method="hide" ></a>
             <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}}"></a>
           </div>
           <div class="content">
@@ -120,6 +125,7 @@
     <!-- }} -->
     <div id="rsWidget" class="hidden"></div>
     <div id="statusbar">
+      <span class="icon-refresh syncInProgress"></span>
       <span class="icon-off onoff"></span>
       <span class="icon-exclamation error"></span>
     </div>
@@ -136,7 +142,6 @@
         <p><a class="icon-rss main" data-object="tiles" data-method="show" data-params="feeds" ></a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
-        <span class="icon-refresh syncInProgress"></span>
         <div class="scrollbar"></div>
       </div>
     </div>
