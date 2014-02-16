@@ -45,6 +45,7 @@ config = {
   logLevel: 'info',
   proxy: '',
   bookmarks: {},
+  alarms: {},
   style: {
     fontSize: 1,
     'font-size': 'sans-serif'
@@ -1003,6 +1004,9 @@ window.addEventListener('load', function () {
   remoteStorage.displayWidget("rsWidget");
   // config is loaded during initUI, so this must be registered BEFORE
   window.alir.on('configLoaded', function () {
+    Object.keys(window.config.alarms).forEach(function (d) {
+      window.alarms.set(new Date(d));
+    });
     window.alarms.plan();
   });
   initUI();

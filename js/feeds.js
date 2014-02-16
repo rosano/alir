@@ -103,6 +103,8 @@ function Feeds() {
       if (err) {
         utils.log(err, "warning");
       } else {
+        doc = doc.responseXML;
+        doc.url = url;
         root = doc.getElementsByTagName('rss');
         if (root.length > 0) {
           format = 'rss';
@@ -500,16 +502,25 @@ if (navigator.mozAlarms) {
     },
     set: function (date) {
       "use strict";
-      var alarm;
-      alarm = {
-        date: date,
-        data: {
-          action: 'feedUpdate'
-        }
-      };
-      utils.log("Planning alarm at " + date, "debug");
-      alarm.id = window.setTimeout(function () { window.feeds.handleAlarmMessage(alarm); }, alarm.date - new Date());
-      this.all.push(alarm);
+      var alarm, interval;
+      interval = date - new Date();
+      if (interval > 0) {
+        alarm = {
+          date: date,
+          data: {
+            action: 'feedUpdate'
+          }
+        };
+        utils.log("Planning alarm at " + date, "debug");
+        alarm.id = window.setTimeout(function () {
+          delete window.config.alarms[date.toISOString()];
+          window.feeds.handleAlarmMessage(alarm);
+        }, interval);
+        this.all.push(alarm);
+        window.config.alarms[date.toISOString()] = alarm;
+      } else {
+        utils.log("Unable to plan action in the past", "error");
+      }
     },
     reset: function (cb) {
       "use strict";
