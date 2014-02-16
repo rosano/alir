@@ -73,7 +73,7 @@ var utils = {
       ui.innerHTML = utils.format('<span class="%s">[%s][%s]</span> %s\n', level, curDate, level + new Array(10 - level.length).join(' '), message) + ui.innerHTML;
       console.log(utils.format('=====> [%s][%s] %s\n', curDate, level + new Array(10 - level.length).join(' '), message));
       if (level === 'error') {
-        window.alert(message);
+        //window.alert(message);
         document.body.classList.add('error');
       }
     }

@@ -84,27 +84,7 @@ function Feeds() {
   // @TODO Add CORS Proxy
   this.fetch = function (url, test, cb) {
     //jshint maxcomplexity: 15
-    function getUrl(url, cb) {
-      var xhr, options;
-      options = {
-        mozAnon: true,
-        mozSystem: true
-      };
-      xhr = new XMLHttpRequest(options);
-      xhr.onload = function (e) {
-        xhr.responseXML.url = url;
-        cb(null, xhr.responseXML);
-      };
-      xhr.onerror = function (e) {
-        utils.log("Request for %s failed: %s", url, e.target.status, "error");
-        cb("Error : " + xhr.status + " " + e + " on " + url, {url: url});
-      };
-      // Add a timestamp to bypass the cache
-      xhr.open('GET', url + ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime(), true);
-      xhr.responseType = "document";
-      xhr.send();
-    }
-    getUrl(url, function (err, doc) {
+    window.network.fetch(url, function (err, doc) {
       //jshint maxstatements: 25
       var feedUpdated,
           root,

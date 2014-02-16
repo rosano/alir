@@ -43,6 +43,7 @@ config = {
   menu: true,
   alarmInterval: 60,
   logLevel: 'info',
+  proxy: '',
   bookmarks: {},
   style: {
     fontSize: 1,
@@ -537,6 +538,7 @@ function initUI() {
         alarm.addEventListener('input', onIntervalChanged);
       }());
       $('#settingsLoglevel select').value = conf.logLevel;
+      $('#proxyUrl').value = conf.proxy;
       if (typeof conf.bookmarks === 'undefined') {
         conf.bookmarks = {};
       }
@@ -847,7 +849,7 @@ function initUI() {
       config.menu = false;
     }
   });
-  $('#settings').addEventListener('change', function (ev) {
+  document.body.addEventListener('change', function (ev) {
     var val = ev.target.value;
     if (ev.target.dataset.target) {
       switch (ev.target.dataset.target) {
@@ -864,6 +866,9 @@ function initUI() {
       case 'logLevel':
         config.logLevel = val;
         utils.logLevel  = val;
+        break;
+      case 'proxy':
+        config.proxy = val;
         break;
       }
     }
