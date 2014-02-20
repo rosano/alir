@@ -279,5 +279,13 @@ var Tiles = function (global) {
     var root = document.querySelector('[data-tile="' + name + '"]');
     return function (sel) { return root.querySelector(sel); };
   };
+  this.pop = function () {
+    var tile = tiles.pop();
+    current = tile.name;
+    return tile;
+  };
+  this.tiles = function () {
+    return tiles;
+  };
 };
 window.tiles = new Tiles();

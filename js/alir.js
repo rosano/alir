@@ -323,9 +323,11 @@ window.link = {
     }
     tiles.back();
   },
-  scrap: function () {
+  scrap: function (href) {
     "use strict";
-    var href = document.getElementById('linkRef').textContent;
+    if (typeof href === 'undefined') {
+      href = document.getElementById('linkRef').textContent;
+    }
     try {
       utils.log("Scraping " + href);
       scrap(href, function (err, res) {
@@ -890,22 +892,36 @@ function initUI() {
   (function () {
     var height = document.querySelector("[data-tile].shown").clientHeight,
         scroll = $("#menu .scrollbar");
-    scroll.style.height = (window.innerHeight / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
-    setInterval(function checkSize() {
-      var tile, h;
+    //scroll.style.height = (window.innerHeight / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
+    function checkSize() {
+      var tile, h, header, hh, tmp;
       tile = document.querySelector("[data-tile].shown");
+      header = document.querySelector('.shown > header,.shown > * > header');
       if (tile) {
         h = tile.clientHeight;
-        if (h !== height) {
-          height = h;
-          scroll.style.height = (window.innerHeight / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
+        if (header) {
+          hh = header.getBoundingClientRect().bottom;
+          tmp = (1 - (window.scrollY / (tile.clientHeight - document.body.clientHeight)));
+          if (tmp < -0.5) {
+            tmp = 1;
+          }
+          scroll.style.top = "calc(" + (hh * tmp) + "px + " + (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%)';
+        } else {
           scroll.style.top = (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
         }
+        if (h !== height) {
+          height = h;
+          if (header) {
+            scroll.style.height = ((window.innerHeight - header.clientHeight - hh) / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
+          } else {
+            scroll.style.height = (window.innerHeight / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
+          }
+        }
       }
-    }, 250);
-    window.onscroll = function () {
-      scroll.style.top = (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
-    };
+    }
+    window.tiles.on('shown', checkSize);
+    setInterval(checkSize(), 250);
+    document.addEventListener('scroll', checkSize);
   })();
 
   // Preferences

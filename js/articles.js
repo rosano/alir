@@ -204,7 +204,7 @@ function Article() {
     $('#articleEdit [name="url"]').value   = "";
     $('#articleEdit [name="title"]').value = "";
     $('#articleEdit [name="text"]').value  = "";
-    tiles.show('articleEdit');
+    tiles.go('articleEdit');
   };
   this.read = function (key, cb) {
     remoteStorage.alir.getArticle(key, cb);
@@ -216,7 +216,7 @@ function Article() {
         $('#articleEdit [name="title"]').value = article.title;
         $('#articleEdit [name="url"]').value   = article.url;
         $('#articleEdit [name="text"]').value  = article.text;
-        tiles.show('articleEdit');
+        tiles.go('articleEdit');
       }
     });
   };
@@ -249,7 +249,7 @@ function Article() {
           article.date  = Date.now();
           remoteStorage.alir.saveArticle(article);
           self.display(article);
-          tiles.show('articleList');
+          //tiles.show('articleList');
         }
       });
     } else {
@@ -268,7 +268,7 @@ function Article() {
       };
       remoteStorage.alir.saveArticle(article);
       self.display(article);
-      tiles.show('articleList');
+      //tiles.show('articleList');
     }
   };
   this.reload = function (key) {
@@ -312,7 +312,8 @@ function Article() {
     });
   };
   this.onShown = function onShown() {
-    var iframe = document.getElementById('articleShow').querySelector('iframe');
+    var iframe = document.getElementById('articleShow').querySelector('iframe'),
+        scroll;
     if (iframe) {
       iframe.contentDocument.body.style.margin  = "0px";
       iframe.contentDocument.body.style.padding = "0px";
@@ -321,12 +322,13 @@ function Article() {
     self.ui.menu(false);
     $('#menu .content .top').href = '#' + currentId;
     if (config.bookmarks[currentId]) {
-      window.setTimeout(function () {
-        window.scrollTo(0, config.bookmarks[currentId] * $('#articleShow').clientHeight);
-      }, 100);
+      scroll = config.bookmarks[currentId] * $('#articleShow').clientHeight;
     } else {
-      window.scrollTo(0, 0);
+      scroll = 0;
     }
+    window.setTimeout(function () {
+      window.scrollTo(0, 0);
+    }, 100);
     location.hash = currentId;
   };
   this.hide = function hide() {
@@ -345,7 +347,7 @@ function Article() {
     clMain.add("list");
     self.setCurrentId();
     location.hash = '';
-    tiles.back();
+    //tiles.back();
   };
   this.addTag = function (key) {
     tiles.go('tagTile', function (tag) {
@@ -530,9 +532,10 @@ window.Comment = function () {
           content: $('#noteEdit [name="text"]').value
         };
         remoteStorage.alir.saveArticle(article);
+        tiles.pop();
+        tiles.pop();
         window.articles.display(article);
       }
-      tiles.back();
     });
   };
   this.edit = function () {
