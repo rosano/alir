@@ -6,6 +6,7 @@ var matchesSelector = document.documentElement.matches ||
                       document.documentElement.mozMatchesSelector ||
                       document.documentElement.oMatchesSelector ||
                       document.documentElement.msMatchesSelector;
+var realLog = console.log;
 var utils = {
   device: {
     type: '',
@@ -58,7 +59,7 @@ var utils = {
     }
     levelNum = utils.logLevels.indexOf(level);
     if (levelNum === -1) {
-      console.log("Unknown log level " + level);
+      realLog("Unknown log level " + level);
     }
     if (levelNum >= utils.logLevels.indexOf(utils.logLevel)) {
       if (args.length === 1) {
@@ -70,12 +71,14 @@ var utils = {
         message = utils.format.apply(null, args);
       }
       ui = document.getElementById('debugLog');
-      ui.innerHTML = utils.format('<span class="%s">[%s][%s]</span> %s\n', level, curDate, level + new Array(10 - level.length).join(' '), message) + ui.innerHTML;
-      console.log(utils.format('=====> [%s][%s] %s\n', curDate, level + new Array(10 - level.length).join(' '), message));
-      if (level === 'error') {
-        //window.alert(message);
-        document.body.classList.add('error');
+      if (ui) {
+        ui.innerHTML = utils.format('<span class="%s">[%s][%s]</span> %s\n', level, curDate, level + new Array(10 - level.length).join(' '), message) + ui.innerHTML;
+        if (level === 'error') {
+          //window.alert(message);
+          document.body.classList.add('error');
+        }
       }
+      realLog(utils.format('=====> [%s][%s] %s\n', curDate, level + new Array(10 - level.length).join(' '), message));
     }
   },
   notify: function (title, body, cb) {
@@ -212,6 +215,10 @@ var utils = {
   }
 
 };
+console.log = function () {
+  "use strict";
+  [].slice.call(arguments).forEach(function (a) { utils.log(a, 'debug'); });
+};
 window.onerror = function (errorMsg, url, lineNumber) {
   "use strict";
   utils.log("%s on %s:%s", errorMsg, url, lineNumber, "error");
@@ -238,20 +245,32 @@ var Tiles = function (global) {
     this._emit('shown', name);
   };
   this.go = function (name, cb) {
-    this._emit('leaving', current);
-    tiles.push({name: current, y: window.scrollY, cb: cb});
-    if (popup) {
-      document.body.classList.add("popup");
-      Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
-        if (e.dataset.tile === name) {
-          e.classList.add('popup');
-          window.scrollTo(0, 0);
-          current = name;
-        }
-      });
-      this._emit('shown', name);
+    var i = tiles.findIndex(function (e) { return e.name === name; }),
+        next;
+    if (i !== -1) {
+      next = tiles[i];
+      this.show(next.name);
+      if (typeof next.cb === 'function') {
+        next.cb();
+      }
+      window.scrollTo(0, next.y);
+      tiles.splice(i);
     } else {
-      this.show(name);
+      tiles.push({name: current, y: window.scrollY, cb: cb});
+      if (popup) {
+        document.body.classList.add("popup");
+        Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
+          if (e.dataset.tile === name) {
+            e.classList.add('popup');
+            window.scrollTo(0, 0);
+            current = name;
+          }
+        });
+        this._emit('leaving', current);
+        this._emit('shown', name);
+      } else {
+        this.show(name);
+      }
     }
     document.getElementById('menu').classList.remove('show');
   };

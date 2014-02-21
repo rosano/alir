@@ -229,8 +229,9 @@ function Article() {
       delete config.bookmarks[key];
       elmt = $('#list > [data-key="' + key + '"]');
       if (elmt) {
-        elmt.classList.add('hidden');
+        elmt.parentNode.removeChild(elmt);
       }
+      tiles.back();
     }
     self.hide();
   };
@@ -248,8 +249,8 @@ function Article() {
           article.html  = new Showdown.converter().makeHtml(article.text);
           article.date  = Date.now();
           remoteStorage.alir.saveArticle(article);
+          tiles.pop(); // remove articleEdit from tiles heap
           self.display(article);
-          //tiles.show('articleList');
         }
       });
     } else {
@@ -267,8 +268,8 @@ function Article() {
         tags: ['note']
       };
       remoteStorage.alir.saveArticle(article);
+      tiles.pop(); // remove articleEdit from tiles heap
       self.display(article);
-      //tiles.show('articleList');
     }
   };
   this.reload = function (key) {
@@ -347,7 +348,6 @@ function Article() {
     clMain.add("list");
     self.setCurrentId();
     location.hash = '';
-    //tiles.back();
   };
   this.addTag = function (key) {
     tiles.go('tagTile', function (tag) {

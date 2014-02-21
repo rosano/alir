@@ -923,7 +923,7 @@ function initUI() {
       }
     }
     window.tiles.on('shown', checkSize);
-    setInterval(checkSize(), 250);
+    setInterval(checkSize, 250);
     document.addEventListener('scroll', checkSize);
   })();
 
