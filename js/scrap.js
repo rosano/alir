@@ -52,17 +52,65 @@ function scrap(url, cb) {
   }
   window.network.fetch(url, onComplete);
 }
-window.network = {
-  fetch: function (url, cb) {
-    //jshint maxstatements: 25
-    "use strict";
-    var status, xhr, options, tmp;
+window.Network = function () {
+  "use strict";
+  var self          = this,
+      timeout       = 20000,
+      cache         = [],
+      maxRetry      = 5,
+      retryInterval = 60000;
+  /**
+   * Store a failed request for later retry
+   */
+  function store(reason, url, cb) {
+    var found, item;
+    found = cache.find(function (e) { return e.url === url; });
+    if (typeof found !== "undefined") {
+      found.calls++;
+    } else {
+      item = {
+        url: url,
+        cb: cb,
+        calls: 0
+      };
+      cache.push(item);
+    }
+  }
+  /**
+   * If online, retry to fetch all stored request
+   */
+  function retry(status) {
+    cache = cache.filter(function (item) {
+      if (item.calls > maxRetry) {
+        item.cb("Error fetching " + item.url + ", max retry");
+        return false;
+      } else {
+        return true;
+      }
+    });
+    if (typeof status === "undefined") {
+      status = window.alir.getStatus();
+    }
+    if (status.online === true) {
+      cache.forEach(function (item) {
+        utils.log("Retrying to fetch " + item.url, "debug");
+        self.fetch(item.url, item.cb);
+      });
+    }
+  }
+  window.alir.on('statusUpdated', retry);
+  window.setInterval(retry, retryInterval);
+
+  this.fetch = function (url, cb) {
+    //jshint maxstatements: 26
+    var status, xhr, options, proxy, timer, computedUrl;
     status = window.alir.getStatus();
+    computedUrl = url;
     if (status.installed !== true) {
       if (window.config.proxy) {
-        tmp = url.split('://');
-        if (tmp !== null) {
-          url = window.config.proxy + tmp[1];
+        proxy = url.split('://');
+        if (proxy !== null) {
+          computedUrl = window.config.proxy + proxy[1];
         } else {
           cb(_('scrapNotInstalled'));
           return;
@@ -72,10 +120,11 @@ window.network = {
         return;
       }
     } else {
-      url += ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
+      // Add a timestamp to bypass the cache
+      computedUrl += ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
     }
     if (status.online !== true) {
-      cb(_('scrapOffline'));
+      store('offline', url, cb);
       return;
     }
     try {
@@ -84,23 +133,34 @@ window.network = {
         mozSystem: true
       };
       xhr = new XMLHttpRequest(options);
-      // Add a timestamp to bypass the cache
-      xhr.open("GET", url, true);
+      xhr.open("GET", computedUrl, true);
       xhr.responseType = "document";
-      xhr.timeout = 20000;
+      xhr.timeout = this.timeout;
       xhr.onload = function (e) {
+        clearTimeout(timer);
+        var i = cache.findIndex(function (e) { return e.url === url; });
+        if (i !== -1) {
+          cache.splice(i, 1);
+        }
         cb(null, xhr);
       };
       xhr.onerror = function (e) {
+        clearTimeout(timer);
+        store('error', url, cb);
         utils.log("Request for %s failed: %s", url, e.target.status, "error");
-        cb("Error : " + xhr.status + " " + e + " on " + url, {url: url});
+        return;
       };
+      timer = setTimeout(function () {
+        xhr.abort();
+        store('timeout', url, cb);
+      }, timeout);
       xhr.send(null);
     } catch (e) {
+      store('error', url, cb);
       utils.log(utils.format("Error getting %s : %s", url, e));
-      cb('Failed ' + e.toString());
+      return;
     }
-  }
+  };
 };
 function saveScraped(article) {
   "use strict";

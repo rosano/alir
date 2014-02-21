@@ -301,8 +301,11 @@ function Alir() {
 window.alir = new Alir();
 window.alir.on('statusUpdated', function (status) {
   "use strict";
-  //console.log(status);
+  console.log(status);
 });
+// network depends on alir
+// @FIXME move creation of all global objects elsewhere
+window.network = new window.Network();
 
 window.link = {
   // Open link in external browser
