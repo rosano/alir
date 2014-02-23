@@ -330,6 +330,7 @@ window.link = {
     "use strict";
     if (typeof href === 'undefined') {
       href = document.getElementById('linkRef').textContent;
+      tiles.back();
     }
     try {
       utils.log("Scraping " + href);
@@ -343,7 +344,6 @@ window.link = {
     } catch (e) {
       utils.log(e.toString(), "error");
     }
-    tiles.back();
   },
   share: function () {
     "use strict";
@@ -363,6 +363,27 @@ window.link = {
       utils.log("Sorry, share is not available", "error");
     }
   }
+};
+
+window.choice = function (choices) {
+  "use strict";
+  var tile = document.querySelector('[data-tile=prompt]'),
+      button;
+  choices.push({'object': 'tiles', 'method': 'back', 'l10nId': 'back'});
+  tile.innerHTML = '';
+  choices.forEach(function (choice) {
+    button = document.createElement('button');
+    ['object', 'method', 'params', 'l10nId'].forEach(function (d) {
+      if (typeof choice[d] !== 'undefined') {
+        button.dataset[d] = choice[d];
+      }
+    });
+    if (typeof choice.l10nId !== 'undefined') {
+      button.innerHTML = _(choice.l10nId);
+    }
+    tile.appendChild(button);
+  });
+  tiles.go('prompt');
 };
 
 RemoteStorage.defineModule('alir', function module(privateClient, publicClient) {

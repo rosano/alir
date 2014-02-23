@@ -162,14 +162,14 @@
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
         </fieldset>
-        <fieldset class="inline text hidden">
+        <fieldset class="inline text url">
           <p>
             <label for="articleUrl" data-l10n-id="articleUrlLabel">Url</label>
             <input type="text" name="url" id="articleUrl" placeholder="URL" data-l10n-id="articleUrl" />
             <button type="reset"><span class="icon-remove"></span></button>
           </p>
         </fieldset>
-        <fieldset class="inline text">
+        <fieldset class="inline text article">
           <p>
             <label for="articleTitle" data-l10n-id="articleTitleLabel">Title</label>
             <input type="text" name="title" id="articleTitle" placeholder="Titre" data-l10n-id="articleTitle" />
@@ -180,7 +180,7 @@
           <button data-object="articles" data-method="save" data-l10n-id="articleSave">Save</button>
           <button data-object="tiles" data-method="show" data-params="articleList" data-l10n-id="cancel">Cancel</button>
         </p>
-        <fieldset class="inline text">
+        <fieldset class="inline text article">
           <textarea rows="10" cols="40" name="text" placeholder="Content" data-l10n-id="articleContent"></textarea>
         </fieldset>
         <p class="col2">
@@ -525,6 +525,10 @@
       <button data-object="link" data-method="open" data-l10n-id="linkOpen">Open</button>
       <button data-object="link" data-method="share" class="ifInstalled" data-l10n-id="linkShare">share</button>
       <button data-l10n-id="linkCancel" data-object="tiles" data-method="back">Return</button>
+    </section>
+    <!-- }} -->
+    <!-- prompt {{ -->
+    <section data-tile="prompt">
     </section>
     <!-- }} -->
     <!-- feeds {{ -->

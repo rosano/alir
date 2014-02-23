@@ -256,7 +256,9 @@ var Tiles = function (global) {
       window.scrollTo(0, next.y);
       tiles.splice(i);
     } else {
-      tiles.push({name: current, y: window.scrollY, cb: cb});
+      if (name !== current) {
+        tiles.push({name: current, y: window.scrollY, cb: cb});
+      }
       if (popup) {
         document.body.classList.add("popup");
         Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {

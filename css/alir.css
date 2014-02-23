@@ -494,6 +494,10 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   border-style: solid;
   padding: 1rem .5rem;
 }
+#articleEdit.article fieldset.url,
+#articleEdit.url fieldset.article {
+  display: none;
+}
 /** Settings {{ **/
 #settings .container {
   border: 1px solid #888;

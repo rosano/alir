@@ -1,7 +1,7 @@
 /*jshint browser: true, devel: true */
 /*global _: true, $:true, config: true, remoteStorage: true, tiles: true, View: true, utils: true, Showdown: true */
 function Article() {
-  //jshint maxstatements: 25
+  //jshint maxstatements: 27
   "use strict";
   var self = this,
       currentId,
@@ -200,16 +200,36 @@ function Article() {
     return item;
   };
   this.create = function () {
+    var choices = [];
     $('#articleEdit [name="id"]').value    = "";
     $('#articleEdit [name="url"]').value   = "";
     $('#articleEdit [name="title"]').value = "";
     $('#articleEdit [name="text"]').value  = "";
+    choices.push({'object': 'articles', 'method': 'createArticle', 'l10nId': 'articleCreateArticle'});
+    choices.push({'object': 'articles', 'method': 'createUrl', 'l10nId': 'articleCreateUrl'});
+    window.choice(choices);
+  };
+  this.createArticle = function () {
+    var tile = document.querySelector('[data-tile=articleEdit]');
+    tiles.back();
+    tile.classList.remove('url');
+    tile.classList.add('article');
+    tiles.go('articleEdit');
+  };
+  this.createUrl = function () {
+    var tile = document.querySelector('[data-tile=articleEdit]');
+    tiles.back();
+    tile.classList.add('url');
+    tile.classList.remove('article');
     tiles.go('articleEdit');
   };
   this.read = function (key, cb) {
     remoteStorage.alir.getArticle(key, cb);
   };
   this.edit = function (key) {
+    var tile = document.querySelector('[data-tile=articleEdit]');
+    tile.classList.remove('url');
+    tile.classList.add('article');
     self.read(key, function (article) {
       if (typeof article !== 'undefined') {
         $('#articleEdit [name="id"]').value    = key;
@@ -236,7 +256,8 @@ function Article() {
     self.hide();
   };
   this.save = function () {
-    var id = $('#articleEdit [name="id"]').value,
+    var tile = document.querySelector('[data-tile=articleEdit]'),
+        id = $('#articleEdit [name="id"]').value,
         article;
 
     if (id) {
@@ -249,27 +270,32 @@ function Article() {
           article.html  = new Showdown.converter().makeHtml(article.text);
           article.date  = Date.now();
           remoteStorage.alir.saveArticle(article);
-          tiles.pop(); // remove articleEdit from tiles heap
+          tiles.back(); // remove articleEdit from tiles heap
           self.display(article);
         }
       });
     } else {
-      // create
-      article = {
-        id: utils.uuid(),
-        url:   $('#articleEdit [name="url"]').value,
-        title: $('#articleEdit [name="title"]').value,
-        text:  $('#articleEdit [name="text"]').value,
-        html:  new Showdown.converter().makeHtml($('#articleEdit [name="text"]').value),
-        date:  Date.now(),
-        flags: {
-          editable: true
-        },
-        tags: ['note']
-      };
-      remoteStorage.alir.saveArticle(article);
-      tiles.pop(); // remove articleEdit from tiles heap
-      self.display(article);
+      if (tile.classList.contains('article')) {
+        // create
+        article = {
+          id: utils.uuid(),
+          url:   $('#articleEdit [name="url"]').value,
+          title: $('#articleEdit [name="title"]').value,
+          text:  $('#articleEdit [name="text"]').value,
+          html:  new Showdown.converter().makeHtml($('#articleEdit [name="text"]').value),
+          date:  Date.now(),
+          flags: {
+            editable: true
+          },
+          tags: ['note']
+        };
+        remoteStorage.alir.saveArticle(article);
+        tiles.back(); // remove articleEdit from tiles heap
+        self.display(article);
+      } else {
+        tiles.back(); // remove articleEdit from tiles heap
+        window.link.scrap($('#articleEdit [name="url"]').value);
+      }
     }
   };
   this.reload = function (key) {
@@ -532,8 +558,7 @@ window.Comment = function () {
           content: $('#noteEdit [name="text"]').value
         };
         remoteStorage.alir.saveArticle(article);
-        tiles.pop();
-        tiles.pop();
+        tiles.back();
         window.articles.display(article);
       }
     });
