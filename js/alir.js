@@ -30,7 +30,9 @@ config = {
   gesture: false,
   vibrate: false,
   rs: {
-    login: ''
+    login: '',
+    syncIntervalOn: 60,
+    syncIntervalOff: 300
   },
   dropBox: {
     apiKey: ''
@@ -301,7 +303,7 @@ function Alir() {
 window.alir = new Alir();
 window.alir.on('statusUpdated', function (status) {
   "use strict";
-  console.log(status);
+  //console.log(status);
 });
 // network depends on alir
 // @FIXME move creation of all global objects elsewhere
@@ -564,6 +566,32 @@ function initUI() {
         alarm.addEventListener('change', onIntervalChanged);
         alarm.addEventListener('input', onIntervalChanged);
       }());
+      // sync interval {{
+      ['On', 'Off'].forEach(function (mode) {
+        var range      = $('#rsSyncInterval' + mode),
+            rangeValue = $('#rsSyncInterval' + mode + 'Value'),
+            prefName   = 'syncInterval' + mode;
+        function onIntervalChanged(event) {
+          var value = event.target.value;
+          conf.rs[prefName] = value;
+          rangeValue.textContent = value;
+          if (event.type === 'change') {
+            if (mode === 'On') {
+              remoteStorage.setSyncInterval(value * 1000);
+            }
+            if (mode === 'Off') {
+              remoteStorage.setBackgroundSyncInterval(value * 1000);
+            }
+          }
+        }
+        range.value            = conf.rs[prefName];
+        rangeValue.textContent = conf.rs[prefName];
+        range.addEventListener('change', onIntervalChanged);
+        range.addEventListener('input', onIntervalChanged);
+      });
+      remoteStorage.setSyncInterval(conf.rs.syncIntervalOn * 1000);
+      remoteStorage.setBackgroundSyncInterval(conf.rs.syncIntervalOff * 1000);
+      // }}
       $('#settingsLoglevel select').value = conf.logLevel;
       $('#proxyUrl').value = conf.proxy;
       if (typeof conf.bookmarks === 'undefined') {
@@ -1035,13 +1063,13 @@ window.addEventListener('load', function () {
     utils.notify('Not installed');
   }
 
-  //remoteStorage.enableLog();
-  remoteStorage.setSyncInterval(60000);
-  remoteStorage.setBackgroundSyncInterval(300000);
-  remoteStorage.access.claim('alir', 'rw');
-  remoteStorage.caching.enable('/alir/');
-  //remoteStorage.caching.enable('/public/alir/');
-  remoteStorage.displayWidget("rsWidget");
+  window.alir.on('configLoaded', function () {
+    //remoteStorage.enableLog();
+    remoteStorage.access.claim('alir', 'rw');
+    remoteStorage.caching.enable('/alir/');
+    //remoteStorage.caching.enable('/public/alir/');
+    remoteStorage.displayWidget("rsWidget");
+  });
   // config is loaded during initUI, so this must be registered BEFORE
   window.alir.on('configLoaded', function () {
     Object.keys(window.config.alarms).forEach(function (d) {

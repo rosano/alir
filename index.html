@@ -285,6 +285,16 @@
                   <button data-l10n-id="rsCache" data-object="alir.rs" data-method="cacheReset"></button>
                 </p>
               </fieldset>
+              <fieldset>
+                <legend data-l10n-id="rsSyncIntervalOn"></legend>
+                <input type="range" name="rsSyncIntervalOn" id="rsSyncIntervalOn" min="10" max="600" step="5" />
+                <p><span id="rsSyncIntervalOnValue" ></span>s</p>
+              </fieldset>
+              <fieldset>
+                <legend data-l10n-id="rsSyncIntervalOff"></legend>
+                <input type="range" name="rsSyncIntervalOff" id="rsSyncIntervalOff" min="60" max="3600" step="5" />
+                <p><span id="rsSyncIntervalOffValue" ></span>s</p>
+              </fieldset>
               <fieldset class="inline text">
                 <p>
                   <label for="prefToken" data-l10n-id="settingsToken">Token</label>
