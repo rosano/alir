@@ -18,6 +18,15 @@ p.col2 button {
   display: inline;
   margin: .33rem;
 }
+p.float {
+  clear: both;
+}
+p.float button {
+  width: 45%;
+  display: block;
+  float: left;
+  margin: .33rem;
+}
 fieldset {
   border: 1px solid #888;
   border-radius: 3px;

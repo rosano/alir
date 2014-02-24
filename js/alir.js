@@ -1,5 +1,5 @@
 /*jshint browser: true, devel: true */
-/*global remoteStorage: true, RemoteStorage: true, Gesture: true, tiles: true, utils: true, Event: true, scrap: true, saveScraped: true, $:true, $$: true */
+/*global remoteStorage: true, RemoteStorage: true, Gesture: true, tiles: true, utils: true, Event: true, scrap: true, saveScraped: true, $:true, $$: true, Showdown: true */
 /*exported: alir */
 /**
     Alir
@@ -51,7 +51,8 @@ config = {
   style: {
     fontSize: 1,
     'font-size': 'sans-serif'
-  }
+  },
+  first: true
 };
 function displayItem(item) {
   "use strict";
@@ -525,7 +526,9 @@ function initUI() {
       utils.merge(config, conf);
       if (typeof conf.lang !== 'undefined') {
         $('#settingsLang select').value = conf.lang;
-        document.webL10n.setLanguage(conf.lang);
+        if (document.webL10n.getLanguage() !== conf.lang) {
+          document.webL10n.setLanguage(conf.lang);
+        }
       }
 
       if (conf.rs.login) {
@@ -598,6 +601,24 @@ function initUI() {
         conf.bookmarks = {};
       }
 
+      // Create first use content
+      window.addEventListener('localized', function () {
+        document.documentElement.lang = document.webL10n.getLanguage();
+        document.documentElement.dir = document.webL10n.getDirection();
+        if (conf.first === true) {
+          conf.first = false;
+          var article = {
+            id:    utils.uuid(),
+            title: _('firstArticleTitle'),
+            html:  new Showdown.converter().makeHtml(_('firstArticleMd')),
+            date:  Date.now(),
+            flags: {
+              editable: false
+            }
+          };
+          remoteStorage.alir.saveArticle(article);
+        }
+      }, false);
       config = conf;
       window.alir._emit('configLoaded', conf);
     }
@@ -861,13 +882,13 @@ function initUI() {
       actions.connect.remove("hidden");
       actions.disconnect.add("hidden");
       actions.sync.add("hidden");
-      actions.reset.add("hidden");
+      //actions.reset.add("hidden");
       break;
     case "connected":
       actions.connect.add("hidden");
       actions.disconnect.remove("hidden");
       actions.sync.remove("hidden");
-      actions.reset.remove("hidden");
+      //actions.reset.remove("hidden");
       break;
     default:
       utils.log("unknown state " + state, "warning");
