@@ -229,7 +229,7 @@ var Tiles = function (global) {
   RemoteStorage.eventHandling(this, "leaving", "shown");
   var current,
       tiles = [],
-      popup = (window.matchMedia("(min-width: 37rem) and (min-height: 37rem)").matches);
+      popup = (window.matchMedia("(min-width: 78rem) and (min-height: 30rem)").matches);
   this.show = function (name) {
     this._emit('leaving', current);
     Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
@@ -264,6 +264,10 @@ var Tiles = function (global) {
         Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
           if (e.dataset.tile === name) {
             e.classList.add('popup');
+            setTimeout(function () {
+              e.style.left = "40rem";
+              e.style.opacity = "1";
+            });
             window.scrollTo(0, 0);
             current = name;
           }
@@ -278,14 +282,22 @@ var Tiles = function (global) {
   };
   this.back = function (res) {
     var popupElmt, next;
+    next = tiles.pop();
     if (popup) {
       popupElmt = document.querySelector(".popup[data-tile]");
       if (popupElmt) {
-        popupElmt.classList.remove('popup');
+        popupElmt.style.left = "0";
+        popupElmt.style.opacity = "0";
+        setTimeout(function () {
+          popupElmt.style.left = "0";
+          popupElmt.classList.remove('popup');
+          document.body.classList.remove('popup');
+        }, 2000);
       }
-      document.body.classList.remove('popup');
+      this._emit('leaving', current);
+      current = next.name;
+      this._emit('shown', current);
     } else {
-      next = tiles.pop();
       if (typeof next === 'object') {
         this.show(next.name);
         if (typeof next.cb === 'function') {

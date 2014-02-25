@@ -166,6 +166,9 @@ body.menu-right #menu .content .icon-chevron-left {
   padding-top: 4em;
   list-style-type: none;
   display: none;
+  max-width: 37rem;
+  border-right: 1px solid #888;
+  height: 100%;
 }
 .noheader[data-tile] {
   padding-top: 2em;
@@ -201,9 +204,13 @@ body.menu-right [data-tile] {
   padding-left: 0.5rem;
   padding-right: 2.5rem;
 }
+body.popup {
+  background-color: #BBB;
+}
 body.popup .shown {
   opacity: 0.3;
 }
+/*
 .popup[data-tile] {
   position: absolute;
   top: 12%;
@@ -218,6 +225,24 @@ body.popup .shown {
   display: block;
   box-shadow: 0 0 1rem #000;
   padding: 0.5rem !important;
+}
+*/
+.popup[data-tile] {
+  position: absolute;
+  top: 0;
+  transition: left 2s, opacity 2s;
+  /*left: 42rem;*/
+  left: 0rem;
+  opacity: 0;
+  width: 37rem;
+  display: block;
+  background-color: inherit;
+  border-width: 0 1px;
+  border-style: solid;
+  border-color: #888;
+}
+body.popup [data-tile] > header, body.popup [data-tile] > * > header {
+  width: 38rem;
 }
 body.hosted .ifInstalled, body.installed .ifHosted {
   display: none;

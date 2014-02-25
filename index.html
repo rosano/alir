@@ -137,9 +137,9 @@
         <p><a class="icon-chevron-left back detail" data-object="articles" data-method="hide"></a></p>
         <p><a class="icon-chevron-right back detail" data-object="articles" data-method="hide"></a></p>
         <p><a class="icon-refresh sync" data-object="alir.rs" data-method="sync"></a></p>
-        <p><a class="icon-cog settings main" data-object="tiles" data-method="show" data-params="settings"></a></p>
+        <p><a class="icon-cog settings main" data-object="tiles" data-method="go" data-params="settings"></a></p>
         <p><a class="icon-off onoff" data-object="alir" data-method="onoff"></a></p>
-        <p><a class="icon-rss main" data-object="tiles" data-method="show" data-params="feeds" ></a></p>
+        <p><a class="icon-rss main" data-object="tiles" data-method="go" data-params="feeds" ></a></p>
       </div>
       <div class="slider" data-action="toggleMenu">
         <div class="scrollbar"></div>
@@ -150,7 +150,7 @@
     <div id="articleEdit" class="" data-tile="articleEdit">
       <header>
         <h2>
-          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="articleList"></a>
+          <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
           <span data-l10n-id="inputHeader">Note</span>
         </h2>
       </header>
@@ -178,14 +178,14 @@
         </fieldset>
         <p class="col2">
           <button data-object="articles" data-method="save" data-l10n-id="articleSave">Save</button>
-          <button data-object="tiles" data-method="show" data-params="articleList" data-l10n-id="cancel">Cancel</button>
+          <button data-object="tiles" data-method="back" data-l10n-id="cancel">Cancel</button>
         </p>
         <fieldset class="inline text article">
           <textarea rows="10" cols="40" name="text" placeholder="Content" data-l10n-id="articleContent"></textarea>
         </fieldset>
         <p class="col2">
           <button data-object="articles" data-method="save" data-l10n-id="articleSave">Save</button>
-          <button data-object="tiles" data-method="show" data-params="articleList" data-l10n-id="cancel">Cancel</button>
+          <button data-object="tiles" data-method="back" data-l10n-id="cancel">Cancel</button>
         </p>
       </form>
     </div>
@@ -218,7 +218,7 @@
     <div id="settings" class="" data-tile="settings">
       <header>
         <h2>
-          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="articleList"></a>
+          <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
           <span data-l10n-id="settings">Settings</span>
         </h2>
       </header>
@@ -555,12 +555,12 @@
     <section data-tile="feeds">
       <header>
         <h2>
-          <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="articleList"></a>
+          <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
           <span data-l10n-id="feeds">Feeds</span>
         </h2>
       </header>
       <p class="toolbar">
-        <a class="icon-chevron-left" data-object="tiles" data-method="show" data-params="articleList"></a>
+        <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
         <a class="icon-plus" data-object="feeds" data-method="create" ></a>
         <a class="icon-refresh" data-object="feeds" data-method="update"></a>
       </p>
