@@ -83,14 +83,11 @@ body.menu-right #menu .slider {
   position: fixed;
   top: 1rem;
   width: calc(2rem - 2px);
-  border: 1px solid #080;
+  border-width: 1px;
+  border-style: solid;
   color: #080;
-  background-color: rgba(0, 255, 0, .3);
   z-index: 1000;
   pointer-events: none;
-}
-body.online #menu .scrollbar {
-  background-color: #0F0;
 }
 body.sync #statusbar .syncInProgress {
   color: #FFF;
@@ -176,9 +173,7 @@ body.menu-right #menu .content .icon-chevron-left {
 [data-tile] > header, [data-tile] > * > header {
   margin: -1rem -0.5rem 1rem -3rem;
   padding: 0.2rem 1.5rem;
-  background: linear-gradient(to bottom,  #1AFAA5,  #20F47A);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-  color: white;
   /*position: sticky;*/
   position: fixed;
   top: 2rem;
@@ -505,8 +500,6 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   margin-bottom: .5rem;
 }
 #settings .container > .header {
-  background: linear-gradient(to bottom, #1AFAA5, #20F47A) repeat scroll 0 0 rgba(0, 0, 0, 0);
-  color: white;
   padding: 0.01rem;
 }
 #settings .container > .header > * {

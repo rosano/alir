@@ -1,5 +1,5 @@
 js =	lib/polyfill.js lib/remotestorage.js lib/webL10n/l10n.js lib/htmlparser.js lib/showdown.js js/touch.js js/utils.js js/view.js js/articles.js js/feeds.js addon/data/lib/readabilitySAX/DOMasSAX.js addon/data/lib/readabilitySAX/readabilitySAX.js js/scrap.js
-css = css/alir.css css/form.css css/font.css css/widgetCss.css 
+css = css/alir.css css/form.css css/font.css css/widgetCss.css css/theme.css
 
 default: help
 
@@ -42,7 +42,7 @@ tests:
 	xvfb-run casperjs --engine=slimerjs test tests/suites/
 
 watch:
-	while true; do inotifywait -e close_write,moved_to,create,modify js/* css/alir.css lib/remotestorage.js; make debug; done
+	while true; do inotifywait -e close_write,moved_to,create,modify js/* css/alir.css css/theme.css lib/remotestorage.js; make debug; done
 
 clean:
 	git checkout alir.zip VERSION build.js.map css/build.css lib/build.js

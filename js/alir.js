@@ -52,7 +52,8 @@ config = {
     fontSize: 1,
     'font-size': 'sans-serif'
   },
-  first: true
+  first: true,
+  theme: 'themeGreen'
 };
 function displayItem(item) {
   "use strict";
@@ -298,6 +299,17 @@ function Alir() {
     },
     widgetShow: function () {
       $('#rsWidget').classList.toggle("hidden");
+    },
+    setTheme: function (theme) {
+      var cl = document.body.classList;
+      [].slice.call(document.body.classList).forEach(function (c) {
+        if (c.substr(0, 5) === 'theme') {
+          cl.remove(c);
+        }
+      });
+      if (theme !== '') {
+        cl.add(theme);
+      }
     }
   };
 }
@@ -595,8 +607,16 @@ function initUI() {
       remoteStorage.setSyncInterval(conf.rs.syncIntervalOn * 1000);
       remoteStorage.setBackgroundSyncInterval(conf.rs.syncIntervalOff * 1000);
       // }}
+
       $('#settingsLoglevel select').value = conf.logLevel;
+      utils.logLevel = conf.logLevel;
+
+      $('#settingsTheme select').value = conf.theme;
+
       $('#proxyUrl').value = conf.proxy;
+
+      window.alir.ui.setTheme(conf.theme);
+
       if (typeof conf.bookmarks === 'undefined') {
         conf.bookmarks = {};
       }
@@ -942,6 +962,10 @@ function initUI() {
       case 'logLevel':
         config.logLevel = val;
         utils.logLevel  = val;
+        break;
+      case 'theme':
+        config.theme = val;
+        window.alir.ui.setTheme(val);
         break;
       case 'proxy':
         config.proxy = val;

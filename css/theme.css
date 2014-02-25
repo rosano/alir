@@ -1,0 +1,49 @@
+/* Default {{ */
+.header,
+[data-tile] header,
+[data-tile] > * > header {
+  background-color: #f97c17;
+  color: white;
+}
+#menu .scrollbar {
+  background-color: rgba(255, 127, 0, .3);
+  border-color: #080;
+}
+body.online #menu .scrollbar {
+  background-color: #F80;
+}
+/* }} */
+/* Green {{ */
+body.themeGreen .header,
+body.themeGreen [data-tile] > header,
+body.themeGreen [data-tile] > * > header {
+  background: linear-gradient(to bottom,  #1AFAA5,  #20F47A);
+  color: white;
+}
+body.themeGreen #menu .scrollbar {
+  background-color: rgba(0, 255, 0, .3);
+  border-color: #080;
+}
+body.themeGreen body.online #menu .scrollbar {
+  background-color: #0F0;
+}
+/* }} */
+/* Red {{ */
+body.themeRed {
+  color: #DDD;
+  background-color: #222;
+}
+body.themeRed .header,
+body.themeRed [data-tile] > header,
+body.themeRed [data-tile] > * > header {
+  background: radial-gradient(ellipse farthest-corner, #aa0000 0%, #000000 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+  color: white;
+}
+body.themeRed #menu .scrollbar {
+  background-color: rgba(255, 0, 0, .3);
+  border-color: #800;
+}
+body.themeRed body.online #menu .scrollbar {
+  background-color: #F00;
+}
+/* }} */
