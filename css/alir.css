@@ -49,7 +49,7 @@ body.net #statusbar .onoff {
   top: 1rem;
   padding: 0;
   height: 100%;
-  background-color: #FFF;
+  background-color: #EEE;
   color: #FFF;
   transition: margin .5s ease-in-out, background-color .5s;
 }
@@ -168,7 +168,7 @@ body.menu-right #menu .content .icon-chevron-left {
   display: none;
   max-width: 37rem;
   border-right: 1px solid #888;
-  height: 100%;
+  min-height: 100%;
 }
 .noheader[data-tile] {
   padding-top: 2em;
@@ -180,7 +180,7 @@ body.menu-right #menu .content .icon-chevron-left {
   /*position: sticky;*/
   position: fixed;
   top: 2rem;
-  width: 100%;
+  width: 39rem;
   z-index: 999;
 }
 [data-tile] header h2 {
@@ -270,10 +270,10 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #list .content + .toolbar {
   margin-top: 2rem;
 }
-#articleDetail .articleActions .alternate {
+#articleShow .articleActions .alternate {
   display: none;
 }
-#articleDetail .hasAlternates .articleActions .alternate {
+#articleShow .hasAlternates .articleActions .alternate {
   display: inline;
 }
 #articleShow .articleMenu {
@@ -329,7 +329,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   height: 100%;
   left: 0;
   margin: 0;
-  padding: 1rem 4rem;
+  padding: 5rem;
   position: absolute;
   top: 0;
 }
@@ -351,10 +351,10 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   margin: 0;
   font-style: italic;
 }
-#articleDetail .articleActions .compose {
+#articleShow .articleActions .compose {
   display: none;
 }
-#articleDetail [data-flags*=",editable,"] .compose {
+#articleShow [data-flags*=",editable,"] .compose {
   display: inline;
 }
 #list .filters {

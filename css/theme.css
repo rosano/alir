@@ -7,7 +7,7 @@
 }
 #menu .scrollbar {
   background-color: rgba(255, 127, 0, .3);
-  border-color: #080;
+  border-color: #F80;
 }
 body.online #menu .scrollbar {
   background-color: #F80;
@@ -21,16 +21,16 @@ body.themeGreen [data-tile] > * > header {
   color: white;
 }
 body.themeGreen #menu .scrollbar {
-  background-color: rgba(0, 255, 0, .3);
+  background-color: rgba(0, 255, 0, .7);
   border-color: #080;
 }
-body.themeGreen body.online #menu .scrollbar {
+body.themeGreen.online #menu .scrollbar {
   background-color: #0F0;
 }
 /* }} */
 /* Red {{ */
 body.themeRed {
-  color: #DDD;
+  color: #EEE;
   background-color: #222;
 }
 body.themeRed .header,
@@ -40,10 +40,14 @@ body.themeRed [data-tile] > * > header {
   color: white;
 }
 body.themeRed #menu .scrollbar {
-  background-color: rgba(255, 0, 0, .3);
+  background-color: rgba(255, 0, 0, .7);
   border-color: #800;
 }
-body.themeRed body.online #menu .scrollbar {
+body.themeRed.online #menu .scrollbar {
   background-color: #F00;
+}
+fieldset.inline > p:hover {
+  border-color: #F00;
+  box-shadow: 0 0 5px #F00;
 }
 /* }} */

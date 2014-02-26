@@ -78,7 +78,9 @@ var utils = {
           document.body.classList.add('error');
         }
       }
-      realLog(utils.format('=====> [%s][%s] %s\n', curDate, level + new Array(10 - level.length).join(' '), message));
+      try {
+        realLog(utils.format('=====> [%s][%s] %s\n', curDate, level + new Array(10 - level.length).join(' '), message));
+      } catch (e) {}
     }
   },
   notify: function (title, body, cb) {
@@ -245,8 +247,10 @@ var Tiles = function (global) {
     this._emit('shown', name);
   };
   this.go = function (name, cb) {
+    //jshint maxstatements: 30
     var i = tiles.findIndex(function (e) { return e.name === name; }),
-        next;
+        next,
+        popupElmt;
     if (i !== -1) {
       next = tiles[i];
       this.show(next.name);
@@ -260,20 +264,22 @@ var Tiles = function (global) {
         tiles.push({name: current, y: window.scrollY, cb: cb});
       }
       if (popup) {
-        document.body.classList.add("popup");
-        Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
-          if (e.dataset.tile === name) {
-            e.classList.add('popup');
-            setTimeout(function () {
-              e.style.left = "40rem";
-              e.style.opacity = "1";
-            });
-            window.scrollTo(0, 0);
-            current = name;
-          }
-        });
+        popupElmt = document.querySelector(".popup[data-tile]");
+        if (popupElmt) {
+          popupElmt.classList.remove('popup');
+        }
+        popupElmt = document.querySelector("[data-tile='" + name + "']");
         this._emit('leaving', current);
-        this._emit('shown', name);
+        if (popupElmt) {
+          popupElmt.classList.add('popup');
+          setTimeout(function () {
+            popupElmt.style.left = "40rem";
+            popupElmt.style.opacity = "1";
+          });
+          window.scrollTo(0, 0);
+          this._emit('shown', name);
+          current = name;
+        }
       } else {
         this.show(name);
       }
@@ -281,20 +287,30 @@ var Tiles = function (global) {
     document.getElementById('menu').classList.remove('show');
   };
   this.back = function (res) {
-    var popupElmt, next;
+    //jshint maxstatements: 30
+    var popupOldElmt, popupNewElmt, next;
     next = tiles.pop();
     if (popup) {
-      popupElmt = document.querySelector(".popup[data-tile]");
-      if (popupElmt) {
-        popupElmt.style.left = "0";
-        popupElmt.style.opacity = "0";
+      popupOldElmt = document.querySelector(".popup[data-tile]");
+      if (popupOldElmt) {
+        popupOldElmt.style.left = "0";
+        popupOldElmt.style.opacity = "0";
         setTimeout(function () {
-          popupElmt.style.left = "0";
-          popupElmt.classList.remove('popup');
-          document.body.classList.remove('popup');
+          popupOldElmt.style.left = "0";
+          popupOldElmt.classList.remove('popup');
+          if (tiles.length === 0) {
+            document.body.classList.remove('popup');
+          }
         }, 2000);
       }
       this._emit('leaving', current);
+      if (tiles.length !== 0) {
+        popupNewElmt = document.querySelector("[data-tile='" + next.name + "']");
+        if (popupNewElmt) {
+          popupNewElmt.classList.add('popup');
+          //window.scrollTo(0, 0);
+        }
+      }
       current = next.name;
       this._emit('shown', current);
     } else {

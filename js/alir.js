@@ -1006,7 +1006,7 @@ function initUI() {
         } else {
           scroll.style.top = (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
         }
-        if (h !== height) {
+        if (h !== height || scroll.style.height === '') {
           height = h;
           if (header) {
             scroll.style.height = ((window.innerHeight - header.clientHeight - hh) / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
