@@ -134,7 +134,7 @@ window.Network = function () {
       };
       xhr = new XMLHttpRequest(options);
       xhr.open("GET", computedUrl, true);
-      xhr.responseType = "document";
+      //xhr.responseType = "document";
       xhr.timeout = this.timeout;
       xhr.onload = function (e) {
         clearTimeout(timer);

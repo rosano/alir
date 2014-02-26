@@ -85,11 +85,12 @@ function Feeds() {
   this.fetch = function (url, test, cb) {
     //jshint maxcomplexity: 15
     window.network.fetch(url, function (err, doc) {
-      //jshint maxstatements: 25
+      //jshint maxstatements: 35
       var feedUpdated,
           root,
           format = 'atom',
-          cache;
+          cache,
+          parser;
       if (typeof _cache[url] === 'undefined') {
         // @FIXME we should load the cache instead
         _cache[url] = {
@@ -103,7 +104,21 @@ function Feeds() {
       if (err) {
         utils.log(err, "warning");
       } else {
-        doc = doc.responseXML;
+        if (doc.responseXML && doc.responseXML.getElementsByTagName('rss').length === 0 && doc.responseXML.getElementsByTagName('atom').length === 0) {
+          try {
+            parser = new DOMParser();
+            doc = parser.parseFromString(doc.response, 'text/html');
+          } catch (e) { }
+          if (doc.getElementsByTagName('rss').length === 0 && doc.getElementsByTagName('atom').length === 0) {
+            utils.log("Unable to parse feed", "error");
+            if (cb) {
+              cb(cache.articles);
+            }
+            return;
+          }
+        } else {
+          doc = doc.responseXML;
+        }
         doc.url = url;
         root = doc.getElementsByTagName('rss');
         if (root.length > 0) {
@@ -118,7 +133,7 @@ function Feeds() {
         if (feedUpdated) {
           feedUpdated = new Date(feedUpdated.textContent);
         }
-        root = format === 'atom' ? root + ' > entry' : root + ' > item';
+        root = format === 'atom' ? root + ' entry' : root + ' item';
         [].slice.call(doc.querySelectorAll(root)).forEach(function (entry) {
           //jshint maxstatements: 30
           var itemContent, itemId, itemTitle, itemUpdated, itemUrl;
