@@ -880,6 +880,17 @@ function initUI() {
       }
     });
   }());
+  Gesture.attach(document.getElementById('main'), {
+    gesture: function (e) {
+      var target;
+      if (e.detail.dir === 'W') {
+        target = utils.parent(e.detail.startTarget, function (e) { return typeof e.dataset.key !== 'undefined'; });
+        if (target) {
+          window.articles.delete(target.dataset.key);
+        }
+      }
+    }
+  });
   // }}
   // Tags {{
   (function () {

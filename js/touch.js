@@ -8,7 +8,8 @@ var Gesture = (function () {
   "use strict";
   var cursor,
       allowedEvent = ['gestureStart', 'gestureMove', 'gestureEnd', 'gesture'],
-      listeners = [];
+      listeners = [],
+      startTarget, endTarget;
 
   cursor = {
     startX: 0,
@@ -28,8 +29,9 @@ var Gesture = (function () {
   }
   function onTouchStart(event) {
     var ev = getEvent(event);
-    cursor.startX    = ev.pageX;
-    cursor.startY    = ev.pageY;
+    cursor.startX = ev.pageX;
+    cursor.startY = ev.pageY;
+    startTarget   = ev.target;
     listeners.forEach(function (elmt) {
       if (elmt.contains(ev.target)) {
         elmt.dispatchEvent(new CustomEvent("gestureStart", {detail: ev}));
@@ -50,6 +52,8 @@ var Gesture = (function () {
         dirs  = ['N', 'NW', 'W', 'SW', 'S', 'SE', 'E', 'NE', 'N'],
         dir   = false;
 
+    endTarget   = ev.target;
+
     if (Math.abs(ev.pageX - cursor.startX) > delta || Math.abs(ev.pageY - cursor.startY) > delta) {
       dir = dirs[Math.round(Math.atan2(ev.pageX - cursor.startX, ev.pageY - cursor.startY) * 4 / Math.PI) + 4];
     }
@@ -58,7 +62,7 @@ var Gesture = (function () {
       if (elmt.contains(ev.target)) {
         elmt.dispatchEvent(new window.CustomEvent("gestureEnd", {detail: ev}));
         if (dir) {
-          elmt.dispatchEvent(new window.CustomEvent("gesture", {detail: {dir: dir}}));
+          elmt.dispatchEvent(new window.CustomEvent("gesture", {detail: {dir: dir, startTarget: startTarget, endTarget: endTarget}}));
         }
       }
     });
@@ -99,4 +103,3 @@ var Gesture = (function () {
   };
 
 })();
-
