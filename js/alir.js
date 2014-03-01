@@ -267,6 +267,11 @@ function Alir() {
     });
   };
   this.rs = {
+    "setView": function () {
+      if (typeof remoteStorage.widget.view === 'undefined') {
+        remoteStorage.widget.display();
+      }
+    },
     "connect": function () {
       remoteStorage.widget.view.form.userAddress.value = $('#rsLogin').value;
       remoteStorage.widget.view.events.connect(new Event(""));
@@ -288,7 +293,14 @@ function Alir() {
     },
     "cacheReset": function () {
       remoteStorage.caching.reset();
-    }
+    },
+    "status": ""
+  };
+  this.reset = function () {
+    config.testMode = true;
+    localStorage.clear();
+    this.rs.setView();
+    remoteStorage.widget.view.events.reset(new Event(""));
   };
   this.ui = {
     clearLogs: function () {
@@ -533,9 +545,37 @@ function initUI() {
   // configuration {{
   (function () {
     var conf = localStorage.getItem('config');
+    function firstUse() {
+      // Create first use content
+      function doFirst() {
+        document.documentElement.lang = document.webL10n.getLanguage();
+        document.documentElement.dir = document.webL10n.getDirection();
+        if (config.first === true) {
+          config.first = false;
+          var article = {
+            id:    utils.uuid(),
+            title: _('firstArticleTitle'),
+            html:  new Showdown.converter().makeHtml(_('firstArticleMd')),
+            date:  Date.now(),
+            flags: {
+              editable: false
+            }
+          };
+          remoteStorage.alir.saveArticle(article);
+        }
+      }
+      if (document.webL10n.getReadyState() === 'complete') {
+        doFirst();
+      } else {
+        document.addEventListener('localized', doFirst);
+      }
+    }
     if (conf) {
       conf = JSON.parse(conf);
       utils.merge(config, conf);
+
+      firstUse();
+
       if (typeof conf.lang !== 'undefined') {
         $('#settingsLang select').value = conf.lang;
         if (document.webL10n.getLanguage() !== conf.lang) {
@@ -621,26 +661,10 @@ function initUI() {
         conf.bookmarks = {};
       }
 
-      // Create first use content
-      window.addEventListener('localized', function () {
-        document.documentElement.lang = document.webL10n.getLanguage();
-        document.documentElement.dir = document.webL10n.getDirection();
-        if (conf.first === true) {
-          conf.first = false;
-          var article = {
-            id:    utils.uuid(),
-            title: _('firstArticleTitle'),
-            html:  new Showdown.converter().makeHtml(_('firstArticleMd')),
-            date:  Date.now(),
-            flags: {
-              editable: false
-            }
-          };
-          remoteStorage.alir.saveArticle(article);
-        }
-      }, false);
       config = conf;
       window.alir._emit('configLoaded', conf);
+    } else {
+      firstUse();
     }
   }());
   // }}
@@ -917,6 +941,7 @@ function initUI() {
   remoteStorage.on('ready', function () {
     utils.log(utils.format("Ready fired at %s", Math.round(window.performance.now())), "debug");
     setState(remoteStorage.remote.connected ? 'connected' : 'initial');
+    window.alir.rs.status = 'ready';
   });
   remoteStorage.on('disconnected', function () {
     setState('initial');
@@ -1108,11 +1133,10 @@ window.addEventListener('load', function () {
     utils.notify('Not installed');
   }
 
+  remoteStorage.access.claim('alir', 'rw');
+  remoteStorage.caching.enable('/alir/');
   window.alir.on('configLoaded', function () {
     //remoteStorage.enableLog();
-    remoteStorage.access.claim('alir', 'rw');
-    remoteStorage.caching.enable('/alir/');
-    //remoteStorage.caching.enable('/public/alir/');
     remoteStorage.displayWidget("rsWidget");
   });
   // config is loaded during initUI, so this must be registered BEFORE
@@ -1183,5 +1207,7 @@ window.addEventListener('load', function () {
 });
 window.addEventListener('unload', function () {
   "use strict";
-  localStorage.setItem('config', JSON.stringify(config));
+  if (config.testMode !== true) {
+    localStorage.setItem('config', JSON.stringify(config));
+  }
 });
