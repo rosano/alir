@@ -161,6 +161,9 @@ window.Network = function () {
       return;
     }
   };
+  this.clear = function () {
+    cache = [];
+  };
 };
 function saveScraped(article) {
   "use strict";

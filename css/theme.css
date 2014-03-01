@@ -21,7 +21,7 @@ body.themeGreen [data-tile] > * > header {
   color: white;
 }
 body.themeGreen #menu .scrollbar {
-  background-color: rgba(0, 255, 0, .7);
+  background-color: rgba(0, 255, 0, .3);
   border-color: #080;
 }
 body.themeGreen.online #menu .scrollbar {
@@ -46,7 +46,7 @@ body.themeRed #menu .scrollbar {
 body.themeRed.online #menu .scrollbar {
   background-color: #F00;
 }
-fieldset.inline > p:hover {
+body.themeRed.online fieldset.inline > p:hover {
   border-color: #F00;
   box-shadow: 0 0 5px #F00;
 }

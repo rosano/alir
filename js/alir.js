@@ -45,7 +45,7 @@ config = {
   menu: true,
   alarmInterval: 60,
   logLevel: 'info',
-  proxy: '',
+  proxy: 'http://',
   bookmarks: {},
   alarms: {},
   style: {
@@ -53,7 +53,7 @@ config = {
     'font-size': 'sans-serif'
   },
   first: true,
-  theme: 'themeGreen'
+  theme: ''
 };
 function displayItem(item) {
   "use strict";
@@ -869,14 +869,14 @@ function initUI() {
       }
     };
     if (config.gesture) {
-      Gesture.attach(document.getElementById('articleDetail'), gestureEvents);
+      Gesture.attach(document.getElementById('articleShow'), gestureEvents);
     }
     checkbox = document.getElementById('prefGesture');
     checkbox.addEventListener('change', function () {
       if (checkbox.checked) {
-        Gesture.attach(document.getElementById('articleDetail'), gestureEvents);
+        Gesture.attach(document.getElementById('articleShow'), gestureEvents);
       } else {
-        Gesture.detach(document.getElementById('articleDetail'), gestureEvents);
+        Gesture.detach(document.getElementById('articleShow'), gestureEvents);
       }
     });
   }());

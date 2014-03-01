@@ -20,6 +20,7 @@ init:
 
 debug: 
 	echo -e "\n\n####################\nBuilding at" `date`
+	$$(export CACHEDATE=`date -Iseconds` && sed -i "s/^# v0.*$$/# v0.1 $$CACHEDATE/" cache.manifest)
 	uglifyjs 	$(js) \
 						-o lib/build.js \
 						-b indent-level=2 \
@@ -28,6 +29,7 @@ debug:
 
 build: 
 	echo -e "\n\n####################\nBuilding at" `date`
+	$$(export CACHEDATE=`date -Iseconds` && sed -i "s/^# v0.*$$/# v0.1 $$CACHEDATE/" cache.manifest)
 	uglifyjs 	$(js) \
 						-o lib/build.js \
 						--screw-ie8
@@ -45,4 +47,4 @@ watch:
 	while true; do inotifywait -e close_write,moved_to,create,modify js/* css/alir.css css/theme.css lib/remotestorage.js; make debug; done
 
 clean:
-	git checkout alir.zip VERSION build.js.map css/build.css lib/build.js
+	git checkout alir.zip VERSION build.js.map css/build.css lib/build.js cache.manifest

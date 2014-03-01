@@ -230,7 +230,7 @@ body.popup .shown {
 .popup[data-tile] {
   position: absolute;
   top: 0;
-  transition: left 2s, opacity 2s;
+  transition: left 1s, opacity 1s;
   /*left: 42rem;*/
   left: 0rem;
   opacity: 0;

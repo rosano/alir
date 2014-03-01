@@ -1,7 +1,7 @@
 /*jshint browser: true, devel: true */
 /*global _: true, $:true, config: true, remoteStorage: true, tiles: true, View: true, utils: true, Showdown: true */
 function Article() {
-  //jshint maxstatements: 27
+  //jshint maxstatements: 28
   "use strict";
   var self = this,
       currentId,
@@ -68,7 +68,7 @@ function Article() {
     }
   });
   window.tiles.on('shown', function (name) {
-    if (name === 'articleList' && typeof currentId !== 'undefined') {
+    if (name === 'articleDetail' && typeof currentId !== 'undefined') {
       self.onShown(currentId);
     }
   });
@@ -202,7 +202,7 @@ function Article() {
   this.create = function () {
     var choices = [];
     $('#articleEdit [name="id"]').value    = "";
-    $('#articleEdit [name="url"]').value   = "";
+    $('#articleEdit [name="url"]').value   = "http://";
     $('#articleEdit [name="title"]').value = "";
     $('#articleEdit [name="text"]').value  = "";
     choices.push({'object': 'articles', 'method': 'createArticle', 'l10nId': 'articleCreateArticle'});
@@ -260,6 +260,14 @@ function Article() {
         id = $('#articleEdit [name="id"]').value,
         article;
 
+    function doSave(article) {
+      if (article.url === 'http://') {
+        article.url = '';
+      }
+      remoteStorage.alir.saveArticle(article);
+      tiles.back(); // remove articleEdit from tiles heap
+      self.display(article);
+    }
     if (id) {
       // update
       self.read(id, function (article) {
@@ -269,9 +277,9 @@ function Article() {
           article.text  = $('#articleEdit [name="text"]').value;
           article.html  = new Showdown.converter().makeHtml(article.text);
           article.date  = Date.now();
-          remoteStorage.alir.saveArticle(article);
-          tiles.back(); // remove articleEdit from tiles heap
-          self.display(article);
+          doSave(article);
+        } else {
+          utils.log('Unable to load article ' + id, 'error');
         }
       });
     } else {
@@ -289,9 +297,7 @@ function Article() {
           },
           tags: ['note']
         };
-        remoteStorage.alir.saveArticle(article);
-        tiles.back(); // remove articleEdit from tiles heap
-        self.display(article);
+        doSave(article);
       } else {
         tiles.back(); // remove articleEdit from tiles heap
         window.link.scrap($('#articleEdit [name="url"]').value);
@@ -354,7 +360,7 @@ function Article() {
       scroll = 0;
     }
     window.setTimeout(function () {
-      window.scrollTo(0, 0);
+      window.scrollTo(0, scroll);
     }, 100);
     location.hash = currentId;
   };

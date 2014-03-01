@@ -1,10 +1,12 @@
 CACHE MANIFEST
-# v0.0.1a
-https://clochix.net/alir/index.html
-https://clochix.net/alir/js/alir.js
-https://clochix.net/alir/lib/remotestorage.min.js
-https://clochix.net/alir/css/alir.css
-https://clochix.net/alir/css/gaia/icons/styles/action_icons.css
-https://clochix.net/alir/css/gaia/style/switches.css
-https://clochix.net/alir/css/gaia/style/switches/images/switch/background_off.png
-https://clochix.net/alir/css/gaia/icons/styles/action_icons.png
+# v0.1 2014-03-01T16:20:00+0100
+css/build.css
+css/dynamic.css
+css/user.css
+css/fonts/icomoon.woff
+img/icon-256.png
+img/icon-32.png
+index.html
+js/alir.js
+lib/build.js
+locales/locales.ini

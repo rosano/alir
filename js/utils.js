@@ -301,7 +301,7 @@ var Tiles = function (global) {
           if (tiles.length === 0) {
             document.body.classList.remove('popup');
           }
-        }, 2000);
+        }, 1000);
       }
       this._emit('leaving', current);
       if (tiles.length !== 0) {
