@@ -53,7 +53,7 @@ function Feeds() {
       window.feeds.display(feed);
       window.feeds.cache(feed);
       tiles.show('feeds');
-      $('[name="url"]').value   = '';
+      $('[name="url"]').value   = 'http://';
       $('[name="title"]').value = '';
       $('[name="feedShort"]').checked = false;
     }
@@ -83,9 +83,9 @@ function Feeds() {
   };
   // @TODO Add CORS Proxy
   this.fetch = function (url, test, cb) {
-    //jshint maxcomplexity: 15
+    //jshint maxcomplexity: 20
     window.network.fetch(url, function (err, doc) {
-      //jshint maxstatements: 35
+      //jshint maxstatements: 40
       var feedUpdated,
           root,
           format = 'atom',
@@ -104,12 +104,12 @@ function Feeds() {
       if (err) {
         utils.log(err, "warning");
       } else {
-        if (doc.responseXML && doc.responseXML.getElementsByTagName('rss').length === 0 && doc.responseXML.getElementsByTagName('atom').length === 0) {
+        if ((!doc.responseXML) || (doc.responseXML && doc.responseXML.getElementsByTagName('rss').length === 0 && doc.responseXML.getElementsByTagName('feed').length === 0)) {
           try {
             parser = new DOMParser();
             doc = parser.parseFromString(doc.response, 'text/html');
           } catch (e) { }
-          if (doc.getElementsByTagName('rss').length === 0 && doc.getElementsByTagName('atom').length === 0) {
+          if (doc.getElementsByTagName('rss').length === 0 && doc.getElementsByTagName('feed').length === 0) {
             utils.log("Unable to parse feed", "error");
             if (cb) {
               cb(cache.articles);
@@ -118,6 +118,13 @@ function Feeds() {
           }
         } else {
           doc = doc.responseXML;
+        }
+        if (!doc) {
+          utils.log("Unable to parse feed", "error");
+          if (cb) {
+            cb(cache.articles);
+          }
+          return;
         }
         doc.url = url;
         root = doc.getElementsByTagName('rss');
@@ -143,16 +150,23 @@ function Feeds() {
               if (prop) {
                 return val.getAttribute(prop);
               } else {
-                return val.textContent;
+                if (val.textContent !== '') {
+                  return utils.trim(val.textContent);
+                } else if (val.nextSibling && val.nextSibling.nodeType === 3) {
+                  return utils.trim(val.nextSibling.textContent);
+                }
               }
             } else {
               return null;
             }
           }
           itemId      = format === 'atom' ? getVal('id') : getVal('guid');
-          itemUrl     = format === 'atom' ? getVal('link', 'href') : entry.querySelector('link').textContent;
+          itemUrl     = format === 'atom' ? getVal('link', 'href') : getVal('link');
           itemTitle   = getVal('title');
-          itemContent = getVal('content') || getVal('summary');
+          itemContent = getVal('content') || getVal('summary') || entry.getElementsByTagName("content:encoded");
+          if (itemContent && typeof itemContent.length !== 'undefined') {
+            itemContent = itemContent[0].innerHTML;
+          }
           itemUpdated = entry.querySelector("updated") || entry.querySelector("published") || entry.querySelector("pubDate") || entry.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", 'date');
           if (itemUpdated && typeof itemUpdated.length !== 'undefined') {
             itemUpdated = itemUpdated[0];
@@ -253,7 +267,7 @@ function Feeds() {
       title = '';
     }
     if (typeof url === 'undefined') {
-      url = '';
+      url = 'http://';
     }
     var $   = tiles.$('feedEdit');
     $('[name="id"]').value    = '';
@@ -375,6 +389,12 @@ function Feeds() {
         utils.log(e, "warning");
       }
     }
+  };
+  this.reset = function (url) {
+    _cache[url].article = {};
+    tiles.back();
+    this.show(url);
+    tiles.go('feedShow');
   };
 }
 window.feeds = new Feeds();

@@ -107,7 +107,7 @@ window.Network = function () {
     status = window.alir.getStatus();
     computedUrl = url;
     if (status.installed !== true) {
-      if (window.config.proxy) {
+      if (window.config.proxy !== '' && window.config.proxy !== 'http://') {
         proxy = url.split('://');
         if (proxy !== null) {
           computedUrl = window.config.proxy + proxy[1];
