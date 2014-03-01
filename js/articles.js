@@ -506,6 +506,37 @@ function Article() {
       document.querySelector("#articleShow .content > .alternates").classList.toggle('hidden');
     }
   };
+  this.mock = function (n) {
+    var article, ipsum, aIpsum, i, j, l, text;
+    ipsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
+    aIpsum = ipsum.split(' ');
+    l = aIpsum.length;
+    function title() {
+      var res = [], j;
+      for (j = 0; j < Math.floor(Math.random() * 5) + 1; j++) {
+        res.push(aIpsum[Math.floor(Math.random() * (l - 1))]);
+      }
+      res = res.join(" ");
+      return res.charAt(0).toUpperCase() + res.slice(1);
+    }
+    for (i = 0; i < n; i++) {
+      text = '';
+      for (j = 0; j < Math.floor(Math.random() * 10) + 1; j++) {
+        text += '###' + title() + "\n\n" + ipsum + "\n\n";
+      }
+      article = {
+        id: utils.uuid(),
+        title: title(),
+        html:  new Showdown.converter().makeHtml(text),
+        date:  Date.now(),
+        flags: {
+          editable: true
+        },
+        tags: ['note']
+      };
+      remoteStorage.alir.saveArticle(article);
+    }
+  };
 }
 window.articles = new Article();
 
