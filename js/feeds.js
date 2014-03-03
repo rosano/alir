@@ -81,7 +81,6 @@ function Feeds() {
       doSave(obj);
     }
   };
-  // @TODO Add CORS Proxy
   this.fetch = function (url, test, cb) {
     //jshint maxcomplexity: 20
     window.network.fetch(url, function (err, doc) {
@@ -110,7 +109,7 @@ function Feeds() {
             doc = parser.parseFromString(doc.response, 'text/html');
           } catch (e) { }
           if (doc.getElementsByTagName('rss').length === 0 && doc.getElementsByTagName('feed').length === 0) {
-            utils.log("Unable to parse feed", "error");
+            utils.log("Unable to get feed type for " + url, "error");
             if (cb) {
               cb(cache.articles);
             }
@@ -120,7 +119,7 @@ function Feeds() {
           doc = doc.responseXML;
         }
         if (!doc) {
-          utils.log("Unable to parse feed", "error");
+          utils.log("Unable to parse feed " + url, "error");
           if (cb) {
             cb(cache.articles);
           }
@@ -163,9 +162,10 @@ function Feeds() {
           itemId      = format === 'atom' ? getVal('id') : getVal('guid');
           itemUrl     = format === 'atom' ? getVal('link', 'href') : getVal('link');
           itemTitle   = getVal('title');
-          itemContent = getVal('content') || getVal('summary') || entry.getElementsByTagName("content:encoded");
-          if (itemContent && typeof itemContent.length !== 'undefined') {
-            itemContent = itemContent[0].innerHTML;
+          itemContent = getVal('content') || getVal('summary') || getVal('description') || entry.getElementsByTagName("content:encoded");
+          if (itemContent && typeof itemContent.length !== 'undefined' && itemContent.length > 0) {
+            //itemContent = itemContent[0].innerHTML;
+            itemContent = itemContent[0].textContent;
           }
           itemUpdated = entry.querySelector("updated") || entry.querySelector("published") || entry.querySelector("pubDate") || entry.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", 'date');
           if (itemUpdated && typeof itemUpdated.length !== 'undefined') {
@@ -311,17 +311,21 @@ function Feeds() {
     // Note: when app is awake by alarm, cache may be empty, so
     // we can't rely on it here
     remoteStorage.alir.private.getAll('feed/').then(function (feeds) {
-      var keys    = Object.keys(feeds),
-          toFetch = keys.length;
-      keys.forEach(function (key) {
-        window.feeds.fetch(feeds[key].url, false, function () {
-          self.cache(feeds[key]);
-          toFetch--;
-          if (toFetch === 0) {
-            utils.log("Feeds updated", "debug");
-          }
+      if (feeds) {
+        var keys    = Object.keys(feeds),
+            toFetch = keys.length;
+        keys.forEach(function (key) {
+          window.feeds.fetch(feeds[key].url, false, function () {
+            self.cache(feeds[key]);
+            toFetch--;
+            if (toFetch === 0) {
+              utils.log("Feeds updated", "debug");
+            }
+          });
         });
-      });
+      } else {
+        utils.log("No feeds yet", "warning");
+      }
     });
   };
   this.showArticle = function (url) {

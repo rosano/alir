@@ -53,7 +53,8 @@ config = {
     'font-size': 'sans-serif'
   },
   first: true,
-  theme: ''
+  theme: '',
+  logs: ''
 };
 function displayItem(item) {
   "use strict";
@@ -544,6 +545,7 @@ function initUI() {
   }
   // configuration {{
   (function () {
+    // jshint maxcomplexity: 10
     var conf = localStorage.getItem('config');
     function firstUse() {
       // Create first use content
@@ -659,6 +661,10 @@ function initUI() {
 
       if (typeof conf.bookmarks === 'undefined') {
         conf.bookmarks = {};
+      }
+
+      if (conf.logs !== '') {
+        document.getElementById('debugLog').innerHTML += conf.logs;
       }
 
       config = conf;
@@ -880,13 +886,14 @@ function initUI() {
       }
     });
   }());
+  // Delete article with left swipe in list
   Gesture.attach(document.getElementById('main'), {
     gesture: function (e) {
       var target;
       if (e.detail.dir === 'W') {
         target = utils.parent(e.detail.startTarget, function (e) { return typeof e.dataset.key !== 'undefined'; });
         if (target) {
-          window.articles.delete(target.dataset.key);
+          window.articles.delete(target.dataset.key, target.dataset.title);
         }
       }
     }
@@ -1218,6 +1225,7 @@ window.addEventListener('load', function () {
 });
 window.addEventListener('unload', function () {
   "use strict";
+  config.logs = document.getElementById('debugLog').innerHTML;
   if (config.testMode !== true) {
     localStorage.setItem('config', JSON.stringify(config));
   }

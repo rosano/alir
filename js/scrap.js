@@ -1,7 +1,7 @@
 //jshint browser: true
 /* global utils: true, remoteStorage: true, _: true */
 function scrap(url, cb) {
-  //jshint maxstatements: 25
+  //jshint maxstatements: 30
   "use strict";
   var article;
   article = {
@@ -14,10 +14,23 @@ function scrap(url, cb) {
       cb(err, article);
     } else {
       try {
-        var readable = new window.Readability(),
+        var parser,
+            readable = new window.Readability(),
             root, parsed;
         readable.setSkipLevel(3);
-        doc = doc.responseXML;
+        if (doc.responseXML) {
+          doc = doc.response;
+        } else {
+          try {
+            parser = new DOMParser();
+            doc = parser.parseFromString(doc.response, 'text/html');
+          } catch (e) {
+            cb('Unable to parse document response', article);
+          }
+        }
+        if (!doc) {
+          cb('Unable to parse document response', article);
+        }
         root = doc.getElementsByTagName('html');
         if (root.length === 1) {
           root = root[0];
@@ -57,8 +70,8 @@ window.Network = function () {
   var self          = this,
       timeout       = 20000,
       cache         = [],
-      maxRetry      = 5,
       retryInterval = 60000;
+  this.maxRetry = 5;
   /**
    * Store a failed request for later retry
    */
@@ -81,7 +94,7 @@ window.Network = function () {
    */
   function retry(status) {
     cache = cache.filter(function (item) {
-      if (item.calls > maxRetry) {
+      if (item.calls > self.maxRetry) {
         item.cb("Error fetching " + item.url + ", max retry");
         return false;
       } else {

@@ -26,7 +26,7 @@ function Article() {
    * prepare an article for display
    */
   function prepare(obj) {
-    //jshint maxcomplexity: 12
+    //jshint maxcomplexity: 13
     var title = obj.title || obj.id,
         data;
     if (typeof obj.notes !== 'object') {
@@ -59,6 +59,21 @@ function Article() {
     if (utils.trim(data.title) === '') {
       data.title = _("noTitle");
     }
+    // Tags {{
+    if (Array.isArray(obj.tags) && obj.tags.length > 0) {
+      obj.tags.forEach(function (tag) {
+        if (tags.indexOf(tag) === -1) {
+          tags.push(tag);
+          (function (tag) {
+            var elmt = document.createElement('li');
+            elmt.dataset.tag = tag;
+            elmt.textContent = tag;
+            View.insertInList(document.getElementById('tagList'), "li", elmt, function (e) { return (e.dataset.tag.toLowerCase() > tag.toLowerCase()); });
+          })(tag);
+        }
+      });
+    }
+    // }}
 
     return data;
   }
@@ -162,21 +177,6 @@ function Article() {
       });
     }
     // }}
-    // Tags {{
-    if (Array.isArray(obj.tags) && obj.tags.length > 0) {
-      obj.tags.forEach(function (tag) {
-        if (tags.indexOf(tag) === -1) {
-          tags.push(tag);
-          (function (tag) {
-            var elmt = document.createElement('li');
-            elmt.dataset.tag = tag;
-            elmt.textContent = tag;
-            View.insertInList(document.getElementById('tagList'), "li", elmt, function (e) { return (e.dataset.tag.toLowerCase() > tag.toLowerCase()); });
-          })(tag);
-        }
-      });
-    }
-    // }}
     // Alternates {{
     if (Array.isArray(obj.alternates) && obj.alternates.length > 0) {
       topAlt = item.querySelector(".content > .alternates .alternatesButtons");
@@ -240,9 +240,9 @@ function Article() {
       }
     });
   };
-  this.delete = function (key) {
+  this.delete = function (key, title) {
     var elmt;
-    if (window.confirm(_('confirmDelete'))) {
+    if (window.confirm(_('confirmDelete', {title: title}))) {
       //@FIXME
       remoteStorage.alir.private.remove('/article/' + key);
       remoteStorage.alir.private.remove('article/' + key);
@@ -340,8 +340,10 @@ function Article() {
     self.read(key, function (article) {
       if (article) {
         self.display(article);
+        doShow();
+      } else {
+        window.alert(_('articleNotFound'));
       }
-      doShow();
     });
   };
   this.onShown = function onShown() {
@@ -538,7 +540,7 @@ function Article() {
         flags: {
           editable: true
         },
-        tags: ['note']
+        tags: title.toLowerCase().split(' ')
       };
       remoteStorage.alir.saveArticle(article);
     }

@@ -351,7 +351,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   margin: 0;
   font-style: italic;
 }
-#articleShow .articleActions .compose {
+#articleShow .compose {
   display: none;
 }
 #articleShow [data-flags*=",editable,"] .compose {
@@ -514,8 +514,8 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   border-style: solid;
   padding: 1rem .5rem;
 }
-#articleEdit.article fieldset.url,
-#articleEdit.url fieldset.article {
+#articleEdit.article .url,
+#articleEdit.url .article {
   display: none;
 }
 /** Settings {{ **/
