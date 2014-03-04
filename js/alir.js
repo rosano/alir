@@ -337,10 +337,13 @@ window.network = new window.Network();
 
 window.link = {
   // Open link in external browser
-  open: function () {
+  open: function (site) {
     "use strict";
     var href = document.getElementById('linkRef').textContent,
         openURL;
+    if (site) {
+      href = site + window.encodeURI(href);
+    }
     if (window.alir.getStatus().installed) {
       openURL = new window.MozActivity({
         name: "view",
@@ -390,6 +393,18 @@ window.link = {
       // @TODO How to share ???
       utils.log("Sorry, share is not available", "error");
     }
+  },
+  facebook: function () {
+    "use strict";
+    this.open('https://www.facebook.com/sharer/sharer.php?u=');
+  },
+  google: function () {
+    "use strict";
+    this.open('https://plus.google.com/share?url=');
+  },
+  twitter: function () {
+    "use strict";
+    this.open('https://twitter.com/intent/tweet?url=');
   }
 };
 
