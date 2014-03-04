@@ -44,7 +44,7 @@
               <p><a class="icon-chevron-left"        data-object="articles" data-method="hide"      data-params="{{=key}}"></a></p>
               <p><a class="icon-inbox archive"       data-object="articles" data-method="switchTag" data-params="{{=key}},archive" ></a></p>
               <p><a class="icon-star star"           data-object="articles" data-method="switchTag" data-params="{{=key}},star" ></a></p>
-              <p><a class="icon-trash"               data-object="articles" data-method="delete"    data-params="{{=key}}"></a></p>
+              <p><a class="icon-trash"               data-object="articles" data-method="delete"    data-params="{{=key}},{{=title}}"></a></p>
               <p><a class="icon-tags"                data-object="articles" data-method="addTag"    data-params="{{=key}}"></a></p>
               <p><a class="icon-pencil compose"      data-object="articles" data-method="edit"      data-params="{{=key}}"></a></p>
               <p><a class="icon-refresh" data-object="articles" data-method="reload"    data-params="{{=key}}"></a></p>
@@ -224,7 +224,7 @@
       </header>
       <form >
         <section class="container folded">
-          <header class="header"><h2 data-l10n-id="settingsMisc"></h3></header>
+          <header class="header"><h2 data-l10n-id="settingsMisc"></h2></header>
           <div>
             <fieldset id="settingsLang">
               <legend data-l10n-id="settingsLang">Language</legend>
@@ -275,7 +275,7 @@
           </div>
         </section>
         <section class="container folded">
-          <header class="header"><h2 data-l10n-id="settingsSync"></h3></header>
+          <header class="header"><h2 data-l10n-id="settingsSync"></h2></header>
           <div>
             <fieldset id="prefRS">
               <legend data-l10n-id="remoteStorage">remoteStorage</legend>
@@ -352,7 +352,7 @@
           </div>
         </section>
         <section class="container folded">
-          <header class="header"><h2 data-l10n-id="settingsReader"></h3></header>
+          <header class="header"><h2 data-l10n-id="settingsReader"></h2></header>
           <div>
             <fieldset id="settingsAlarm">
               <legend data-l10n-id="alarmInterval"></legend>

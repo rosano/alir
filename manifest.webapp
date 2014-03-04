@@ -48,8 +48,12 @@
     "alarms": {
       "description": "To fetch feeds"
     },
-    "systemXHR":{},
-    "browser": {},
+    "systemXHR":{
+      "description": "To fetch remote contents"
+    },
+    "browser": {
+      "description": "To authenticate to remote storage server"
+    },
     "desktop-notification": {
       "description": "Allows to display notifications"
     }

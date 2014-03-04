@@ -162,11 +162,11 @@ function Feeds() {
           itemId      = format === 'atom' ? getVal('id') : getVal('guid');
           itemUrl     = format === 'atom' ? getVal('link', 'href') : getVal('link');
           itemTitle   = getVal('title');
-          itemContent = getVal('content') || getVal('summary') || getVal('description') || entry.getElementsByTagName("content:encoded");
-          if (itemContent && typeof itemContent.length !== 'undefined' && itemContent.length > 0) {
-            //itemContent = itemContent[0].innerHTML;
-            itemContent = itemContent[0].textContent;
-          }
+          itemContent = getVal('encoded') || getVal('content') || getVal('summary') || getVal('description');/* || entry.getElementsByTagName("content:encoded")*/
+          //if (typeof itemContent === 'object' && typeof itemContent.length !== 'undefined' && itemContent.length > 0) {
+          //  //itemContent = itemContent[0].innerHTML;
+          //  itemContent = itemContent[0].textContent;
+          //}
           itemUpdated = entry.querySelector("updated") || entry.querySelector("published") || entry.querySelector("pubDate") || entry.getElementsByTagNameNS("http://purl.org/dc/elements/1.1/", 'date');
           if (itemUpdated && typeof itemUpdated.length !== 'undefined') {
             itemUpdated = itemUpdated[0];
@@ -260,6 +260,7 @@ function Feeds() {
     window.feeds.fetch(url, true, function (items) {
       items = items || {};
       window.alert("Found " + Object.keys(items).length + " item");
+      items = {};
     });
   };
   this.create = function (url, title) {

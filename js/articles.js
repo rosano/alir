@@ -83,7 +83,7 @@ function Article() {
     }
   });
   window.tiles.on('shown', function (name) {
-    if (name === 'articleDetail' && typeof currentId !== 'undefined') {
+    if (name === 'articleShow' && typeof currentId !== 'undefined') {
       self.onShown(currentId);
     }
   });
@@ -126,7 +126,7 @@ function Article() {
    * @param {Object} obj
    *
    */
-  this.display = function (obj) {
+  this.display = function (obj, update) {
     //jshint maxstatements: 25
     var data, item, topNote, topAlt, tile;
     data = prepare(obj);
@@ -194,7 +194,10 @@ function Article() {
     tile = document.getElementById('articleShow');
     tile.innerHTML = '';
     tile.appendChild(item);
-    tiles.go('articleShow');
+    currentId = obj.id;
+    if (update !== true) {
+      tiles.go('articleShow');
+    }
     // }}
 
     return item;
@@ -407,7 +410,7 @@ function Article() {
       if (article) {
         article.tags = tags.filter(function (t) {return t !== ''; });
         remoteStorage.alir.saveArticle(article);
-        self.display(article);
+        self.display(article, true);
       }
     });
   };
@@ -598,7 +601,7 @@ window.Comment = function () {
         };
         remoteStorage.alir.saveArticle(article);
         tiles.back();
-        window.articles.display(article);
+        window.articles.display(article, true);
       }
     });
   };

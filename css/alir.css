@@ -166,7 +166,7 @@ body.menu-right #menu .content .icon-chevron-left {
   padding-top: 4em;
   list-style-type: none;
   display: none;
-  max-width: 37rem;
+  max-width: 35rem;
   border-right: 1px solid #888;
   min-height: 100%;
 }
@@ -234,7 +234,7 @@ body.popup .shown {
   /*left: 42rem;*/
   left: 0rem;
   opacity: 0;
-  width: 37rem;
+  width: 35rem;
   display: block;
   background-color: inherit;
   border-width: 0 1px;
@@ -242,7 +242,7 @@ body.popup .shown {
   border-color: #888;
 }
 body.popup [data-tile] > header, body.popup [data-tile] > * > header {
-  width: 38rem;
+  width: 36rem;
 }
 body.hosted .ifInstalled, body.installed .ifHosted {
   display: none;
@@ -400,45 +400,39 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #main > .filters fieldset {
   display: inline;
 }
-#main.detail > .filters {
-  display: none;
-}
 #list > li h2 span {
   display: none;
 }
 #list > li h2 span.title,
-#main.list #list > li.hasNotes h2 .hasNotes,
-#main.list #list > li[data-tags*=",archive,"] h2 .isArchive,
-#main.list #list > li[data-tags*=",feed,"] h2 .isFeed,
-#main.list #list > li[data-tags*=",star"] h2 .isStar
+#list > li.hasNotes h2 .hasNotes,
+#list > li[data-tags*=",archive,"] h2 .isArchive,
+#list > li[data-tags*=",feed,"] h2 .isFeed,
+#list > li[data-tags*=",star"] h2 .isStar
 {
   display: inline;
 }
-#main.list #list > li[data-tags*=",archive,"],
-#main.list #list > li[data-tags*=",feed,"] {
+#list > li[data-tags*=",archive,"],
+#list > li[data-tags*=",feed,"] {
   display: none;
 }
-#main.detail #list {
-  margin-top: -2rem;
-}
-#main.list.archives .filters .archive,
+#main.archives .filters .archive,
 [data-tags*=",archive,"] .archive,
-#main.list.feeds .filters .feed,
+#main.feeds .filters .feed,
 [data-tags*=",feed,"] .feed {
   color: #ff6347;
 }
-#main.list.stars .filters .star,
+#main.stars .filters .star,
 [data-tags*=",star,"] .star {
   color: yellow;
 }
-#main.list.archives #list > li[data-tags*=",archive,"],
-#main.list.feeds #list > li[data-tags*=",feed,"] {
+#main.archives #list > li[data-tags*=",archive,"],
+#main.feeds #list > li[data-tags*=",feed,"] {
   display: block;
 }
-#main.list.stars #list > li:not([data-tags*=",star,"]) {
+#main.stars #list > li:not([data-tags*=",star,"]) {
   display: none;
 }
-#main.list.stars #list > li[data-tags*=",star,"] {
+#main.stars #list > li[data-tags*=",star,"] {
   display: block;
 }
 /* Hide URL of article without url */
@@ -449,7 +443,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   color: yellow;
   text-shadow: 0 0 1px #000;
 }
-#main.list #list > li > h2, #feeds > li > h2 {
+#list > li > h2, #feeds > li > h2 {
   margin: 0.66rem 0;
   font-size: 1.2rem;
 }

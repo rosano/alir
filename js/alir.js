@@ -112,6 +112,7 @@ function Alir() {
   // }}
   // status {{
   (function () {
+    //jshint maxstatements: 21
     var status;
     status = {
       installed: false,
@@ -172,6 +173,12 @@ function Alir() {
       self._emit('statusUpdated', status);
     });
     // check if application is installed {
+    function hosted() {
+      if (config && config.first) {
+        config.proxy = window.location.protocol + '//www.corsproxy.com/';
+        document.getElementById('proxyUrl').value = config.proxy;
+      }
+    }
     if (window.navigator.mozApps) {
       (function () {
         var request = window.navigator.mozApps.getSelf();
@@ -180,10 +187,13 @@ function Alir() {
             status.installed = true;
             document.body.classList.remove('hosted');
             document.body.classList.add('installed');
+          } else {
+            hosted();
           }
         };
         request.onerror = function () {
           alert("Error: " + request.error.name);
+          hosted();
         };
       }());
     } else {
@@ -568,7 +578,6 @@ function initUI() {
         document.documentElement.lang = document.webL10n.getLanguage();
         document.documentElement.dir = document.webL10n.getDirection();
         if (config.first === true) {
-          config.first = false;
           var article = {
             id:    utils.uuid(),
             title: _('firstArticleTitle'),
@@ -1241,6 +1250,7 @@ window.addEventListener('load', function () {
 window.addEventListener('unload', function () {
   "use strict";
   config.logs = document.getElementById('debugLog').innerHTML;
+  config.first = false;
   if (config.testMode !== true) {
     localStorage.setItem('config', JSON.stringify(config));
   }
