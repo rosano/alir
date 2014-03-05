@@ -273,7 +273,7 @@ var Tiles = function (global) {
         if (popupElmt) {
           popupElmt.classList.add('popup');
           setTimeout(function () {
-            popupElmt.style.left = "40rem";
+            popupElmt.style.left = (popupElmt.getBoundingClientRect().width - 2) + 'px';
             popupElmt.style.opacity = "1";
           });
           window.scrollTo(0, 0);
@@ -335,6 +335,9 @@ var Tiles = function (global) {
   };
   this.tiles = function () {
     return tiles;
+  };
+  this.getCurrent = function () {
+    return current;
   };
 };
 window.tiles = new Tiles();

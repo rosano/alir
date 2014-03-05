@@ -134,7 +134,7 @@ window.Network = function () {
       }
     } else {
       // Add a timestamp to bypass the cache
-      computedUrl += ((/\?/).test(url) ? "&" : "?") + (new Date()).getTime();
+      computedUrl += ((/\?/).test(url) ? "&" : "?") + 'ts=' + (new Date()).getTime();
     }
     if (status.online !== true) {
       store('offline', url, cb);

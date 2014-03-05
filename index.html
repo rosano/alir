@@ -277,78 +277,87 @@
         <section class="container folded">
           <header class="header"><h2 data-l10n-id="settingsSync"></h2></header>
           <div>
-            <fieldset id="prefRS">
-              <legend data-l10n-id="remoteStorage">remoteStorage</legend>
-              <fieldset class="inline text">
-                <p>
-                  <label for="rsLogin" data-l10n-id="rsLoginLabel">Login</label>
-                  <input type="email" name="rsLogin" id="rsLogin" placeholder="user@host" data-l10n-id="rsLogin" />
-                  <button type="reset"><span class="icon-remove"></span></button>
-                </p>
+            <section class="container folded">
+              <header class="header"><h3 data-l10n-id="remoteStorage"></h3></header>
+              <fieldset id="prefRS">
+                <legend data-l10n-id="remoteStorage">remoteStorage</legend>
+                <fieldset class="inline text">
+                  <p>
+                    <label for="rsLogin" data-l10n-id="rsLoginLabel">Login</label>
+                    <input type="email" name="rsLogin" id="rsLogin" placeholder="user@host" data-l10n-id="rsLogin" />
+                    <button type="reset"><span class="icon-remove"></span></button>
+                  </p>
+                </fieldset>
+                <fieldset>
+                  <p class="float">
+                    <button data-l10n-id="rsConnect" data-object="alir.rs" data-method="connect"></button>
+                    <button data-l10n-id="rsDisconnect" data-object="alir.rs" data-method="disconnect"></button>
+                    <button data-l10n-id="rsSync"  data-object="alir.rs" data-method="sync"></button>
+                    <button data-l10n-id="rsReset" data-object="alir.rs" data-method="reset"></button>
+                    <button data-l10n-id="rsCache" data-object="alir.rs" data-method="cacheReset"></button>
+                  </p>
+                </fieldset>
+                <fieldset>
+                  <legend data-l10n-id="rsSyncIntervalOn"></legend>
+                  <input type="range" name="rsSyncIntervalOn" id="rsSyncIntervalOn" min="10" max="600" step="5" />
+                  <p><span id="rsSyncIntervalOnValue" ></span>s</p>
+                </fieldset>
+                <fieldset>
+                  <legend data-l10n-id="rsSyncIntervalOff"></legend>
+                  <input type="range" name="rsSyncIntervalOff" id="rsSyncIntervalOff" min="60" max="3600" step="5" />
+                  <p><span id="rsSyncIntervalOffValue" ></span>s</p>
+                </fieldset>
+                <fieldset class="inline text">
+                  <p>
+                    <label for="prefToken" data-l10n-id="settingsToken">Token</label>
+                    <input type="text" name="prefToken" id="prefToken" disabled>
+                  </p>
+                </fieldset>
               </fieldset>
-              <fieldset>
-                <p class="float">
-                  <button data-l10n-id="rsConnect" data-object="alir.rs" data-method="connect"></button>
-                  <button data-l10n-id="rsDisconnect" data-object="alir.rs" data-method="disconnect"></button>
-                  <button data-l10n-id="rsSync"  data-object="alir.rs" data-method="sync"></button>
-                  <button data-l10n-id="rsReset" data-object="alir.rs" data-method="reset"></button>
-                  <button data-l10n-id="rsCache" data-object="alir.rs" data-method="cacheReset"></button>
-                </p>
+            </section>
+            <section class="container folded">
+              <header class="header"><h3 data-l10n-id="dropbox"></h3></header>
+              <fieldset id="prefDropbox">
+                <legend data-l10n-id="dropbox">Dropbox</legend>
+                <fieldset class="inline text">
+                  <p>
+                    <label for="dropboxApiKey" data-l10n-id="dropboxKeyLabel">Key</label>
+                    <input type="text" name="dropboxApiKey" id="dropboxApiKey" placeholder="Key" data-l10n-id="dropboxKey" />
+                    <button type="reset"><span class="icon-remove"></span></button>
+                  </p>
+                </fieldset>
+                <fieldset>
+                  <p>
+                    <button data-l10n-id="rsConnect" data-object="alir.rs" data-method="connectDropbox"></button>
+                  <p>
+                </fieldset>
               </fieldset>
-              <fieldset>
-                <legend data-l10n-id="rsSyncIntervalOn"></legend>
-                <input type="range" name="rsSyncIntervalOn" id="rsSyncIntervalOn" min="10" max="600" step="5" />
-                <p><span id="rsSyncIntervalOnValue" ></span>s</p>
+            </section>
+            <section class="container folded">
+              <header class="header"><h3 data-l10n-id="drive"></h3></header>
+              <fieldset id="prefDrive">
+                <legend data-l10n-id="drive">Google Drive</legend>
+                <fieldset class="inline text">
+                  <p>
+                    <label for="driveClientId" data-l10n-id="driveIdLabel">Client Id</label>
+                    <input type="text" name="driveClientId" id="driveClientId" placeholder="ClientId" data-l10n-id="driveId" />
+                    <button type="reset"><span class="icon-remove"></span></button>
+                  </p>
+                </fieldset>
+                <fieldset class="inline text">
+                  <p>
+                    <label for="driveApiKey" data-l10n-id="driveKeyLabel">Key</label>
+                    <input type="text" name="driveApiKey" id="driveApiKey" placeholder="Key" data-l10n-id="driveKey" />
+                    <button type="reset"><span class="icon-remove"></span></button>
+                  </p>
+                </fieldset>
+                <fieldset>
+                  <p>
+                    <button data-l10n-id="rsConnect" data-object="alir.rs" data-method="connectDrive"></button>
+                  <p>
+                </fieldset>
               </fieldset>
-              <fieldset>
-                <legend data-l10n-id="rsSyncIntervalOff"></legend>
-                <input type="range" name="rsSyncIntervalOff" id="rsSyncIntervalOff" min="60" max="3600" step="5" />
-                <p><span id="rsSyncIntervalOffValue" ></span>s</p>
-              </fieldset>
-              <fieldset class="inline text">
-                <p>
-                  <label for="prefToken" data-l10n-id="settingsToken">Token</label>
-                  <input type="text" name="prefToken" id="prefToken" disabled>
-                </p>
-              </fieldset>
-            </fieldset>
-            <fieldset id="prefDropbox">
-              <legend data-l10n-id="dropbox">Dropbox</legend>
-              <fieldset class="inline text">
-                <p>
-                  <label for="dropboxApiKey" data-l10n-id="dropboxKeyLabel">Key</label>
-                  <input type="text" name="dropboxApiKey" id="dropboxApiKey" placeholder="Key" data-l10n-id="dropboxKey" />
-                  <button type="reset"><span class="icon-remove"></span></button>
-                </p>
-              </fieldset>
-              <fieldset>
-                <p>
-                  <button data-l10n-id="rsConnect" data-object="alir.rs" data-method="connectDropbox"></button>
-                <p>
-              </fieldset>
-            </fieldset>
-            <fieldset id="prefDrive">
-              <legend data-l10n-id="drive">Google Drive</legend>
-              <fieldset class="inline text">
-                <p>
-                  <label for="driveClientId" data-l10n-id="driveIdLabel">Client Id</label>
-                  <input type="text" name="driveClientId" id="driveClientId" placeholder="ClientId" data-l10n-id="driveId" />
-                  <button type="reset"><span class="icon-remove"></span></button>
-                </p>
-              </fieldset>
-              <fieldset class="inline text">
-                <p>
-                  <label for="driveApiKey" data-l10n-id="driveKeyLabel">Key</label>
-                  <input type="text" name="driveApiKey" id="driveApiKey" placeholder="Key" data-l10n-id="driveKey" />
-                  <button type="reset"><span class="icon-remove"></span></button>
-                </p>
-              </fieldset>
-              <fieldset>
-                <p>
-                  <button data-l10n-id="rsConnect" data-object="alir.rs" data-method="connectDrive"></button>
-                <p>
-              </fieldset>
-            </fieldset>
+            </section>
           </div>
         </section>
         <section class="container folded">

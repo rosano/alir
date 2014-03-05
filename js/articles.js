@@ -254,9 +254,11 @@ function Article() {
       if (elmt) {
         elmt.parentNode.removeChild(elmt);
       }
-      tiles.back();
+      if (tiles.getCurrent() === 'articleShow') {
+        tiles.back();
+        self.hide();
+      }
     }
-    self.hide();
   };
   this.save = function () {
     var tile = document.querySelector('[data-tile=articleEdit]'),
@@ -519,6 +521,9 @@ function Article() {
   };
   this.mock = function (n) {
     var article, ipsum, aIpsum, i, j, l, text;
+    if (typeof n === 'undefined') {
+      n = 1;
+    }
     ipsum = "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
     aIpsum = ipsum.split(' ');
     l = aIpsum.length;
@@ -543,8 +548,8 @@ function Article() {
         flags: {
           editable: true
         },
-        tags: title.toLowerCase().split(' ')
       };
+      article.tags = article.title.toLowerCase().split(' ');
       remoteStorage.alir.saveArticle(article);
     }
   };
@@ -619,13 +624,15 @@ window.Comment = function () {
         if (article) {
           delete article.notes[noteId];
           remoteStorage.alir.saveArticle(article);
-          window.articles.display(article);
+          tiles.back();
+          window.articles.display(article, true);
         } else {
           tiles.back();
         }
       });
+    } else {
+      tiles.back();
     }
-    tiles.back();
   };
 };
 window.comment = new window.Comment();

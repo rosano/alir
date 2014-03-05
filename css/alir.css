@@ -180,7 +180,7 @@ body.menu-right #menu .content .icon-chevron-left {
   /*position: sticky;*/
   position: fixed;
   top: 2rem;
-  width: 39rem;
+  width: 36rem;
   z-index: 999;
 }
 [data-tile] header h2 {
@@ -516,7 +516,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #settings .container {
   border: 1px solid #888;
   border-radius: 2px;
-  margin-bottom: .5rem;
+  margin: .5rem 0;
 }
 #settings .container > .header {
   padding: 0.01rem;
