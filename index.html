@@ -41,10 +41,9 @@
           <div class="articleMenu folded">
             <p><a class="icon-reorder" data-object="articles.ui" data-method="menu"></a></p>
             <div class="articleActions">
-              <p><a class="icon-chevron-left"        data-object="articles" data-method="hide"      data-params="{{=key}}"></a></p>
+              <p><a class="icon-trash"               data-object="articles" data-method="delete"    data-params="{{=key}},{{=title}}"></a></p>
               <p><a class="icon-inbox archive"       data-object="articles" data-method="switchTag" data-params="{{=key}},archive" ></a></p>
               <p><a class="icon-star star"           data-object="articles" data-method="switchTag" data-params="{{=key}},star" ></a></p>
-              <p><a class="icon-trash"               data-object="articles" data-method="delete"    data-params="{{=key}},{{=title}}"></a></p>
               <p><a class="icon-tags"                data-object="articles" data-method="addTag"    data-params="{{=key}}"></a></p>
               <p><a class="icon-pencil compose"      data-object="articles" data-method="edit"      data-params="{{=key}}"></a></p>
               <p><a class="icon-refresh" data-object="articles" data-method="reload"    data-params="{{=key}}"></a></p>
@@ -411,7 +410,7 @@
           <button data-object="alir" data-method="styleReset" data-l10n-id="styleReset"></button>
         </p>
       </fieldset>
-      <fieldset class="ifHosted">
+      <fieldset>
         <legend data-l10n-id="proxyLegend"></legend>
         <fieldset class="inline text">
           <p>

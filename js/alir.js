@@ -173,12 +173,6 @@ function Alir() {
       self._emit('statusUpdated', status);
     });
     // check if application is installed {
-    function hosted() {
-      if (config && config.first) {
-        config.proxy = window.location.protocol + '//www.corsproxy.com/';
-        document.getElementById('proxyUrl').value = config.proxy;
-      }
-    }
     if (window.navigator.mozApps) {
       (function () {
         var request = window.navigator.mozApps.getSelf();
@@ -187,13 +181,10 @@ function Alir() {
             status.installed = true;
             document.body.classList.remove('hosted');
             document.body.classList.add('installed');
-          } else {
-            hosted();
           }
         };
         request.onerror = function () {
           alert("Error: " + request.error.name);
-          hosted();
         };
       }());
     } else {
@@ -224,7 +215,14 @@ function Alir() {
   // }}
   this.install = function () {
     (function () {
-      var request = window.navigator.mozApps.installPackage("https://alir.5apps.com/package.manifest");
+      var host, request;
+      host = window.location.protocol + '//' + window.location.host;
+      // @FIXME dirty hack to detect Firefox OS
+      if (typeof window.mozActivity === 'undefined') {
+        window.navigator.mozApps.install(host + '/hosted.webapp');
+      } else {
+        request = window.navigator.mozApps.installPackage(host + "/package.manifest");
+      }
       request.onerror = function () {
         utils.log("Install Error : " + this.error.name, "error");
         utils.log(this.error, 'error');
@@ -251,9 +249,7 @@ function Alir() {
     }());
   };
   this.getAll = function () {
-    var startTime = {},
-        status = window.alir.getStatus(),
-        canReload = status.installed && status.online;
+    var startTime = {};
 
     ['article', 'feed'].forEach(function (type) {
       startTime[type] = window.performance.now();
@@ -264,7 +260,7 @@ function Alir() {
             try {
               objects[key].id   = key;
               objects[key].type = type;
-              if (type === 'article' && canReload && (objects[key].loaded === false || objects[key].title === '???')) {
+              if (type === 'article' && (objects[key].loaded === false || objects[key].title === '???')) {
                 self.reload(key);
               }
               displayItem(objects[key]);
@@ -354,14 +350,18 @@ window.link = {
     if (site) {
       href = site + window.encodeURI(href);
     }
-    if (window.alir.getStatus().installed) {
-      openURL = new window.MozActivity({
-        name: "view",
-        data: {
-          type: "url",
-          url: href
-        }
-      });
+    if (typeof window.MozActivity !== 'undefined') {
+      try {
+        openURL = new window.MozActivity({
+          name: "view",
+          data: {
+            type: "url",
+            url: href
+          }
+        });
+      } catch (e) {
+        window.open(href);
+      }
     } else {
       window.open(href);
     }
@@ -390,19 +390,23 @@ window.link = {
     "use strict";
     var href = document.getElementById('linkRef').textContent,
         openURL;
-    if (window.alir.getStatus().installed) {
-      openURL = new window.MozActivity({
-        name: "share",
-        data: {
-          type: "url",
-          url: href
-        }
-      });
-      tiles.back();
+    if (typeof window.MozActivity !== 'undefined') {
+      try {
+        openURL = new window.MozActivity({
+          name: "share",
+          data: {
+            type: "url",
+            url: href
+          }
+        });
+      } catch (e) {
+        utils.log("Error sharing : " + e, "error");
+      }
     } else {
       // @TODO How to share ???
       utils.log("Sorry, share is not available", "error");
     }
+    tiles.back();
   },
   facebook: function () {
     "use strict";
@@ -575,10 +579,17 @@ function initUI() {
     function firstUse() {
       // Create first use content
       function doFirst() {
+        var article,
+            xhr = new XMLHttpRequest({ mozSystem: true });
         document.documentElement.lang = document.webL10n.getLanguage();
         document.documentElement.dir = document.webL10n.getDirection();
         if (config.first === true) {
-          var article = {
+          // if mozSystem is not available, init a CORS Proxy
+          if (typeof xhr.mozSystem !== 'boolean' || xhr.mozSystem !== true) {
+            config.proxy = window.location.protocol + '//www.corsproxy.com/';
+            document.getElementById('proxyUrl').value = config.proxy;
+          }
+          article = {
             id:    utils.uuid(),
             title: _('firstArticleTitle'),
             html:  new Showdown.converter().makeHtml(_('firstArticleMd')),
@@ -1152,7 +1163,6 @@ window.addEventListener('load', function () {
   _ = document.webL10n.get;
   var hasPending = false;
   // Check if application is installed
-
   if (typeof navigator.mozHasPendingMessage === 'function' && typeof navigator.mozSetMessageHandler === 'function') {
     if (navigator.mozHasPendingMessage('alarm')) {
       utils.notify('Pending alarms');
@@ -1171,8 +1181,6 @@ window.addEventListener('load', function () {
         utils.log(notification, "debug");
       });
     }
-  } else {
-    utils.notify('Not installed');
   }
 
   remoteStorage.access.claim('alir', 'rw');

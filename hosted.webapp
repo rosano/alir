@@ -1,0 +1,62 @@
+{
+  "name": "Alir",
+  "description": "Store articles to read offline",
+  "launch_path": "/index.html",
+  "icons": {
+    "128": "/img/icon-128.png",
+    "120": "/img/icon-120.png",
+    "256": "/img/icon-256.png",
+    "32": "/img/icon-32.png",
+    "48": "/img/icon-48.png",
+    "60": "/img/icon-60.png",
+    "90": "/img/icon-60.png"
+  },
+  "developer": {
+    "name": "Clochix",
+    "url": "http://clochix.net"
+  },
+  "activities": {
+    "save-bookmark": {
+      "filters": {
+        "type": "url",
+        "url": {
+          "required":true,
+          "regexp":"/^https?:/"
+        }
+      },
+      "disposition": "inline",
+      "href": "/index.html",
+      "returnValue": true
+    },
+    "share": {
+      "filters": {
+        "type": "url"
+      },
+      "disposition": "inline",
+      "href": "/index.html",
+      "returnValue": true
+    }
+  },
+  "messages": [
+    { "alarm" : "/index.html" }
+  ],
+  "permissions": {
+    "desktop-notification": {
+      "description": "Allows to display notifications"
+    }
+  },
+  "default_locale": "en",
+  "locales": {
+    "en": {
+      "name": "Àlir",
+      "description": "Paper box for text to read later"
+    },
+    "fr": {
+      "name": "Àlir",
+      "description": "Banette pour textes à lire plus tard"
+    }
+  },
+  "appcache_path": "/cache.manifest",
+  "version": "0.2.09"
+}
+

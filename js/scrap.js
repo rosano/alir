@@ -119,23 +119,6 @@ window.Network = function () {
     var status, xhr, options, proxy, timer, computedUrl;
     status = window.alir.getStatus();
     computedUrl = url;
-    if (status.installed !== true) {
-      if (window.config.proxy !== '' && window.config.proxy !== 'http://') {
-        proxy = url.split('://');
-        if (proxy !== null) {
-          computedUrl = window.config.proxy + proxy[1];
-        } else {
-          cb(_('scrapNotInstalled'));
-          return;
-        }
-      } else {
-        cb(_('scrapNotInstalled'));
-        return;
-      }
-    } else {
-      // Add a timestamp to bypass the cache
-      computedUrl += ((/\?/).test(url) ? "&" : "?") + 'ts=' + (new Date()).getTime();
-    }
     if (status.online !== true) {
       store('offline', url, cb);
       return;
@@ -146,6 +129,23 @@ window.Network = function () {
         mozSystem: true
       };
       xhr = new XMLHttpRequest(options);
+      if (typeof xhr.mozSystem !== 'boolean' || xhr.mozSystem !== true) {
+        if (window.config.proxy !== '' && window.config.proxy !== 'http://') {
+          proxy = url.split('://');
+          if (proxy !== null) {
+            computedUrl = window.config.proxy + proxy[1];
+          } else {
+            cb(_('scrapNotInstalled'));
+            return;
+          }
+        } else {
+          cb(_('scrapNotInstalled'));
+          return;
+        }
+      } else {
+        // Add a timestamp to bypass the cache
+        computedUrl += ((/\?/).test(url) ? "&" : "?") + 'ts=' + (new Date()).getTime();
+      }
       xhr.open("GET", computedUrl, true);
       //xhr.responseType = "document";
       xhr.timeout = this.timeout;

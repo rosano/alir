@@ -417,7 +417,7 @@ function Article() {
     });
   };
   this.share = function (key) {
-    if (window.alir.getStatus().installed) {
+    if (typeof window.mozActivity !== 'undefined') {
       var node = $('#list > [data-key="' + key + '"]'),
           request = new window.MozActivity({
         name: "share",
@@ -429,8 +429,8 @@ function Article() {
       request.onerror = function () {
         window.alert("Error sharing : " + request.error.name);
       };
-    //} else {
-    //  // @TODO What to do ???
+    } else {
+      utils.log("Share is not available", "error");
     }
   };
   this.ui = {
