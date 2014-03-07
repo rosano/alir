@@ -244,6 +244,7 @@ var Tiles = function (global) {
       }
     });
     document.getElementById('menu').classList.remove('show');
+    window.location.hash = name;
     this._emit('shown', name);
   };
   this.go = function (name, cb) {
@@ -260,7 +261,7 @@ var Tiles = function (global) {
       window.scrollTo(0, next.y);
       tiles.splice(i);
     } else {
-      if (name !== current) {
+      if (name !== current && typeof current !== 'undefined') {
         tiles.push({name: current, y: window.scrollY, cb: cb});
       }
       if (popup) {
@@ -277,6 +278,7 @@ var Tiles = function (global) {
             popupElmt.style.opacity = "1";
           });
           window.scrollTo(0, 0);
+          window.location.hash = name;
           this._emit('shown', name);
           current = name;
         }
@@ -290,6 +292,13 @@ var Tiles = function (global) {
     //jshint maxstatements: 30
     var popupOldElmt, popupNewElmt, next;
     next = tiles.pop();
+    if (typeof next === 'undefined') {
+      // default tile
+      next = {
+        name: 'articleList',
+        y: 0
+      };
+    }
     if (popup) {
       popupOldElmt = document.querySelector(".popup[data-tile]");
       if (popupOldElmt) {
@@ -312,6 +321,7 @@ var Tiles = function (global) {
         }
       }
       current = next.name;
+      window.location.hash = name;
       this._emit('shown', current);
     } else {
       if (typeof next === 'object') {
@@ -338,6 +348,9 @@ var Tiles = function (global) {
   };
   this.getCurrent = function () {
     return current;
+  };
+  this.exists = function (name) {
+    return document.querySelectorAll("[data-tile='" + name + "']").length === 1;
   };
 };
 window.tiles = new Tiles();

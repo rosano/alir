@@ -133,7 +133,7 @@
     <!-- Menu {{ -->
     <div id="menu" class="list">
       <div class="content">
-        <p><a class="icon-chevron-up top detail" href="#articleShow"></a></p>
+        <p><a class="icon-chevron-up top detail" href="#articleShowTile"></a></p>
         <p><a class="icon-plus new" data-object="articles" data-method="create"></a></p>
         <p><a class="icon-refresh sync" data-object="alir.rs" data-method="sync"></a></p>
         <p><a class="icon-cog settings" data-object="tiles" data-method="go" data-params="settings"></a></p>
@@ -146,7 +146,7 @@
     </div>
     <!-- }} -->
     <!-- articleEdit {{ -->
-    <div id="articleEdit" class="" data-tile="articleEdit">
+    <div id="articleEditTile" class="" data-tile="articleEdit">
       <header>
         <h2>
           <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
@@ -210,7 +210,7 @@
     </div>
     <!-- }} -->
     <!-- articleShow {{ -->
-    <section data-tile="articleShow" id="articleShow">
+    <section data-tile="articleShow" id="articleShowTile">
     </section>
     <!-- }} -->
     <!-- settings {{ -->
@@ -245,16 +245,6 @@
                 </select>
               </fieldset>
             </fieldset>
-            <fieldset id="settingsTheme">
-              <legend data-l10n-id="settingsTheme"></legend>
-              <fieldset class="inline text">
-                <select data-target="theme">
-                  <option value="" data-l10n-id="themeDefault"></option>
-                  <option value="themeGreen" data-l10n-id="themeGreen"></option>
-                  <option value="themeRed" data-l10n-id="themeRed"></option>
-                </select>
-              </fieldset>
-            </fieldset>
             <fieldset class="inline check compact">
               <p>
                 <label for="prefMenuLeft" data-l10n-id="settingsMenu">Left Menu</label>
@@ -270,6 +260,39 @@
                 <label for="prefVibrate" data-l10n-id="settingsVibrate">Vibrate</label>
                 <input type="checkbox" name="prefVibrate" id="prefVibrate" data-target="vibrate" >
               </p>
+            </fieldset>
+          </div>
+        </section>
+        <section class="container folded">
+          <header class="header"><h2 data-l10n-id="settingsUI"></h2></header>
+          <div>
+            <fieldset>
+              <legend data-l10n-id="settingsFont"></legend>
+              <p>
+                <input id="styleFontSize" type="range" min="0.3" max="3" step="0.1" />
+              </p>
+              <fieldset class="inline text">
+                <select id="styleFontFamily" data-target="fontFamily">
+                  <option value="sans-serif">Sans-Serif</option>
+                  <option value="serif">Serif</option>
+                </select>
+              </fieldset>
+              <p id="styleFontSizeSample">
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              </p>
+              <p>
+                <button data-object="alir" data-method="styleReset" data-l10n-id="styleReset"></button>
+              </p>
+            </fieldset>
+            <fieldset id="settingsTheme">
+              <legend data-l10n-id="settingsTheme"></legend>
+              <fieldset class="inline text">
+                <select data-target="theme">
+                  <option value="" data-l10n-id="themeDefault"></option>
+                  <option value="themeGreen" data-l10n-id="themeGreen"></option>
+                  <option value="themeRed" data-l10n-id="themeRed"></option>
+                </select>
+              </fieldset>
             </fieldset>
           </div>
         </section>
@@ -394,23 +417,6 @@
         </h2>
       </header>
       <fieldset>
-        <p>
-          <input id="styleFontSize" type="range" min="0.3" max="3" step="0.1" />
-        </p>
-        <fieldset class="inline text">
-          <select id="styleFontFamily" data-target="fontFamily">
-            <option value="sans-serif">Sans-Serif</option>
-            <option value="serif">Serif</option>
-          </select>
-        </fieldset>
-        <p id="styleFontSizeSample">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        </p>
-        <p>
-          <button data-object="alir" data-method="styleReset" data-l10n-id="styleReset"></button>
-        </p>
-      </fieldset>
-      <fieldset>
         <legend data-l10n-id="proxyLegend"></legend>
         <fieldset class="inline text">
           <p>
@@ -420,23 +426,22 @@
           </p>
         </fieldset>
       </fieldset>
-      <p class="float">
-        <button data-object="alir" data-method="reset" data-l10n-id="alirReset"></button>
-        <button data-object="alir.ui" data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
+      <p>
         <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
-      <p class="col2">
-      </p>
         <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
-        <button data-object="alir.ui" data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
-      <p class="col2">
-      </p>
         <button data-object="alir" data-method="getAll" data-l10n-id="settingsReload">Reload</button>
-        <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
+        <button data-object="alir" data-method="reset" data-l10n-id="alirReset"></button>
       </p>
+      <!--
+      <p class="float">
+        <button data-object="alir.ui" data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
+        <button data-object="alir.ui" data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
+      </p>
+      -->
     </div>
     <!-- }} -->
     <!-- noteView {{ -->
-    <section id="noteView" data-tile="noteView" class="">
+    <section id="noteViewTile" data-tile="noteView" class="">
       <header>
         <h2>
           <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
@@ -459,7 +464,7 @@
     </section>
     <!-- }} -->
     <!-- noteEdit {{ -->
-    <section id="noteEdit" data-tile="noteEdit" class="">
+    <section id="noteEditTile" data-tile="noteEdit" class="">
       <header>
         <h2>
           <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
@@ -581,7 +586,7 @@
         <a class="icon-plus" data-object="feeds" data-method="create" ></a>
         <a class="icon-refresh" data-object="feeds" data-method="update"></a>
       </p>
-      <ul id="feeds">
+      <ul id="feedsList">
       </ul>
     </section>
     <!-- }} -->

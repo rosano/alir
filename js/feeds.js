@@ -31,7 +31,7 @@ function Feeds() {
       url: obj.url
     };
     item = View.template('tmpl-feed', data);
-    View.insertInList(document.getElementById('feeds'), "[data-key]", item, function (e) { return (e.dataset.title.toLowerCase() > title.toLowerCase()); });
+    View.insertInList(document.getElementById('feedsList'), "[data-key]", item, function (e) { return (e.dataset.title.toLowerCase() > title.toLowerCase()); });
     // update feed cache
     window.feeds.cache(obj);
 
@@ -107,7 +107,9 @@ function Feeds() {
           try {
             parser = new DOMParser();
             doc = parser.parseFromString(doc.response, 'text/html');
-          } catch (e) { }
+          } catch (e) {
+            utils.log("Error parsing feed : " + e.toString(), "error");
+          }
           if (doc.getElementsByTagName('rss').length === 0 && doc.getElementsByTagName('feed').length === 0) {
             utils.log("Unable to get feed type for " + url, "error");
             if (cb) {

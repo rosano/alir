@@ -219,7 +219,7 @@ function Alir() {
       host = window.location.protocol + '//' + window.location.host;
       // @FIXME dirty hack to detect Firefox OS
       if (typeof window.mozActivity === 'undefined') {
-        window.navigator.mozApps.install(host + '/hosted.webapp');
+        request = window.navigator.mozApps.install(host + '/hosted.webapp');
       } else {
         request = window.navigator.mozApps.installPackage(host + "/package.manifest");
       }
@@ -611,6 +611,7 @@ function initUI() {
       conf = JSON.parse(conf);
       utils.merge(config, conf);
 
+      config.first = conf.first;
       firstUse();
 
       if (typeof conf.lang !== 'undefined') {
@@ -1107,16 +1108,20 @@ function initUI() {
     });
   }());
 
-  window.addEventListener("hashchange", function () {
-    if (window.location.hash === '' && document.getElementById('menu').classList.contains('detail')) {
-      window.articles.hide();
+  function onHash() {
+    var hash = window.location.hash.substr(1);
+    if (tiles.exists(hash) && tiles.getCurrent() !== hash) {
+      tiles.go(hash);
+      return true;
     }
-    if (window.location.hash !== '' && document.getElementById('menu').classList.contains('list')) {
-      window.articles.show(window.location.hash.substr(1));
-    }
-  }, false);
+    return false;
+  }
+  window.addEventListener("hashchange", onHash, false);
 
-  tiles.show('articleList');
+  if (!onHash()) {
+    // display default tile
+    tiles.show('articleList');
+  }
   if (typeof document.getElementById("authFrame").setVisible === "function") {
     // the application is installed, override auth methods
     (function () {

@@ -18,9 +18,9 @@ function Article() {
     }
   }
   if ("ontouchstart" in window) {
-    document.getElementById("articleShow").addEventListener('contextmenu', doNote);
+    document.getElementById("articleShowTile").addEventListener('contextmenu', doNote);
   }
-  document.getElementById("articleShow").addEventListener('dblclick', doNote);
+  document.getElementById("articleShowTile").addEventListener('dblclick', doNote);
 
   /**
    * prepare an article for display
@@ -191,7 +191,7 @@ function Article() {
         topAlt.appendChild(a);
       });
     }
-    tile = document.getElementById('articleShow');
+    tile = document.getElementById('articleShowTile');
     tile.innerHTML = '';
     tile.appendChild(item);
     currentId = obj.id;
@@ -352,7 +352,7 @@ function Article() {
     });
   };
   this.onShown = function onShown() {
-    var iframe = document.getElementById('articleShow').querySelector('iframe'),
+    var iframe = document.getElementById('articleShowTile').querySelector('iframe'),
         scroll;
     if (iframe) {
       iframe.contentDocument.body.style.margin  = "0px";
@@ -362,7 +362,7 @@ function Article() {
     self.ui.menu(false);
     $('#menu .content .top').href = '#' + currentId;
     if (config.bookmarks[currentId]) {
-      scroll = config.bookmarks[currentId] * $('#articleShow').clientHeight;
+      scroll = config.bookmarks[currentId] * $('#articleShowTile').clientHeight;
     } else {
       scroll = 0;
     }
@@ -376,7 +376,7 @@ function Article() {
         clMain  = document.getElementById('main').classList,
         current = $('#list > [data-key="' + currentId + '"]');
     if (current) {
-      config.bookmarks[currentId] = window.scrollY / $('#articleShow').clientHeight;
+      config.bookmarks[currentId] = window.scrollY / $('#articleShowTile').clientHeight;
       current.classList.remove('current');
       current.scrollIntoView();
     }
@@ -435,8 +435,8 @@ function Article() {
   };
   this.ui = {
     menu: function (folded) {
-      var cl = $('#articleShow .articleMenu').classList,
-          actions = $('#articleShow .articleMenu .articleActions');
+      var cl = $('#articleShowTile .articleMenu').classList,
+          actions = $('#articleShowTile .articleMenu .articleActions');
       function style() {
         if (cl.contains('folded')) {
           actions.style.marginTop = -actions.clientHeight + 'px';
@@ -516,7 +516,7 @@ function Article() {
     },
     // Toggle display of alternate subscription buttons
     toggleAlternates: function () {
-      document.querySelector("#articleShow .content > .alternates").classList.toggle('hidden');
+      document.querySelector("#articleShowTile .content > .alternates").classList.toggle('hidden');
     }
   };
   this.mock = function (n) {

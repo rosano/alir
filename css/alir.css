@@ -259,24 +259,24 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #main.list #list > li.read {
   color: #444;
 }
-#articleShow h3 {
+#articleShowTile h3 {
   margin-top: 0;
 }
-#articleShow .content,
-#articleShow .toolbar,
-#articleShow .articleMenu {
+#articleShowTile .content,
+#articleShowTile .toolbar,
+#articleShowTile .articleMenu {
   display: block;
 }
 #list .content + .toolbar {
   margin-top: 2rem;
 }
-#articleShow .articleActions .alternate {
+#articleShowTile .articleActions .alternate {
   display: none;
 }
-#articleShow .hasAlternates .articleActions .alternate {
+#articleShowTile .hasAlternates .articleActions .alternate {
   display: inline;
 }
-#articleShow .articleMenu {
+#articleShowTile .articleMenu {
   position: fixed;
   top: 1rem;
   right: 0;
@@ -291,40 +291,40 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   border-color: #888;
   box-shadow: 0 0 .5rem #888;
 }
-#articleShow .articleMenu > p {
+#articleShowTile .articleMenu > p {
   position: fixed;
   background-color: rgba(255, 255, 255, .9);
   margin: -0.7rem;
   padding: .8rem;
 }
-#articleShow .articleMenu.folded {
+#articleShowTile .articleMenu.folded {
   color: white;
 }
-#articleShow .articleMenu.folded > p {
+#articleShowTile .articleMenu.folded > p {
   background-color: rgba(255, 255, 255, .5);
   color: black;
 }
-#articleShow .articleMenu .articleActions {
+#articleShowTile .articleMenu .articleActions {
   transition: margin 1s ease-in-out, color 1s ease-in-out;
   margin-top: 3rem;
 }
 
-#articleShow .articleMenu.folded .articleActions {
+#articleShowTile .articleMenu.folded .articleActions {
   margin-top: calc(-100vh);
 }
 
-#articleShow .content .note {
+#articleShowTile .content .note {
   padding: 10px;
   display: block;
   float: left;
 }
-#articleShow .content > .notes,
-#articleShow .content > .alternates,
-#articleShow .content > .tags {
+#articleShowTile .content > .notes,
+#articleShowTile .content > .alternates,
+#articleShowTile .content > .tags {
   display: table-row;
   vertical-align: middle;
 }
-#articleShow .content > .alternates {
+#articleShowTile .content > .alternates {
   background-color: #444;
   height: 100%;
   left: 0;
@@ -333,28 +333,28 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   position: absolute;
   top: 0;
 }
-#articleShow .content .tags * {
+#articleShowTile .content .tags * {
   padding: 2px;
   vertical-align: middle;
 }
-#articleShow .content .tags .tag {
+#articleShowTile .content .tags .tag {
   display: table-cell;
   background-color: yellow;
   border-radius: 5px;
   margin: 0px 5px;
   box-shadow: -5px 5px 5px #888;
 }
-#articleShow .content .url {
+#articleShowTile .content .url {
   margin: 0;
 }
-#articleShow .content .date {
+#articleShowTile .content .date {
   margin: 0;
   font-style: italic;
 }
-#articleShow .compose {
+#articleShowTile .compose {
   display: none;
 }
-#articleShow [data-flags*=",editable,"] .compose {
+#articleShowTile [data-flags*=",editable,"] .compose {
   display: inline;
 }
 #list .filters {
@@ -385,7 +385,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   float: left;
   padding: 0 1rem 0 .5rem;
 }
-#list > li, #feeds > li {
+#list > li, #feedsList > li {
   max-width: 35em;
   margin: auto;
   border-color: #888;
@@ -443,7 +443,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   color: yellow;
   text-shadow: 0 0 1px #000;
 }
-#list > li > h2, #feeds > li > h2 {
+#list > li > h2, #feedsList > li > h2 {
   margin: 0.66rem 0;
   font-size: 1.2rem;
 }
@@ -452,7 +452,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   color: inherit;
   text-decoration: none;
 }
-#articleShow .content img {
+#articleShowTile .content img {
   max-width: 100%;
 }
 #list > li.hideLeft,
@@ -493,7 +493,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 .shown {
   display: inherit;
 }
-#articleEdit > form ,
+#articleEditTile > form ,
 #settings > form {
   max-width: 600px;
   margin: auto;
@@ -508,8 +508,8 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   border-style: solid;
   padding: 1rem .5rem;
 }
-#articleEdit.article .url,
-#articleEdit.url .article {
+#articleEditTile.article .url,
+#articleEditTile.url .article {
   display: none;
 }
 /** Settings {{ **/
@@ -555,10 +555,10 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   width: 100%;
   border: 0;
 }
-#feeds, #feedDetail ul {
+#feedsList, #feedDetail ul {
   padding: 0;
 }
-#feeds li, #feedDetail li {
+#feedsList li, #feedDetail li {
   list-style-type: none;
   padding: .5rem 0;
   border-bottom: 1px solid #888;
