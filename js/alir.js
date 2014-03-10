@@ -87,7 +87,7 @@ function Alir() {
       }
       slider.value = conf.fontSize;
       family.value = conf.fontFamily;
-      dynamicSheet.insertRule("#articleShow .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; font-family: " + conf.fontFamily  + " }", 0);
+      dynamicSheet.insertRule("#articleShowTile .content .html, #styleFontSizeSample { font-size: " + conf.fontSize + "rem; font-family: " + conf.fontFamily  + " }", 0);
     }
     function onSizeChanged(event) {
       window.config.style.fontSize = slider.value;
@@ -348,7 +348,7 @@ window.link = {
     var href = document.getElementById('linkRef').textContent,
         openURL;
     if (site) {
-      href = site + window.encodeURI(href);
+      href = site + window.encodeURIComponent(href);
     }
     if (typeof window.MozActivity !== 'undefined') {
       try {
@@ -410,7 +410,8 @@ window.link = {
   },
   facebook: function () {
     "use strict";
-    this.open('https://www.facebook.com/sharer/sharer.php?u=');
+    var txt = window.encodeURIComponent(document.getElementById('linkText').value);
+    this.open('https://www.facebook.com/sharer/sharer.php?t=' + txt + '&u=');
   },
   google: function () {
     "use strict";
@@ -418,7 +419,8 @@ window.link = {
   },
   twitter: function () {
     "use strict";
-    this.open('https://twitter.com/intent/tweet?url=');
+    var txt = window.encodeURIComponent(document.getElementById('linkText').value);
+    this.open('https://twitter.com/intent/tweet?text=' + txt + '&url=');
   }
 };
 
@@ -745,9 +747,11 @@ function initUI() {
         },
         // Links inside content
         {
-          sel: "#articleShow .content a[href][target]",
+          sel: "#articleShowTile .content a[href][target]",
           action: function (elmt) {
             document.getElementById("linkRef").textContent = elmt.href;
+            document.getElementById("linkRefFull").textContent = elmt.href;
+            document.getElementById("linkText").value = '';
             tiles.go('link');
           }
         },
@@ -1062,6 +1066,18 @@ function initUI() {
       $('#menu').classList.toggle("show");
     }
   });
+  // }}
+
+  // Link share text {{
+  (function () {
+    var ta = document.getElementById('linkText'),
+        l  = document.getElementById('linkTextLength');
+    function onInput(event) {
+      l.textContent = ta.value.length;
+    }
+    ta.addEventListener('change', onInput, false);
+    ta.addEventListener('input', onInput, false);
+  }());
   // }}
 
   // Manage scroll

@@ -573,6 +573,12 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   margin: 0;
   font-style: italic;
 }
+#linkTextLength {
+  position: relative;
+  top: -1.5rem;
+  left: calc(100% - 2rem);
+  color: #444;
+}
 /** Console {{ **/
 #debugLog {
   border: 1px solid #888;

@@ -48,13 +48,18 @@ View.toDom = function (str, fullUrl) {
       e.setAttribute('target', '_blank');
     });
     Array.prototype.forEach.call(sandbox.querySelectorAll('* img:not([src^=http])'), function (e) {
-      var src = e.getAttribute('src');
+      var src = e.getAttribute('src'),
+          cachedImg;
       if (src) {
         if (src.substr(0, 1) === '/') {
-          e.setAttribute('src', domainUrl + src);
+          src = domainUrl + src;
         } else {
-          e.setAttribute('src', baseUrl + src);
+          src = baseUrl + src;
         }
+        e.setAttribute('src', src);
+        // preoload images into cache
+        cachedImg = new Image();
+        cachedImg.src = src;
       }
     });
     Array.prototype.forEach.call(sandbox.querySelectorAll('* a[href]:not([href^=http])'), function (e) {

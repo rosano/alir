@@ -204,10 +204,10 @@ function Article() {
   };
   this.create = function () {
     var choices = [];
-    $('#articleEdit [name="id"]').value    = "";
-    $('#articleEdit [name="url"]').value   = "http://";
-    $('#articleEdit [name="title"]').value = "";
-    $('#articleEdit [name="text"]').value  = "";
+    $('#articleEditTile [name="id"]').value    = "";
+    $('#articleEditTile [name="url"]').value   = "http://";
+    $('#articleEditTile [name="title"]').value = "";
+    $('#articleEditTile [name="text"]').value  = "";
     choices.push({'object': 'articles', 'method': 'createArticle', 'l10nId': 'articleCreateArticle'});
     choices.push({'object': 'articles', 'method': 'createUrl', 'l10nId': 'articleCreateUrl'});
     window.choice(choices);
@@ -235,10 +235,10 @@ function Article() {
     tile.classList.add('article');
     self.read(key, function (article) {
       if (typeof article !== 'undefined') {
-        $('#articleEdit [name="id"]').value    = key;
-        $('#articleEdit [name="title"]').value = article.title;
-        $('#articleEdit [name="url"]').value   = article.url;
-        $('#articleEdit [name="text"]').value  = article.text;
+        $('#articleEditTile [name="id"]').value    = key;
+        $('#articleEditTile [name="title"]').value = article.title;
+        $('#articleEditTile [name="url"]').value   = article.url;
+        $('#articleEditTile [name="text"]').value  = article.text;
         tiles.go('articleEdit');
       }
     });
@@ -262,7 +262,7 @@ function Article() {
   };
   this.save = function () {
     var tile = document.querySelector('[data-tile=articleEdit]'),
-        id = $('#articleEdit [name="id"]').value,
+        id = $('#articleEditTile [name="id"]').value,
         article;
 
     function doSave(article) {
@@ -277,9 +277,9 @@ function Article() {
       // update
       self.read(id, function (article) {
         if (article) {
-          article.url   = $('#articleEdit [name="url"]').value;
-          article.title = $('#articleEdit [name="title"]').value;
-          article.text  = $('#articleEdit [name="text"]').value;
+          article.url   = $('#articleEditTile [name="url"]').value;
+          article.title = $('#articleEditTile [name="title"]').value;
+          article.text  = $('#articleEditTile [name="text"]').value;
           article.html  = new Showdown.converter().makeHtml(article.text);
           article.date  = Date.now();
           doSave(article);
@@ -292,10 +292,10 @@ function Article() {
         // create
         article = {
           id: utils.uuid(),
-          url:   $('#articleEdit [name="url"]').value,
-          title: $('#articleEdit [name="title"]').value,
-          text:  $('#articleEdit [name="text"]').value,
-          html:  new Showdown.converter().makeHtml($('#articleEdit [name="text"]').value),
+          url:   $('#articleEditTile [name="url"]').value,
+          title: $('#articleEditTile [name="title"]').value,
+          text:  $('#articleEditTile [name="text"]').value,
+          html:  new Showdown.converter().makeHtml($('#articleEditTile [name="text"]').value),
           date:  Date.now(),
           flags: {
             editable: true
@@ -305,7 +305,7 @@ function Article() {
         doSave(article);
       } else {
         tiles.back(); // remove articleEdit from tiles heap
-        window.link.scrap($('#articleEdit [name="url"]').value);
+        window.link.scrap($('#articleEditTile [name="url"]').value);
       }
     }
   };
@@ -563,9 +563,9 @@ window.Comment = function () {
   "use strict";
   var UI;
   UI = {
-    article: $('#noteEdit [name="articleId"]'),
-    path:    $('#noteEdit [name="xpath"]'),
-    content: $('#noteEdit [name="text"]')
+    article: $('#noteEditTile [name="articleId"]'),
+    path:    $('#noteEditTile [name="xpath"]'),
+    content: $('#noteEditTile [name="text"]')
   };
 
   this.create = function (article, path) {
@@ -579,19 +579,19 @@ window.Comment = function () {
     window.articles.read(articleId, function (article) {
       if (article) {
         // @TODO: sanitize
-        $('#noteView .content').textContent      = article.notes[noteId].content;
-        $('#noteView [name="text"]').value       = article.notes[noteId].content;
-        $('#noteView [name="articleId"]').value  = articleId;
-        $('#noteView [name="noteId"]').value     = noteId;
-        $('#noteView [name="xpath"]').value      = article.notes[noteId].xpath;
+        $('#noteViewTile .content').textContent      = article.notes[noteId].content;
+        $('#noteViewTile [name="text"]').value       = article.notes[noteId].content;
+        $('#noteViewTile [name="articleId"]').value  = articleId;
+        $('#noteViewTile [name="noteId"]').value     = noteId;
+        $('#noteViewTile [name="xpath"]').value      = article.notes[noteId].xpath;
         tiles.go('noteView');
       }
     });
   };
 
   this.save = function () {
-    var noteId    = $('#noteEdit [name="noteId"]').value,
-        articleId = $('#noteEdit [name="articleId"]').value;
+    var noteId    = $('#noteEditTile [name="noteId"]').value,
+        articleId = $('#noteEditTile [name="articleId"]').value;
     if (!noteId) {
       noteId = utils.uuid();
     }
@@ -601,8 +601,8 @@ window.Comment = function () {
           article.notes = {};
         }
         article.notes[noteId] = {
-          xpath: $('#noteEdit [name="xpath"]').value,
-          content: $('#noteEdit [name="text"]').value
+          xpath: $('#noteEditTile [name="xpath"]').value,
+          content: $('#noteEditTile [name="text"]').value
         };
         remoteStorage.alir.saveArticle(article);
         tiles.back();
@@ -612,13 +612,13 @@ window.Comment = function () {
   };
   this.edit = function () {
     ["articleId", "noteId", "xpath", "text"].forEach(function (field) {
-      $('#noteEdit [name="' + field + '"]').value = $('#noteView [name="' + field + '"]').value;
+      $('#noteEditTile [name="' + field + '"]').value = $('#noteViewTile [name="' + field + '"]').value;
     });
     window.tiles.go('noteEdit');
   };
   this.delete = function () {
-    var noteId    = $('#noteView [name="noteId"]').value,
-        articleId = $('#noteView [name="articleId"]').value;
+    var noteId    = $('#noteViewTile [name="noteId"]').value,
+        articleId = $('#noteViewTile [name="articleId"]').value;
     if (window.confirm(_('noteConfirmDelete'))) {
       window.articles.read(articleId, function (article) {
         if (article) {
