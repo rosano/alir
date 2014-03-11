@@ -31,11 +31,33 @@ body {
   background-color: #000;
   color: #FFF;
   text-align: right;
-  z-index: 1002;
+  z-index: 1003;
 }
 #statusbar > * {
   color: #888;
   padding: 2px .5rem;
+}
+#messagebar {
+  position: fixed;
+  top: -2rem;
+  left: 0;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: .5rem;
+  z-index: 1002;
+  color: white;
+  font-weight: bold;
+  background-color: transparent;
+  transition: top .5s, background-color .5s;
+}
+#messagebar.info, #messagebar.error {
+  top: 1rem;
+}
+#messagebar.info {
+  background-color: #0F0;
+}
+#messagebar.error {
+  background-color: #F00;
 }
 body.error #statusbar .error {
   color: #F00;

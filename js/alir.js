@@ -316,6 +316,20 @@ function Alir() {
     inspect: function () {
       remoteStorage.inspect();
     },
+    message: function (msg, level) {
+      self.ui.messagebar.classList.remove('info');
+      self.ui.messagebar.classList.remove('error');
+      if (typeof msg !== 'undefined') {
+        level = level || 'info';
+        self.ui.messagebar.classList.add(level);
+        self.ui.messagebar.textContent = msg;
+        if (level === 'info') {
+          window.setTimeout(function () {
+            self.ui.message();
+          }, 5000);
+        }
+      }
+    },
     widgetShow: function () {
       $('#rsWidget').classList.toggle("hidden");
     },
@@ -331,6 +345,10 @@ function Alir() {
       }
     }
   };
+  this.ui.messagebar = document.getElementById('messagebar');
+  this.ui.messagebar.addEventListener('click', function () {
+    self.ui.message();
+  });
 }
 window.alir = new Alir();
 window.alir.on('statusUpdated', function (status) {
@@ -374,16 +392,19 @@ window.link = {
       tiles.back();
     }
     try {
-      utils.log("Scraping " + href);
+      utils.log("Scraping " + href, "info");
+      window.alir.ui.message(_("scraping") + ' ' + href, "info");
       scrap(href, function (err, res) {
         if (err) {
           utils.log(err.toString(), 'error');
+          window.alir.ui.message(_('scrapingError'), 'error');
           res.loaded = false;
         }
         saveScraped(res);
       });
     } catch (e) {
       utils.log(e.toString(), "error");
+      window.alir.ui.message(_('scrapingError'), 'error');
     }
   },
   share: function () {
@@ -401,6 +422,7 @@ window.link = {
         });
       } catch (e) {
         utils.log("Error sharing : " + e, "error");
+        window.alir.ui.message(_('scrapingError'), 'error');
       }
     } else {
       // @TODO How to share ???
@@ -527,6 +549,7 @@ RemoteStorage.defineModule('alir', function module(privateClient, publicClient) 
             obj.id = key;
           } else {
             utils.log("Unable to load " + path, "error");
+            window.alir.ui.message(_('articleNotFound'), "error");
           }
           cb(obj);
         });

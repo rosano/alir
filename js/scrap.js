@@ -161,6 +161,7 @@ window.Network = function () {
         clearTimeout(timer);
         store('error', url, cb);
         utils.log("Request for %s failed: %s", url, e.target.status, "error");
+        cb(utils.format("Request for %s failed: %s", url, e.target.status), xhr);
         return;
       };
       timer = setTimeout(function () {
@@ -170,7 +171,8 @@ window.Network = function () {
       xhr.send(null);
     } catch (e) {
       store('error', url, cb);
-      utils.log(utils.format("Error getting %s : %s", url, e));
+      utils.log("Error getting %s : %s", url, e, "error");
+      cb(utils.format("Error getting %s : %s", url, e), xhr);
       return;
     }
   };
@@ -201,27 +203,30 @@ function saveScraped(article) {
     }
     remoteStorage.alir.saveArticle(obj);
     window.displayItem(obj);
-    utils.notify('"' + article.title + '" has been successfully saved', '', function () {
-      if (window.alir.getStatus().installed) {
-        navigator.mozApps.getSelf().onsuccess = function gotSelf(evt) {
-          var app = evt.target.result;
-          if (app !== null) {
-            app.launch();
-          }
+    if (article.loaded !== false) {
+      utils.notify('"' + article.title + '" has been successfully saved', '', function () {
+        if (window.alir.getStatus().installed) {
+          navigator.mozApps.getSelf().onsuccess = function gotSelf(evt) {
+            var app = evt.target.result;
+            if (app !== null) {
+              app.launch();
+            }
+            window.articles.show(article.id);
+          };
+        } else {
           window.articles.show(article.id);
-        };
-      } else {
-        window.articles.show(article.id);
-      }
-    });
-    utils.log('Scraped : ' + article.title);
+        }
+      });
+    }
+    utils.log('Scraped : ' + article.title, "info");
   } catch (e) {
     utils.log(utils.format("Error saving %s : %s", article.title, e), 'error');
+    window.alir.ui.message(_('scrapSaveError'), 'error');
   }
 }
 function activityHandler(activity) {
   'use strict';
-  utils.log("Handling activity");
+  utils.log("Handling activity", "debug");
   try {
     var data;
     switch (activity.source.name) {
