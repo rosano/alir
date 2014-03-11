@@ -124,50 +124,59 @@ View.template = function (sel, data) {
     return res;
   }
   function repl(match) {
+    //jshint maxcomplexity: 10
     var res, tmp, fct, type, value;
-    type = match[2];
-    match = match.substr(3, match.length - 5);
-    switch (type) {
-    case '=':
-      // Value
-      tmp = match.split('|');
-      res = getData(utils.trim(tmp.shift()), data);
-      if (tmp.length > 0) {
-        while ((fct = tmp.shift()) !== undefined) {
-          switch (utils.trim(fct).toLowerCase()) {
-          case "join":
-            res = res.join(',');
-            break;
-          case "tolocal":
-            res = new Date(res).toLocaleString(undefined, {day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", "minute": "2-digit"});
-            break;
-          case "tolowercase":
-            res = res.toLowerCase();
-            break;
-          default:
-            utils.log("Unknown template function " + fct, "error");
+    try {
+      type = match[2];
+      match = match.substr(3, match.length - 5);
+      switch (type) {
+      case '=':
+        // Value
+        tmp = match.split('|');
+        res = getData(utils.trim(tmp.shift()), data);
+        if (tmp.length > 0) {
+          while ((fct = tmp.shift()) !== undefined) {
+            switch (utils.trim(fct).toLowerCase()) {
+            case "join":
+              res = res.join(',');
+              break;
+            case "tolocal":
+              res = new Date(res).toLocaleString(undefined, {day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", "minute": "2-digit"});
+              break;
+            case "tolowercase":
+              res = res.toLowerCase();
+              break;
+            default:
+              utils.log("Unknown template function " + fct, "error");
+            }
           }
         }
+        break;
+      case '#':
+        // Sub template
+        tmp = match.split(' ');
+        value = getData(tmp[1], data);
+        if (Array.isArray(value)) {
+          res = value.reduce(function (p, c) {
+            var val = {'..': data};
+            val[tmp[1]] = c;
+            return p + View.template(tmp[0], val).outerHTML;
+          }, '');
+        } else {
+          res = View.template(tmp[0], data).outerHTML;
+        }
+        break;
       }
-      break;
-    case '#':
-      // Sub template
-      tmp = match.split(' ');
-      value = getData(tmp[1], data);
-      if (Array.isArray(value)) {
-        res = value.reduce(function (p, c) {
-          var val = {'..': data};
-          val[tmp[1]] = c;
-          return p + View.template(tmp[0], val).outerHTML;
-        }, '');
-      } else {
-        res = View.template(tmp[0], data).outerHTML;
-      }
-      break;
+    } catch (e) {
+      utils.log("Exception in View/Template/repl: " + e.toString(), "error");
     }
     return res;
   }
-  frag = document.getElementById(sel).cloneNode(true);
+  frag = document.getElementById(sel);
+  if (typeof frag === 'undefined') {
+    throw "No template with id " + sel;
+  }
+  frag = frag.cloneNode(true);
   xpathResult = document.evaluate('//@*[contains(., "{{=")]', frag, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
   for (i = 0; i < xpathResult.snapshotLength; i++) {
     attr = xpathResult.snapshotItem(i);

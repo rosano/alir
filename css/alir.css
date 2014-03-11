@@ -284,7 +284,6 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #articleShowTile h3 {
   margin-top: 0;
 }
-#articleShowTile .content,
 #articleShowTile .toolbar,
 #articleShowTile .articleMenu {
   display: block;
@@ -366,10 +365,10 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   margin: 0px 5px;
   box-shadow: -5px 5px 5px #888;
 }
-#articleShowTile .content .url {
+#articleShowTile .tabMeta .url {
   margin: 0;
 }
-#articleShowTile .content .date {
+#articleShowTile .tabMeta .date {
   margin: 0;
   font-style: italic;
 }
@@ -378,6 +377,40 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 }
 #articleShowTile [data-flags*=",editable,"] .compose {
   display: inline;
+}
+#articleShowTile ul.tabs {
+  list-style-type: none;
+}
+#articleShowTile ul.tabs li {
+  display: inline;
+}
+#articleShowTile.tab-content ul.tabs li.tab-content,
+#articleShowTile.tab-notes ul.tabs li.tab-notes,
+#articleShowTile.tab-meta ul.tabs li.tab-meta
+{
+  font-weight: bold;
+}
+#articleShowTile .content,
+#articleShowTile .tabNotes,
+#articleShowTile .tabMeta {
+  display: none;
+}
+#articleShowTile.tab-content .content,
+#articleShowTile.tab-notes .tabNotes,
+#articleShowTile.tab-meta .tabMeta
+{
+  display: block;
+}
+#articleShowTile .tabNotes > div {
+  border: 1px solid #888;
+  border-radius: .33rem;
+  margin: 1rem;
+  padding: 1rem;
+  background-color: #F0F0F0;
+}
+#articleShowTile .tabNotes,
+#articleShowTile .tabMeta {
+  margin: 2rem 0;
 }
 #list .filters {
   font-size: 1rem;

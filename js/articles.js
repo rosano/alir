@@ -50,7 +50,7 @@ function Article() {
       date: obj.date,
       tags: Array.isArray(obj.tags) ? obj.tags : [],
       alternates: Array.isArray(obj.alternates) ? obj.alternates : [],
-      notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e}; }),
+      notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e, content: obj.notes[e].content}; }),
       flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
     };
     if (data.title === '???' && data.url !== '#') {
@@ -417,7 +417,7 @@ function Article() {
     });
   };
   this.share = function (key) {
-    if (typeof window.mozActivity !== 'undefined') {
+    if (typeof window.MozActivity !== 'undefined') {
       var node = $('#list > [data-key="' + key + '"]'),
           request = new window.MozActivity({
         name: "share",

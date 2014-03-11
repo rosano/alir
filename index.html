@@ -55,9 +55,12 @@
             <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}},{{=title}}"></a>
             <a class="icon-pencil compose" data-object="articles" data-method="edit" data-params="{{=key}}"></a>
           </div>
+          <ul class="tabs">
+            <li data-l10n-id="articleTabContent" data-object="alir.ui" data-method="showTab" data-params="content" class="tab-content"></li> |
+            <li data-l10n-id="articleTabNotes" data-object="alir.ui" data-method="showTab" data-params="notes" class="tab-notes"></li> |
+            <li data-l10n-id="articleTabMeta" data-object="alir.ui" data-method="showTab" data-params="meta" class="tab-meta"></li>
+          </ul>
           <div class="content">
-            <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
-            <p class="date">{{=date|tolocal}}</p>
             <p class="notes">
             </p>
             <div class="alternates hidden">
@@ -74,6 +77,13 @@
             <iframe sandbox="allow-same-origin" seamless srcdoc="{{=content}}"></iframe>
             -->
           </div>
+          <div class="tabNotes">
+            {{#tmpl-notes notes}}
+          </div>
+          <div class="tabMeta">
+            <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
+            <p class="date">{{=date|tolocal}}</p>
+          </div>
           <div class="toolbar">
             <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
             <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}},{{=title}}" ></a>
@@ -84,6 +94,11 @@
         <div class="tag">
           <span class="icon-remove" data-object="articles" data-method="switchTag" data-params="{{=../key}},{{=tags}}"></span>
           <span>{{=tags}}</span>
+        </div>
+      </div>
+      <div id="tmpl-notes">
+        <div class="">
+          {{=notes.content}}
         </div>
       </div>
       <ul id="tmpl-feed">
@@ -212,7 +227,7 @@
     </div>
     <!-- }} -->
     <!-- articleShow {{ -->
-    <section data-tile="articleShow" id="articleShowTile">
+    <section data-tile="articleShow" id="articleShowTile" class="tab-content">
     </section>
     <!-- }} -->
     <!-- settings {{ -->

@@ -218,7 +218,7 @@ function Alir() {
       var host, request;
       host = window.location.protocol + '//' + window.location.host;
       // @FIXME dirty hack to detect Firefox OS
-      if (typeof window.mozActivity === 'undefined') {
+      if (typeof window.MozActivity === 'undefined') {
         request = window.navigator.mozApps.install(host + '/hosted.webapp');
       } else {
         request = window.navigator.mozApps.installPackage(host + "/package.manifest");
@@ -343,6 +343,16 @@ function Alir() {
       if (theme !== '') {
         cl.add(theme);
       }
+    },
+    showTab: function (name) {
+      var tile = document.getElementById('articleShowTile');
+      ['content', 'notes', 'meta'].forEach(function (tab) {
+        if (tab === name) {
+          tile.classList.add('tab-' + tab);
+        } else {
+          tile.classList.remove('tab-' + tab);
+        }
+      });
     }
   };
   this.ui.messagebar = document.getElementById('messagebar');
