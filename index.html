@@ -56,9 +56,9 @@
             <a class="icon-pencil compose" data-object="articles" data-method="edit" data-params="{{=key}}"></a>
           </div>
           <ul class="tabs">
-            <li data-l10n-id="articleTabContent" data-object="alir.ui" data-method="showTab" data-params="content" class="tab-content"></li> |
-            <li data-l10n-id="articleTabNotes" data-object="alir.ui" data-method="showTab" data-params="notes" class="tab-notes"></li> |
-            <li data-l10n-id="articleTabMeta" data-object="alir.ui" data-method="showTab" data-params="meta" class="tab-meta"></li>
+            <li class="tab-content"><a data-l10n-id="articleTabContent" data-object="articles.ui" data-method="showTab" data-params="content"></a> | </li>
+            <li class="tab-notes"><a data-l10n-id="articleTabNotes" data-object="articles.ui" data-method="showTab" data-params="notes"></a> | </li>
+            <li class="tab-meta"><a data-l10n-id="articleTabMeta" data-object="articles.ui" data-method="showTab" data-params="meta"></a></li>
           </ul>
           <div class="content">
             <p class="notes">
@@ -69,9 +69,6 @@
               </p>
               <p><button data-object="articles.ui" data-method="toggleAlternates" data-params="{{=key}}">Done</button></p>
             </div>
-            <p class="tags">
-              {{#tmpl-tag tags}}
-            </p>
             <div class="{{=type}}">{{=content}}</div>
             <!--
             <iframe sandbox="allow-same-origin" seamless srcdoc="{{=content}}"></iframe>
@@ -83,6 +80,9 @@
           <div class="tabMeta">
             <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
             <p class="date">{{=date|tolocal}}</p>
+            <p class="tags">
+              {{#tmpl-tag tags}}
+            </p>
           </div>
           <div class="toolbar">
             <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>

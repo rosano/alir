@@ -74,7 +74,6 @@ var utils = {
       if (ui) {
         ui.innerHTML = utils.format('<span class="%s">[%s][%s]</span> %s\n', level, curDate, level + new Array(10 - level.length).join(' '), message) + ui.innerHTML;
         if (level === 'error') {
-          //window.alert(message);
           document.body.classList.add('error');
         }
       }
@@ -112,7 +111,7 @@ var utils = {
         notif.addEventListener('click', cb);
       }
     } else {
-      window.alert(title + "\n" + body);
+      window.alir.ui.message(title + "\n" + body, "info");
     }
   },
   merge: function (a, b) {

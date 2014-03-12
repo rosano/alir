@@ -200,6 +200,8 @@ function Article() {
     }
     // }}
 
+    self.ui.showTab('content');
+
     return item;
   };
   this.create = function () {
@@ -347,7 +349,7 @@ function Article() {
         self.display(article);
         doShow();
       } else {
-        window.alert(_('articleNotFound'));
+        window.alir.ui.message(_('articleNotFound'), 'error');
       }
     });
   };
@@ -427,7 +429,10 @@ function Article() {
         }
       });
       request.onerror = function () {
-        window.alert("Error sharing : " + request.error.name);
+        if (request.error.name !== 'USER_ABORT') {
+          utils.log("Error sharing : " + request.error.name, "error");
+          window.alir.ui.message(_('scrapingError'), 'error');
+        }
       };
     } else {
       utils.log("Share is not available", "error");
@@ -472,14 +477,15 @@ function Article() {
       if (toDel.length > 0) {
         if (window.confirm(_('articlesDelete', {nb: toDel.length}))) {
           toDel.forEach(function (elmt) {
-            var key = utils.parent(elmt, function (e) { return typeof e.dataset.key !== 'undefined'; });
-            if (key) {
-              key.classList.add('hidden');
-              key = key.dataset.key;
+            var parent = utils.parent(elmt, function (e) { return typeof e.dataset.key !== 'undefined'; }),
+                key;
+            if (parent) {
+              key = parent.dataset.key;
               //@FIXME
               remoteStorage.alir.private.remove('/article/' + key);
               remoteStorage.alir.private.remove('article/' + key);
               delete config.bookmarks[key];
+              parent.parentNode.removeChild(elmt);
             }
           });
         }
@@ -517,6 +523,16 @@ function Article() {
     // Toggle display of alternate subscription buttons
     toggleAlternates: function () {
       document.querySelector("#articleShowTile .content > .alternates").classList.toggle('hidden');
+    },
+    showTab: function (name) {
+      var tile = document.getElementById('articleShowTile');
+      ['content', 'notes', 'meta'].forEach(function (tab) {
+        if (tab === name) {
+          tile.classList.add('tab-' + tab);
+        } else {
+          tile.classList.remove('tab-' + tab);
+        }
+      });
     }
   };
   this.mock = function (n) {

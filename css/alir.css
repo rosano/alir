@@ -341,7 +341,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 }
 #articleShowTile .content > .notes,
 #articleShowTile .content > .alternates,
-#articleShowTile .content > .tags {
+#articleShowTile .tabMeta > .tags {
   display: table-row;
   vertical-align: middle;
 }
@@ -354,11 +354,11 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   position: absolute;
   top: 0;
 }
-#articleShowTile .content .tags * {
+#articleShowTile .tabMeta .tags * {
   padding: 2px;
   vertical-align: middle;
 }
-#articleShowTile .content .tags .tag {
+#articleShowTile .tabMeta .tags .tag {
   display: table-cell;
   background-color: yellow;
   border-radius: 5px;
@@ -384,8 +384,14 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #articleShowTile ul.tabs li {
   display: inline;
 }
-#articleShowTile.tab-content ul.tabs li.tab-content,
-#articleShowTile.tab-notes ul.tabs li.tab-notes,
+#articleShowTile ul.tabs li.tab-notes {
+  display: none;
+}
+#articleShowTile .hasNotes ul.tabs li.tab-notes {
+  display: inline;
+}
+#articleShowTile.tab-content ul.tabs li.tab-content a,
+#articleShowTile.tab-notes ul.tabs li.tab-notes a,
 #articleShowTile.tab-meta ul.tabs li.tab-meta
 {
   font-weight: bold;

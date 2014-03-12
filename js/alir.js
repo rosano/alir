@@ -183,9 +183,6 @@ function Alir() {
             document.body.classList.add('installed');
           }
         };
-        request.onerror = function () {
-          alert("Error: " + request.error.name);
-        };
       }());
     } else {
       status.installed = false;
@@ -202,7 +199,7 @@ function Alir() {
           if (document.getElementById('rsLogin').value !== '') {
             remoteStorage.widget.view.events.connect(new Event(""));
           } else {
-            window.alert(_('notConnected'));
+            window.alir.ui.message(_('notConnected'), 'error');
           }
         }
       }
@@ -226,9 +223,10 @@ function Alir() {
       request.onerror = function () {
         utils.log("Install Error : " + this.error.name, "error");
         utils.log(this.error, 'error');
+        window.alir.ui.message('_installKo', "info");
       };
       request.onsuccess = function () {
-        window.alert("Install successful");
+        window.alir.ui.message('_installOk', "info");
         tiles.show('list');
       };
     }());
@@ -343,16 +341,6 @@ function Alir() {
       if (theme !== '') {
         cl.add(theme);
       }
-    },
-    showTab: function (name) {
-      var tile = document.getElementById('articleShowTile');
-      ['content', 'notes', 'meta'].forEach(function (tab) {
-        if (tab === name) {
-          tile.classList.add('tab-' + tab);
-        } else {
-          tile.classList.remove('tab-' + tab);
-        }
-      });
     }
   };
   this.ui.messagebar = document.getElementById('messagebar');
@@ -420,16 +408,22 @@ window.link = {
   share: function () {
     "use strict";
     var href = document.getElementById('linkRef').textContent,
-        openURL;
+        request;
     if (typeof window.MozActivity !== 'undefined') {
       try {
-        openURL = new window.MozActivity({
+        request = new window.MozActivity({
           name: "share",
           data: {
             type: "url",
             url: href
           }
         });
+        request.onerror = function () {
+          if (request.error.name !== 'USER_ABORT') {
+            utils.log("Error sharing : " + request.error.name, "error");
+            window.alir.ui.message(_('scrapingError'), 'error');
+          }
+        };
       } catch (e) {
         utils.log("Error sharing : " + e, "error");
         window.alir.ui.message(_('scrapingError'), 'error');

@@ -201,6 +201,9 @@ function saveScraped(article) {
     if (article.title === '???') {
       article.loaded = false;
     }
+    // Parse HTML to cache images (???)
+    View.toDom(article.html, article.url);
+
     remoteStorage.alir.saveArticle(obj);
     window.displayItem(obj);
     if (article.loaded !== false) {

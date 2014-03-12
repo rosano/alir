@@ -92,9 +92,7 @@ function Feeds() {
         };
       } else {
         window.alir.ui.message(_('feedNoCache'), 'error');
-        if (cb) {
-          cb({});
-        }
+        cb({});
         return;
       }
     }
@@ -222,9 +220,6 @@ function Feeds() {
             };
             if (typeof content === 'undefined') {
               article.loaded = false;
-            } else {
-              // Parse HTML to cache images (???)
-              View.toDom(content, itemUrl);
             }
             if (test !== true) {
               remoteStorage.alir.saveArticle(article);
@@ -365,9 +360,6 @@ function Feeds() {
           if (err) {
             utils.log(err.toString(), 'error');
             obj.loaded = false;
-          } else {
-            // Parse HTML to cache images (???)
-            View.toDom(article.html, article.url);
           }
           remoteStorage.alir.saveArticle(obj).then(function () {
             utils.log('Created : ' + obj.title, "info");
