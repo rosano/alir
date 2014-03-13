@@ -13,30 +13,26 @@ casper.test.begin('Create and update articles', function suite(test) {
     test.assertVisible('#main', "Main is visible");
     test.assertVisible('#listFilter', "listFilter is visible");
     test.assertElementCount("#list > li", 0, "No article");
-    casper.click("#menu [data-action=toggleMenu]");
     casper.click("#menu [data-method=create]");
-    casper.waitUntilVisible("#input.shown", function () {
-      casper.test.pass("Input field displayed");
-      casper.fill("#input > form", {
-        "title": "Todo",
-        "text": " - First\n - Second\n"
-      });
-      casper.click("[data-action=articleSave]");
-      casper.waitUntilVisible("#list > li", function () {
-        test.assertElementCount("#list > li", 1, "Article created");
-        test.assertVisible("#list > li");
-        test.assertSelectorHasText("#list > li h2", "Todo");
-        casper.click("#list > li h2 a");
-        casper.waitForSelector("#main.detail", function () {
-          test.assertVisible("#list > li > .content");
-          test.assertElementCount("#list > li > .content .tags .tag", 1);
-          test.assertSelectorHasText("#list > li > .content .tags .tag", "note");
-          test.assertElementCount("#list > li .content li", 2, "Article content");
+    casper.waitUntilVisible('[data-tile=prompt]', function () {
+      casper.click('[data-method=createArticle]');
+      casper.waitUntilVisible('[data-tile=articleEdit]', function () {
+        test.assertNotVisible('#articleUrl');
+        test.assertVisible('#articleTitle');
+        test.assertVisible('[data-tile=articleEdit] [name=text]');
+        casper.fill("#articleEditTile > form", {
+          "title": "Todo",
+          "text": " - First\n - Second\n"
+        });
+        casper.click('[data-l10n-id="articleSave"]');
+        casper.waitUntilVisible('[data-tile=articleShow]', function () {
+          test.assertSelectorHasText("#articleShowTile > div > h3", "Todo");
         });
       });
     });
   });
 
+  /*
   casper.then(function () {
     casper.click("#list > li:nth-of-type(1) .articleActions .compose");
     casper.waitUntilVisible('#input', function () {
@@ -59,6 +55,7 @@ casper.test.begin('Create and update articles', function suite(test) {
       });
     });
   });
+  */
 
   casper.run(function () {
     test.done();

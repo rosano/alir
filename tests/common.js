@@ -7,6 +7,7 @@ function init(casper) {
   //casper.options.logLevel = 'debug';
   casper.on('exit', function () {
     casper.capture("last.png");
+    require('fs').write('last.html', this.getHTML());
   });
   casper.on("remote.message", function (msg) {
     //casper.echo("Message: " + msg, "INFO");
