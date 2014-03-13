@@ -146,6 +146,7 @@ window.Network = function () {
         // Add a timestamp to bypass the cache
         computedUrl += ((/\?/).test(url) ? "&" : "?") + 'ts=' + (new Date()).getTime();
       }
+      computedUrl += ((/\?/).test(url) ? "&" : "?") + 'ts=' + (new Date()).getTime();
       xhr.open("GET", computedUrl, true);
       //xhr.responseType = "document";
       xhr.timeout = this.timeout;
@@ -202,7 +203,7 @@ function saveScraped(article) {
       article.loaded = false;
     }
     // Parse HTML to cache images (???)
-    View.toDom(article.html, article.url);
+    window.View.toDom(article.html, article.url);
 
     remoteStorage.alir.saveArticle(obj);
     window.displayItem(obj);

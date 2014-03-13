@@ -342,7 +342,9 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #articleShowTile .content > .notes,
 #articleShowTile .content > .alternates,
 #articleShowTile .tabMeta > .tags {
-  display: table-row;
+  display: table;
+  border-collapse: separate;
+  border-spacing: 1rem .5rem;
   vertical-align: middle;
 }
 #articleShowTile .content > .alternates {
