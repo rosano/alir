@@ -61,6 +61,7 @@
             <li class="tab-meta"><a data-l10n-id="articleTabMeta" data-object="articles.ui" data-method="showTab" data-params="meta"></a></li>
           </ul>
           <div class="content">
+            <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
             <p class="notes">
             </p>
             <div class="alternates hidden">
@@ -78,7 +79,6 @@
             {{#tmpl-notes notes}}
           </div>
           <div class="tabMeta">
-            <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
             <p class="date">{{=date|tolocal}}</p>
             <p class="tags">
               {{#tmpl-tag tags}}
@@ -108,7 +108,7 @@
       </ul>
       <div id="tmpl-feed-detail">
         <div>
-          <header>
+          <header data-url="{{=url}}">
             <h2>
               <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
               <span>{{=title}}</span>
@@ -578,6 +578,7 @@
         </h2>
       </header>
       <p id="linkRefFull"></p>
+      <button data-object="tiles" data-method="back" data-l10n-id="linkCancel">Return</button>
       <button data-object="link" data-method="scrap" data-l10n-id="linkScrap">Scrap</button>
       <button data-object="link" data-method="open" data-l10n-id="linkOpen">Open</button>
       <button data-object="link" data-method="share" class="ifInstalled" data-l10n-id="linkShare">share</button>
@@ -588,7 +589,6 @@
         <textarea id="linkText" rows="5" cols="40"></textarea>
         <span id="linkTextLength"></span>
       </fieldset>
-      <button data-object="tiles" data-method="back" data-l10n-id="linkCancel">Return</button>
     </section>
     <!-- }} -->
     <!-- prompt {{ -->

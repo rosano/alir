@@ -91,6 +91,7 @@ function Feeds() {
           'title': '???'
         };
       } else {
+        utils.log('No cache for url ' + url, 'error');
         window.alir.ui.message(_('feedNoCache'), 'error');
         if (cb) {
           cb({});
@@ -257,6 +258,12 @@ function Feeds() {
               obj.date     = Date.now();
               remoteStorage.alir.saveFeed(obj);
               window.feeds.display(obj);
+              // If feed is shown, try to reload it
+              try {
+                if (tiles.getCurrent() === "feedShow" && document.querySelector('#feedDetail [data-url]').dataset.url === obj.url) {
+                  window.feeds.show(obj.url);
+                }
+              } catch (e) {}
             }
           });
         }
@@ -325,9 +332,10 @@ function Feeds() {
     // Note: when app is awake by alarm, cache may be empty, so
     // we can't rely on it here
     remoteStorage.alir.private.getAll('feed/').then(function (feeds) {
+      var keys, toFetch;
       if (feeds) {
-        var keys    = Object.keys(feeds),
-            toFetch = keys.length;
+        keys    = Object.keys(feeds);
+        toFetch = keys.length;
         keys.forEach(function (key) {
           window.feeds.fetch(feeds[key].url, false, function () {
             self.cache(feeds[key]);
@@ -338,7 +346,17 @@ function Feeds() {
           });
         });
       } else {
+        keys    = Object.keys(_cache);
+        toFetch = keys.length;
         utils.log("No feeds yet", "warning");
+        keys.forEach(function (key) {
+          window.feeds.fetch(_cache[key].url, false, function () {
+            toFetch--;
+            if (toFetch === 0) {
+              utils.log("Feeds updated", "debug");
+            }
+          });
+        });
       }
     });
   };

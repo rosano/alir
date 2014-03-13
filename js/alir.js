@@ -326,6 +326,8 @@ function Alir() {
             self.ui.message();
           }, 5000);
         }
+      } else {
+        self.ui.messagebar.textContent = '';
       }
     },
     widgetShow: function () {
@@ -774,7 +776,7 @@ function initUI() {
         },
         // Links inside content
         {
-          sel: "#articleShowTile .content a[href][target]",
+          sel: "#articleShowTile a[href][target]",
           action: function (elmt) {
             document.getElementById("linkRef").textContent = elmt.href;
             document.getElementById("linkRefFull").textContent = elmt.href;

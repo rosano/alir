@@ -485,7 +485,7 @@ function Article() {
               remoteStorage.alir.private.remove('/article/' + key);
               remoteStorage.alir.private.remove('article/' + key);
               delete config.bookmarks[key];
-              parent.parentNode.removeChild(elmt);
+              parent.parentNode.removeChild(parent);
             }
           });
         }
