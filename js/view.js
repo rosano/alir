@@ -16,10 +16,10 @@ var View = {};
 View.toDom = function (str, fullUrl) {
   /*jshint newcap: false*/
   "use strict";
-  var fragment = document.createDocumentFragment(),
-      sandbox  = document.createElement('div'),
+  var sandbox  = document.createElement('div'),
       domain   = new RegExp("((http.?://[^/]+).*/)([^?]*).?(.*$)").exec(fullUrl),
-      domainUrl, baseUrl;
+      domainUrl, baseUrl, parser;
+  parser  = new DOMParser();
   try {
     if (domain !== null) {
       domainUrl = domain[2];
@@ -27,14 +27,14 @@ View.toDom = function (str, fullUrl) {
     } else {
       domainUrl = '';
       baseUrl   = '';
+      utils.log('[view] Unable to get base URL from ' + fullUrl, 'error');
     }
-    fragment.appendChild(sandbox);
     try {
-      sandbox.innerHTML = HTMLtoXML(str);
+      sandbox = parser.parseFromString(HTMLtoXML(str), "text/html");
     } catch (e) {
       utils.log('Error sanityzing: ' + e.toString(), "error");
       //@FIXME Unsecure !
-      sandbox.innerHTML = str;
+      sandbox = parser.parseFromString(str, "text/html");
     }
     Array.prototype.forEach.call(sandbox.querySelectorAll('script, style', 'frame', 'iframe'), function (e) {
       e.parentNode.removeChild(e);
@@ -50,6 +50,9 @@ View.toDom = function (str, fullUrl) {
     Array.prototype.forEach.call(sandbox.querySelectorAll('* img:not([src^=http])'), function (e) {
       var src = e.getAttribute('src'),
           cachedImg;
+      function srcError() {
+        utils.log('[view] Unable to load %s from %s', src, fullUrl);
+      }
       if (src) {
         if (src.substr(0, 1) === '/') {
           src = domainUrl + src;
@@ -59,6 +62,8 @@ View.toDom = function (str, fullUrl) {
         e.setAttribute('src', src);
         // preoload images into cache
         cachedImg = new Image();
+        cachedImg.onerror = srcError;
+        cachedImg.onabort = srcError;
         cachedImg.src = src;
       }
     });
@@ -75,7 +80,7 @@ View.toDom = function (str, fullUrl) {
   } catch (e) {
     utils.log('Error displaying content: ' + e.toString(), "error");
   }
-  return sandbox.innerHTML;
+  return sandbox.querySelector("html").innerHTML;
 };
 View.insertInList = function (list, selector, item, comp) {
   "use strict";
