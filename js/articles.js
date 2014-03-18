@@ -600,6 +600,7 @@ window.Comment = function () {
         $('#noteViewTile [name="articleId"]').value  = articleId;
         $('#noteViewTile [name="noteId"]').value     = noteId;
         $('#noteViewTile [name="xpath"]').value      = article.notes[noteId].xpath;
+        $('#noteViewTile [name="url"]').value       = article.url;
         tiles.go('noteView');
       }
     });
@@ -649,6 +650,11 @@ window.Comment = function () {
     } else {
       tiles.back();
     }
+  };
+  this.share = function () {
+    document.getElementById('linkRef').textContent = $('#noteViewTile [name="url"]').value;
+    document.getElementById('linkText').value = $('#noteViewTile .content').textContent;
+    tiles.go('link');
   };
 };
 window.comment = new window.Comment();
