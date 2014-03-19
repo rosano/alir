@@ -212,7 +212,7 @@ function Article() {
     $('#articleEditTile [name="text"]').value  = "";
     choices.push({'object': 'articles', 'method': 'createArticle', 'l10nId': 'articleCreateArticle'});
     choices.push({'object': 'articles', 'method': 'createUrl', 'l10nId': 'articleCreateUrl'});
-    window.choice(choices);
+    window.choice(choices, _(''));
   };
   this.createArticle = function () {
     var tile = document.querySelector('[data-tile=articleEdit]');
@@ -330,17 +330,7 @@ function Article() {
       return;
     }
     function doShow() {
-      var clItem  = $('[data-key="' + key + '"]').classList,
-          clMenu  = $('#menu').classList,
-          clList  = $('#main').classList;
-      clMenu.add("detail");
-      clMenu.remove("list");
-      clList.add("detail");
-      clList.remove("list");
-      clList.remove("edit");
-      clItem.add('current');
-      clItem.add('read');
-
+      $('[data-key="' + key + '"]').classList.add('read');
       currentId = key;
       self.onShown();
     }
@@ -374,19 +364,13 @@ function Article() {
     location.hash = currentId;
   };
   this.hide = function hide() {
-    var clMenu  = document.getElementById('menu').classList,
-        clMain  = document.getElementById('main').classList,
-        current = $('#list > [data-key="' + currentId + '"]');
+    var current = $('#list > [data-key="' + currentId + '"]');
     if (current) {
       config.bookmarks[currentId] = window.scrollY / $('#articleShowTile').clientHeight;
       current.classList.remove('current');
       current.scrollIntoView();
     }
-    clMenu.remove("detail");
-    clMenu.add("list");
-    clMenu.remove('show');
-    clMain.remove("detail");
-    clMain.add("list");
+    window.alir.ui.toggleMenu(false);
     self.setCurrentId();
     location.hash = '';
   };
@@ -431,7 +415,7 @@ function Article() {
       request.onerror = function () {
         if (request.error.name !== 'USER_ABORT') {
           utils.log("Error sharing : " + request.error.name, "error");
-          window.alir.ui.message(_('scrapingError'), 'error');
+          window.alir.ui.message(_('sharingError'), 'error');
         }
       };
     } else {
@@ -595,11 +579,11 @@ window.Comment = function () {
     window.articles.read(articleId, function (article) {
       if (article) {
         // @TODO: sanitize
-        $('#noteViewTile .content').textContent      = article.notes[noteId].content;
-        $('#noteViewTile [name="text"]').value       = article.notes[noteId].content;
-        $('#noteViewTile [name="articleId"]').value  = articleId;
-        $('#noteViewTile [name="noteId"]').value     = noteId;
-        $('#noteViewTile [name="xpath"]').value      = article.notes[noteId].xpath;
+        $('#noteViewTile .content').textContent     = article.notes[noteId].content;
+        $('#noteViewTile [name="text"]').value      = article.notes[noteId].content;
+        $('#noteViewTile [name="articleId"]').value = articleId;
+        $('#noteViewTile [name="noteId"]').value    = noteId;
+        $('#noteViewTile [name="xpath"]').value     = article.notes[noteId].xpath;
         $('#noteViewTile [name="url"]').value       = article.url;
         tiles.go('noteView');
       }

@@ -190,7 +190,7 @@ function Feeds() {
           }
           if (typeof cache.articles[itemId] === 'undefined') {
             utils.log('New article "%s" in "%s"', itemTitle, cache.title, "info");
-            utils.notify('New article', utils.format('"%s" in "%s"', itemTitle, cache.title), function () {
+            utils.notify('New article in ' + cache.title, utils.format('"%s" in "%s"', itemTitle, cache.title), function () {
               if (window.alir.getStatus().installed) {
                 navigator.mozApps.getSelf().onsuccess = function gotSelf(evt) {
                   var app = evt.target.result;
@@ -593,7 +593,7 @@ if (navigator.mozAlarms) {
         this.all.push(alarm);
         window.config.alarms[date.toISOString()] = alarm;
       } else {
-        utils.log("Unable to plan action in the past", "error");
+        utils.log("Unable to plan action in the past " + date, "error");
       }
     },
     reset: function (cb) {

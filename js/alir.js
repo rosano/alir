@@ -331,7 +331,7 @@ function Alir() {
       }
     },
     widgetShow: function () {
-      $('#rsWidget').classList.toggle("hidden");
+      document.getElementById('rsWidget').classList.toggle("hidden");
     },
     setTheme: function (theme) {
       var cl = document.body.classList;
@@ -409,14 +409,14 @@ window.link = {
       scrap(href, function (err, res) {
         if (err) {
           utils.log(err.toString(), 'error');
-          window.alir.ui.message(_('scrapingError'), 'error');
+          window.alir.ui.message(_('scrapingError', {url: href}), 'error');
           res.loaded = false;
         }
         saveScraped(res);
       });
     } catch (e) {
       utils.log(e.toString(), "error");
-      window.alir.ui.message(_('scrapingError'), 'error');
+      window.alir.ui.message(_('scrapingError', {url: href}), 'error');
     }
   },
   share: function () {
@@ -435,12 +435,12 @@ window.link = {
         request.onerror = function () {
           if (request.error.name !== 'USER_ABORT') {
             utils.log("Error sharing : " + request.error.name, "error");
-            window.alir.ui.message(_('scrapingError'), 'error');
+            window.alir.ui.message(_('sharingError'), 'error');
           }
         };
       } catch (e) {
         utils.log("Error sharing : " + e, "error");
-        window.alir.ui.message(_('scrapingError'), 'error');
+        window.alir.ui.message(_('sharingError'), 'error');
       }
     } else {
       // @TODO How to share ???
@@ -1105,9 +1105,9 @@ function initUI() {
   (function () {
     $$('.textareaLength').forEach(function (l) {
       var t = l.previousElementSibling;
-    function onInput(event) {
+      function onInput(event) {
         l.textContent = t.value.length;
-    }
+      }
       t.addEventListener('change', onInput, false);
       t.addEventListener('input', onInput, false);
     });
@@ -1160,7 +1160,7 @@ function initUI() {
 
   function onHash() {
     var hash = window.location.hash.substr(1);
-    if (tiles.exists(hash) && tiles.getCurrent() !== hash) {
+    if (tiles.exists(hash) && tiles.getCurrent() !== hash && ['articleShow', 'link', 'noteEdit', 'noteView', 'prompt'].indexOf(hash) !== -1) {
       tiles.go(hash);
       return true;
     }
