@@ -343,6 +343,18 @@ function Alir() {
       if (theme !== '') {
         cl.add(theme);
       }
+    },
+    toggleMenu: function (show) {
+      if (show === true) {
+        document.getElementById('menu').classList.add("show");
+        document.body.classList.add("menu");
+      } else if (show === false) {
+        document.getElementById('menu').classList.remove("show");
+        document.body.classList.remove("menu");
+      } else {
+        document.getElementById('menu').classList.toggle("show");
+        document.body.classList.toggle("menu");
+      }
     }
   };
   this.ui.messagebar = document.getElementById('messagebar');
@@ -452,12 +464,14 @@ window.link = {
   }
 };
 
-window.choice = function (choices) {
+window.choice = function (choices, title) {
   "use strict";
   var tile = document.querySelector('[data-tile=prompt]'),
+      tileContent = tile.querySelector('.content'),
       button;
+  tile.querySelector('.title').textContent = title || '';
   choices.push({'object': 'tiles', 'method': 'back', 'l10nId': 'back'});
-  tile.innerHTML = '';
+  tileContent.innerHTML = '';
   choices.forEach(function (choice) {
     button = document.createElement('button');
     ['object', 'method', 'params', 'l10nId'].forEach(function (d) {
@@ -468,7 +482,7 @@ window.choice = function (choices) {
     if (typeof choice.l10nId !== 'undefined') {
       button.innerHTML = _(choice.l10nId);
     }
-    tile.appendChild(button);
+    tileContent.appendChild(button);
   });
   tiles.go('prompt');
 };
@@ -1086,26 +1100,17 @@ function initUI() {
     }
   });
   // }}
-  // Left menu {{
-  $('#menu').addEventListener('click', function (event) {
-    var target = event.target,
-        action = target.dataset.action;
-    if (action === 'toggleMenu') {
-      clicked(target);
-      $('#menu').classList.toggle("show");
-    }
-  });
-  // }}
 
   // Link share text {{
   (function () {
-    var ta = document.getElementById('linkText'),
-        l  = document.getElementById('linkTextLength');
+    $$('.textareaLength').forEach(function (l) {
+      var t = l.previousElementSibling;
     function onInput(event) {
-      l.textContent = ta.value.length;
+        l.textContent = t.value.length;
     }
-    ta.addEventListener('change', onInput, false);
-    ta.addEventListener('input', onInput, false);
+      t.addEventListener('change', onInput, false);
+      t.addEventListener('input', onInput, false);
+    });
   }());
   // }}
 

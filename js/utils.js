@@ -236,13 +236,13 @@ var Tiles = function (global) {
     Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
       if (e.dataset.tile === name) {
         e.classList.add('shown');
-        window.scrollTo(0, 0);
+        window.setTimeout(function () { window.scrollTo(0, 0); }, 600);
         current = name;
       } else {
         e.classList.remove('shown');
       }
     });
-    document.getElementById('menu').classList.remove('show');
+    window.alir.ui.toggleMenu(false);
     window.location.hash = name;
     this._emit('shown', name);
   };
@@ -257,7 +257,7 @@ var Tiles = function (global) {
       if (typeof next.cb === 'function') {
         next.cb();
       }
-      window.scrollTo(0, next.y);
+      window.setTimeout(function () { window.scrollTo(0, next.y); }, 600);
       tiles.splice(i);
     } else {
       if (name !== current && typeof current !== 'undefined') {
@@ -276,7 +276,7 @@ var Tiles = function (global) {
             popupElmt.style.left = (popupElmt.getBoundingClientRect().width - 2) + 'px';
             popupElmt.style.opacity = "1";
           });
-          window.scrollTo(0, 0);
+          window.setTimeout(function () { window.scrollTo(0, 0); }, 600);
           window.location.hash = name;
           this._emit('shown', name);
           current = name;
@@ -285,7 +285,7 @@ var Tiles = function (global) {
         this.show(name);
       }
     }
-    document.getElementById('menu').classList.remove('show');
+    window.alir.ui.toggleMenu(false);
   };
   this.back = function (res) {
     //jshint maxstatements: 30
@@ -309,7 +309,7 @@ var Tiles = function (global) {
           if (tiles.length === 0) {
             document.body.classList.remove('popup');
           }
-        }, 1000);
+        }, 500);
       }
       this._emit('leaving', current);
       if (tiles.length !== 0) {
@@ -331,7 +331,7 @@ var Tiles = function (global) {
         window.scrollTo(0, next.y);
       }
     }
-    document.getElementById('menu').classList.remove('show');
+    window.alir.ui.toggleMenu(false);
   };
   this.$ = function (name) {
     var root = document.querySelector('[data-tile="' + name + '"]');

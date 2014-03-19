@@ -12,6 +12,10 @@
 body.online #menu .scrollbar {
   background-color: #F80;
 }
+fieldset.inline > p:hover {
+  border-color: #f97c17;
+  box-shadow: 0 0 5px #f97c17;
+}
 /* }} */
 /* Green {{ */
 body.themeGreen .header,
@@ -26,6 +30,29 @@ body.themeGreen #menu .scrollbar {
 }
 body.themeGreen.online #menu .scrollbar {
   background-color: #0F0;
+}
+body.themeGreen fieldset.inline > p:hover {
+  border-color: #0F0;
+  box-shadow: 0 0 5px #0F0;
+}
+/* }} */
+/* Blue {{ */
+body.themeBlue .header,
+body.themeBlue [data-tile] > header,
+body.themeBlue [data-tile] > * > header {
+  background: #007EB2;
+  color: white;
+}
+body.themeBlue #menu .scrollbar {
+  background-color: rgba(0, 126, 178, .3);
+  border-color: #007EB2;
+}
+body.themeBlue.online #menu .scrollbar {
+  background-color: #007EB2;
+}
+body.themeBlue fieldset.inline > p:hover {
+  border-color: #007EB2;
+  box-shadow: 0 0 5px #007EB2;
 }
 /* }} */
 /* Red {{ */
@@ -47,6 +74,10 @@ body.themeRed.online #menu .scrollbar {
   background-color: #F00;
 }
 body.themeRed.online fieldset.inline > p:hover {
+  border-color: #F00;
+  box-shadow: 0 0 5px #F00;
+}
+body.themeRed fieldset.inline > p:hover {
   border-color: #F00;
   box-shadow: 0 0 5px #F00;
 }

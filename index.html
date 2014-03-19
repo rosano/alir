@@ -36,58 +36,60 @@
               <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
               <span>{{=title}}</span>
             </h2>
+            <div class="articleMenu folded">
+              <p><a class="icon-reorder" data-object="articles.ui" data-method="menu"></a></p>
+              <div class="articleActions">
+                <p><a class="icon-trash"               data-object="articles" data-method="delete"    data-params="{{=key}},{{=title}}"></a></p>
+                <p><a class="icon-inbox archive"       data-object="articles" data-method="switchTag" data-params="{{=key}},archive" ></a></p>
+                <p><a class="icon-star star"           data-object="articles" data-method="switchTag" data-params="{{=key}},star" ></a></p>
+                <p><a class="icon-tags"                data-object="articles" data-method="addTag"    data-params="{{=key}}"></a></p>
+                <p><a class="icon-pencil compose"      data-object="articles" data-method="edit"      data-params="{{=key}}"></a></p>
+                <p><a class="icon-refresh" data-object="articles" data-method="reload"    data-params="{{=key}}"></a></p>
+                <p><a class="icon-share ifInstalled"   data-object="articles" data-method="share"     data-params="{{=key}}"></a></p>
+                <p><a class="icon-rss alternate" data-object="articles.ui" data-method="toggleAlternates" data-params="{{=key}}"></a></p>
+              </div>
+            </div>
           </header>
-          <h3>{{=title}}</h3>
-          <div class="articleMenu folded">
-            <p><a class="icon-reorder" data-object="articles.ui" data-method="menu"></a></p>
-            <div class="articleActions">
-              <p><a class="icon-trash"               data-object="articles" data-method="delete"    data-params="{{=key}},{{=title}}"></a></p>
-              <p><a class="icon-inbox archive"       data-object="articles" data-method="switchTag" data-params="{{=key}},archive" ></a></p>
-              <p><a class="icon-star star"           data-object="articles" data-method="switchTag" data-params="{{=key}},star" ></a></p>
-              <p><a class="icon-tags"                data-object="articles" data-method="addTag"    data-params="{{=key}}"></a></p>
-              <p><a class="icon-pencil compose"      data-object="articles" data-method="edit"      data-params="{{=key}}"></a></p>
-              <p><a class="icon-refresh" data-object="articles" data-method="reload"    data-params="{{=key}}"></a></p>
-              <p><a class="icon-share ifInstalled"   data-object="articles" data-method="share"     data-params="{{=key}}"></a></p>
-              <p><a class="icon-rss alternate" data-object="articles.ui" data-method="toggleAlternates" data-params="{{=key}}"></a></p>
+          <section>
+            <h3>{{=title}}</h3>
+            <div class="toolbar">
+              <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}},{{=title}}"></a>
+              <a class="icon-pencil compose" data-object="articles" data-method="edit" data-params="{{=key}}"></a>
             </div>
-          </div>
-          <div class="toolbar">
-            <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}},{{=title}}"></a>
-            <a class="icon-pencil compose" data-object="articles" data-method="edit" data-params="{{=key}}"></a>
-          </div>
-          <ul class="tabs">
-            <li class="tab-content"><a data-l10n-id="articleTabContent" data-object="articles.ui" data-method="showTab" data-params="content"></a> | </li>
-            <li class="tab-notes"><a data-l10n-id="articleTabNotes" data-object="articles.ui" data-method="showTab" data-params="notes"></a> | </li>
-            <li class="tab-meta"><a data-l10n-id="articleTabMeta" data-object="articles.ui" data-method="showTab" data-params="meta"></a></li>
-          </ul>
-          <div class="content">
-            <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
-            <p class="notes">
-            </p>
-            <div class="alternates hidden">
-              <h3>Subscribe to</h3>
-              <p class="alternatesButtons">
+            <ul class="tabs">
+              <li class="tab-content"><a data-l10n-id="articleTabContent" data-object="articles.ui" data-method="showTab" data-params="content"></a> | </li>
+              <li class="tab-notes"><a data-l10n-id="articleTabNotes" data-object="articles.ui" data-method="showTab" data-params="notes"></a> | </li>
+              <li class="tab-meta"><a data-l10n-id="articleTabMeta" data-object="articles.ui" data-method="showTab" data-params="meta"></a></li>
+            </ul>
+            <div class="content">
+              <p class="url"><a href="{{=url}}" target="_blank">{{=url}}</a></p>
+              <p class="notes">
               </p>
-              <p><button data-object="articles.ui" data-method="toggleAlternates" data-params="{{=key}}">Done</button></p>
+              <div class="alternates hidden">
+                <h3>Subscribe to</h3>
+                <p class="alternatesButtons">
+                </p>
+                <p><button data-object="articles.ui" data-method="toggleAlternates" data-params="{{=key}}">Done</button></p>
+              </div>
+              <div class="{{=type}}">{{=content}}</div>
+              <!--
+              <iframe sandbox="allow-same-origin" seamless srcdoc="{{=content}}"></iframe>
+              -->
             </div>
-            <div class="{{=type}}">{{=content}}</div>
-            <!--
-            <iframe sandbox="allow-same-origin" seamless srcdoc="{{=content}}"></iframe>
-            -->
-          </div>
-          <div class="tabNotes">
-            {{#tmpl-notes notes}}
-          </div>
-          <div class="tabMeta">
-            <p class="date">{{=date|tolocal}}</p>
-            <p class="tags">
-              {{#tmpl-tag tags}}
-            </p>
-          </div>
-          <div class="toolbar">
-            <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
-            <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}},{{=title}}" ></a>
-          </div>
+            <div class="tabNotes">
+              {{#tmpl-notes notes}}
+            </div>
+            <div class="tabMeta">
+              <p class="date">{{=date|tolocal}}</p>
+              <p class="tags">
+                {{#tmpl-tag tags}}
+              </p>
+            </div>
+            <div class="toolbar">
+              <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
+              <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}},{{=title}}" ></a>
+            </div>
+          </section>
         </div>
       </div>
       <div id="tmpl-tag">
@@ -114,21 +116,23 @@
               <span>{{=title}}</span>
             </h2>
           </header>
-          <p>{{=url}}</p>
-          <p>{{=date|tolocal}}</p>
-          <p class="toolbar">
-            <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
-            <a class="icon-pencil"  data-object="feeds" data-method="edit"   data-params="{{=url}}"></a>
-            <a class="icon-trash"   data-object="feeds" data-method="delete" data-params="{{=url}}"></a>
-            <a class="icon-refresh" data-object="feeds" data-method="fetch" data-params="{{=url}}"></a>
-          </p>
-          <p class="col">
-            <button data-l10n-id="feedTest" data-object="feeds" data-method="test" data-params="{{=url}}"></button>
-            <button data-l10n-id="feedReset" data-object="feeds" data-method="reset" data-params="{{=url}}"></button>
-          </p>
-          <ul>
-            {{#tmpl-feed-item items}}
-          </ul>
+          <section>
+            <p>{{=url}}</p>
+            <p>{{=date|tolocal}}</p>
+            <p class="toolbar">
+              <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
+              <a class="icon-pencil"  data-object="feeds" data-method="edit"   data-params="{{=url}}"></a>
+              <a class="icon-trash"   data-object="feeds" data-method="delete" data-params="{{=url}}"></a>
+              <a class="icon-refresh" data-object="feeds" data-method="fetch" data-params="{{=url}}"></a>
+            </p>
+            <p class="col">
+              <button data-l10n-id="feedTest" data-object="feeds" data-method="test" data-params="{{=url}}"></button>
+              <button data-l10n-id="feedReset" data-object="feeds" data-method="reset" data-params="{{=url}}"></button>
+            </p>
+            <ul>
+              {{#tmpl-feed-item items}}
+            </ul>
+          </section>
         </div>
       </div>
       <ul id="tmpl-feed-item">
@@ -150,14 +154,18 @@
     <!-- Menu {{ -->
     <div id="menu" class="list">
       <div class="content">
-        <p><a class="icon-chevron-up top detail" href="#articleShowTile"></a></p>
-        <p><a class="icon-plus new" data-object="articles" data-method="create"></a></p>
-        <p><a class="icon-refresh sync" data-object="alir.rs" data-method="sync"></a></p>
-        <p><a class="icon-cog settings" data-object="tiles" data-method="go" data-params="settings"></a></p>
-        <p><a class="icon-off onoff" data-object="alir" data-method="onoff"></a></p>
-        <p><a class="icon-rss" data-object="tiles" data-method="go" data-params="feeds" ></a></p>
+        <p><span class="top" ></span><a class="icon-chevron-up" href="#articleShowTile"></a></p>
+        <p data-object="articles" data-method="create"><span class="new" data-l10n-id="menuNew"></span><a class="icon-plus"></a></p>
+        <p data-object="alir.rs"  data-method="sync"><span class="sync" data-l10n-id="menuSync"></span><a class="icon-refresh"></a></p>
+        <p data-object="tiles"    data-method="go" data-params="settings"><span class="settings" data-l10n-id="menuSettings"></span><a class="icon-cog"></a></p>
+        <p data-object="alir"     data-method="onoff">
+          <span class="menuOnline" data-l10n-id="menuOnline"></span>
+          <span class="menuOffline" data-l10n-id="menuOffline"></span>
+          <a class="icon-off"></a>
+        </p>
+        <p data-object="tiles"    data-method="go" data-params="feeds"><span class="" data-l10n-id="menuFeeds"></span><a class="icon-rss"></a></p>
       </div>
-      <div class="slider" data-action="toggleMenu">
+      <div class="slider" data-object="alir.ui" data-method="toggleMenu">
         <div class="scrollbar"></div>
       </div>
     </div>
@@ -207,23 +215,32 @@
     </div>
     <!-- }} -->
     <!-- articleList {{ -->
-    <div id="main" class="list shown noheader" data-tile="articleList">
-      <form class="filters">
-        <a class="icon-inbox archive" data-object="articles.ui" data-method="filterArchive" ></a>
-        <a class="icon-rss feed"      data-object="articles.ui" data-method="filterFeed" ></a>
-        <a class="icon-star star"     data-object="articles.ui" data-method="filterStar" ></a>
-        <a class="icon-tags tags"     data-object="articles.ui" data-method="addFilterTag" ></a>
-        <a class="icon-pencil edit"   data-object="articles.ui" data-method="editArticles" ></a>
-        <a class="icon-trash delete"  data-object="articles.ui" data-method="deleteArticles" ></a>
-        <fieldset class="inline text compact">
-          <p>
-            <input type="text" name="listFilter" id="listFilter" placeholder="Filter" data-l10n-id="listFilter" />
-            <button type="reset"><span class="icon-remove"></span></button>
-          </p>
-        </fieldset>
-      </form>
-      <ul id="list">
-      </ul>
+    <div id="main" class="list shown" data-tile="articleList">
+      <header>
+        <h2>
+          <a class="icon-reorder" data-object="alir.ui" data-method="toggleMenu" ></a>
+          <span class="filters">
+            <a class="icon-inbox archive" data-object="articles.ui" data-method="filterArchive" ></a>
+            <a class="icon-rss feed"      data-object="articles.ui" data-method="filterFeed" ></a>
+            <a class="icon-star star"     data-object="articles.ui" data-method="filterStar" ></a>
+            <a class="icon-tags tags"     data-object="articles.ui" data-method="addFilterTag" ></a>
+            <a class="icon-pencil edit"   data-object="articles.ui" data-method="editArticles" ></a>
+            <a class="icon-trash delete"  data-object="articles.ui" data-method="deleteArticles" ></a>
+          </span>
+        </h2>
+      </header>
+      <section>
+        <form class="filters">
+          <fieldset class="inline text compact">
+            <p>
+              <input type="text" name="listFilter" id="listFilter" placeholder="Filter" data-l10n-id="listFilter" />
+              <button type="reset"><span class="icon-remove"></span></button>
+            </p>
+          </fieldset>
+        </form>
+        <ul id="list">
+        </ul>
+      </section>
     </div>
     <!-- }} -->
     <!-- articleShow {{ -->
@@ -308,6 +325,7 @@
                   <option value="" data-l10n-id="themeDefault"></option>
                   <option value="themeGreen" data-l10n-id="themeGreen"></option>
                   <option value="themeRed" data-l10n-id="themeRed"></option>
+                  <option value="themeBlue" data-l10n-id="themeBlue"></option>
                 </select>
               </fieldset>
             </fieldset>
@@ -433,28 +451,30 @@
           <span data-l10n-id="settingsAdvanced"></span>
         </h2>
       </header>
-      <fieldset>
-        <legend data-l10n-id="proxyLegend"></legend>
-        <fieldset class="inline text">
-          <p>
-            <label for="proxyUrl" data-l10n-id="proxyUrlLabel"></label>
-            <input type="text" name="proxyUrl" id="proxyUrl" data-l10n-id="proxyUrl" data-target="proxy" />
-            <button type="reset"><span class="icon-remove"></span></button>
-          </p>
+      <section>
+        <fieldset>
+          <legend data-l10n-id="proxyLegend"></legend>
+          <fieldset class="inline text">
+            <p>
+              <label for="proxyUrl" data-l10n-id="proxyUrlLabel"></label>
+              <input type="text" name="proxyUrl" id="proxyUrl" data-l10n-id="proxyUrl" data-target="proxy" />
+              <button type="reset"><span class="icon-remove"></span></button>
+            </p>
+          </fieldset>
         </fieldset>
-      </fieldset>
-      <p>
-        <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
-        <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
-        <button data-object="alir" data-method="getAll" data-l10n-id="settingsReload">Reload</button>
-        <button data-object="alir" data-method="reset" data-l10n-id="alirReset"></button>
-      </p>
-      <!--
-      <p class="float">
-        <button data-object="alir.ui" data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
-        <button data-object="alir.ui" data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
-      </p>
-      -->
+        <p>
+          <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
+          <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
+          <button data-object="alir" data-method="getAll" data-l10n-id="settingsReload">Reload</button>
+          <button data-object="alir" data-method="reset" data-l10n-id="alirReset"></button>
+        </p>
+        <!--
+        <p class="float">
+          <button data-object="alir.ui" data-method="widgetShow" data-l10n-id="settingsWidgetShow">Show widget</button>
+          <button data-object="alir.ui" data-method="inspect" data-l10n-id="settingsDebug">Debug</button>
+        </p>
+        -->
+      </section>
     </div>
     <!-- }} -->
     <!-- noteView {{ -->
@@ -465,20 +485,23 @@
           <span data-l10n-id="noteViewHeader"></span>
         </h2>
       </header>
-      <form>
-        <input type="hidden" name="articleId" />
-        <input type="hidden" name="noteId" />
-        <input type="hidden" name="xpath" />
-        <input type="hidden" name="text" />
-      </form>
-      <div class="content">
-      </div>
-      <p>
-        <button name="back" data-l10n-id="noteBack" data-object="tiles" data-method="back">Back</button>
-        <button data-object="comment" data-method="edit" data-l10n-id="noteEdit"></button>
-        <button data-object="comment" data-method="delete" data-l10n-id="noteDelete"></button>
+      <section>
+        <form>
+          <input type="hidden" name="articleId" />
+          <input type="hidden" name="noteId" />
+          <input type="hidden" name="xpath" />
+          <input type="hidden" name="text" />
+          <input type="hidden" name="url" />
+        </form>
+        <div class="content">
+        </div>
+        <p>
+          <button name="back" data-l10n-id="noteBack" data-object="tiles" data-method="back">Back</button>
+          <button data-object="comment" data-method="edit"   data-l10n-id="noteEdit"></button>
+          <button data-object="comment" data-method="delete" data-l10n-id="noteDelete"></button>
           <button data-object="comment" data-method="share"  data-l10n-id="noteShare"></button>
-      </p>
+        </p>
+      </section>
     </section>
     <!-- }} -->
     <!-- noteEdit {{ -->
@@ -489,18 +512,21 @@
           <span data-l10n-id="noteEditHeader"></span>
         </h2>
       </header>
-      <form>
-        <input type="hidden" name="articleId" />
-        <input type="hidden" name="noteId" />
-        <input type="hidden" name="xpath" />
-        <fieldset class="inline text">
-          <textarea rows="10" cols="40" name="text" placeholder="Note" data-l10n-id="noteContent"></textarea>
-        </fieldset>
-        <p class="col2">
-          <button data-object="comment" data-method="save" data-l10n-id="noteSave">Save</button>
-          <button name="cancel" data-l10n-id="noteCancel" data-object="tiles" data-method="back">Cancel</button>
-        </p>
-      </form>
+      <section>
+        <form>
+          <input type="hidden" name="articleId" />
+          <input type="hidden" name="noteId" />
+          <input type="hidden" name="xpath" />
+          <fieldset class="inline text">
+            <textarea id="noteContent" rows="10" cols="40" name="text" placeholder="Note" data-l10n-id="noteContent"></textarea>
+            <span id="noteContentLength" class="textareaLength"></span>
+          </fieldset>
+          <p class="col2">
+            <button data-object="comment" data-method="save" data-l10n-id="noteSave">Save</button>
+            <button name="cancel" data-l10n-id="noteCancel" data-object="tiles" data-method="back">Cancel</button>
+          </p>
+        </form>
+      </section>
     </section>
     <!-- }} -->
     <!-- tagTile {{ -->
@@ -536,32 +562,34 @@
           <span data-l10n-id="creditHeader">Credits</span>
         </h2>
       </header>
-      <section class="title">
-        <img src="img/icon-256.png" width="256" height="256" alt="Àlir icon" title="Àlir icon" />
-      </section>
-      <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
       <section>
-        <h3>Licence</h3>
-        <p>Àlir — Stack stuffs and read them later.</p>
-        <p>Copyright © 2014 Clochix — <a href="http://clochix.net" target="_blank">Clochix</a></p>
-        <p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
-        <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the <a href="LICENCE" target="_blank">GNU General Public License for more details.</a></p>
-      </section>
-      <section>
-        <h3>Icons</h3>
-        <p>The Chair icon is a creation of <a href="http://www.robinweatherall.eu/icons/" target="_blank">Robin Weatherall</a> distributed as freeware. I found it on <a href="http://www.iconarchive.com/show/library-icons-by-skuzigraphic/chair-icon.html" target="_blank">IconArchive</a>.</p>
-        <p>Others icons are from Font Awesome by Dave Gandy — <a href="http://fontawesome.io" target="_blank">http://fontawesome.io/</a>.</p>
+        <section class="title">
+          <img src="img/icon-256.png" width="256" height="256" alt="Àlir icon" title="Àlir icon" />
+        </section>
+        <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
+        <section>
+          <h3>Licence</h3>
+          <p>Àlir — Stack stuffs and read them later.</p>
+          <p>Copyright © 2014 Clochix — <a href="http://clochix.net" target="_blank">Clochix</a></p>
+          <p>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>
+          <p>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the <a href="LICENCE" target="_blank">GNU General Public License for more details.</a></p>
+        </section>
+        <section>
+          <h3>Icons</h3>
+          <p>The Chair icon is a creation of <a href="http://www.robinweatherall.eu/icons/" target="_blank">Robin Weatherall</a> distributed as freeware. I found it on <a href="http://www.iconarchive.com/show/library-icons-by-skuzigraphic/chair-icon.html" target="_blank">IconArchive</a>.</p>
+          <p>Others icons are from Font Awesome by Dave Gandy — <a href="http://fontawesome.io" target="_blank">http://fontawesome.io/</a>.</p>
 
+        </section>
+        <section>
+          <h3>Contributors</h3>
+          <ul>
+            <li>thanks Mozilla for the awesome Firefox OS and the Keon phone you offered to me;</li>
+            <li>thanks <a href="http://paul.cx/" target="_blank">Paul Adonot</a> for the advices and encouragements;</li>
+            <li>thanks <a href="http://hanblog.info/blog/" target="_blank">Antony</a> for the kick ass ;)</li>
+          </ul>
+        </section>
+        <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
       </section>
-      <section>
-        <h3>Contributors</h3>
-        <ul>
-          <li>thanks Mozilla for the awesome Firefox OS and the Keon phone you offered to me;</li>
-          <li>thanks <a href="http://paul.cx/" target="_blank">Paul Adonot</a> for the advices and encouragements;</li>
-          <li>thanks <a href="http://hanblog.info/blog/" target="_blank">Antony</a> for the kick ass ;)</li>
-        </ul>
-      </section>
-      <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
     </section>
     <!-- }} -->
     <!-- auth {{ -->
@@ -578,22 +606,32 @@
           <span id="linkRef"></span>
         </h2>
       </header>
-      <p id="linkRefFull"></p>
-      <button data-object="tiles" data-method="back" data-l10n-id="linkCancel">Return</button>
-      <button data-object="link" data-method="scrap" data-l10n-id="linkScrap">Scrap</button>
-      <button data-object="link" data-method="open" data-l10n-id="linkOpen">Open</button>
-      <button data-object="link" data-method="share" class="ifInstalled" data-l10n-id="linkShare">share</button>
-      <button data-object="link" data-method="facebook" data-l10n-id="linkShareFacebook"></button>
-      <button data-object="link" data-method="google"   data-l10n-id="linkShareGoogle"></button>
-      <button data-object="link" data-method="twitter"  data-l10n-id="linkShareTwitter"></button>
-      <fieldset class="inline text">
-        <textarea id="linkText" rows="5" cols="40"></textarea>
-        <span id="linkTextLength"></span>
-      </fieldset>
+      <section>
+        <p id="linkRefFull"></p>
+        <button data-object="tiles" data-method="back" data-l10n-id="linkCancel">Return</button>
+        <button data-object="link" data-method="scrap" data-l10n-id="linkScrap">Scrap</button>
+        <button data-object="link" data-method="open" data-l10n-id="linkOpen">Open</button>
+        <button data-object="link" data-method="share" class="ifInstalled" data-l10n-id="linkShare">share</button>
+        <button data-object="link" data-method="facebook" data-l10n-id="linkShareFacebook"></button>
+        <button data-object="link" data-method="google"   data-l10n-id="linkShareGoogle"></button>
+        <button data-object="link" data-method="twitter"  data-l10n-id="linkShareTwitter"></button>
+        <fieldset class="inline text">
+          <textarea id="linkText" name="linkText" rows="5" cols="40"></textarea>
+          <span id="linkTextLength" class="textareaLength"></span>
+        </fieldset>
+      </section>
     </section>
     <!-- }} -->
     <!-- prompt {{ -->
     <section data-tile="prompt">
+      <header>
+        <h2>
+          <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
+          <span class="title"></span>
+        </h2>
+      </header>
+      <div class="content">
+      </div>
     </section>
     <!-- }} -->
     <!-- feeds {{ -->
@@ -604,13 +642,15 @@
           <span data-l10n-id="feeds">Feeds</span>
         </h2>
       </header>
-      <p class="toolbar">
-        <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
-        <a class="icon-plus" data-object="feeds" data-method="create" ></a>
-        <a class="icon-refresh" data-object="feeds" data-method="update"></a>
-      </p>
-      <ul id="feedsList">
-      </ul>
+      <section>
+        <p class="toolbar">
+          <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
+          <a class="icon-plus" data-object="feeds" data-method="create" ></a>
+          <a class="icon-refresh" data-object="feeds" data-method="update"></a>
+        </p>
+        <ul id="feedsList">
+        </ul>
+      </section>
     </section>
     <!-- }} -->
     <!-- feedEdit {{ -->

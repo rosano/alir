@@ -26,7 +26,7 @@ casper.test.begin('Create and update articles', function suite(test) {
         });
         casper.click('[data-l10n-id="articleSave"]');
         casper.waitUntilVisible('[data-tile=articleShow]', function () {
-          test.assertSelectorHasText("#articleShowTile > div > h3", "Todo");
+          test.assertSelectorHasText("#articleShowTile h3", "Todo");
         });
       });
     });
