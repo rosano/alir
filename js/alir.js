@@ -887,7 +887,7 @@ function initUI() {
   });
   // Gestures {{
   (function () {
-    var checkbox, gestureEvents;
+    var gestureEvents;
     gestureEvents = {
       gesture: function (e) {
         var items;
@@ -960,14 +960,6 @@ function initUI() {
     if (config.gesture) {
       Gesture.attach(document.getElementById('articleShow'), gestureEvents);
     }
-    checkbox = document.getElementById('prefGesture');
-    checkbox.addEventListener('change', function () {
-      if (checkbox.checked) {
-        Gesture.attach(document.getElementById('articleShow'), gestureEvents);
-      } else {
-        Gesture.detach(document.getElementById('articleShow'), gestureEvents);
-      }
-    });
   }());
   // Delete article with left swipe in list
   Gesture.attach(document.getElementById('main'), {
@@ -1018,9 +1010,9 @@ function initUI() {
   function setState(state) {
     var actions = {
       "connect": $("#prefRS [data-method=connect]").classList,
-      "disconnect": $("#settings [data-method=disconnect]").classList,
-      "sync": $("#settings [data-method=sync]").classList,
-      "reset": $("#settings [data-method=reset]").classList
+      "disconnect": $("#settingsSync [data-method=disconnect]").classList,
+      "sync": $("#settingsSync [data-method=sync]").classList,
+      "reset": $("#settingsSync [data-method=reset]").classList
     };
     switch (state) {
     case "initial":
@@ -1048,38 +1040,33 @@ function initUI() {
     setState('initial');
   });
   setState('initial');
-  $('#dropboxApiKey').addEventListener('change', function () {
+  document.getElementById('dropboxApiKey').addEventListener('change', function () {
     remoteStorage.setApiKeys('dropbox', {api_key: this.value});
     config.dropBox.apiKey = this.value;
   });
-  $('#driveClientId').addEventListener('change', function () {
+  document.getElementById('driveClientId').addEventListener('change', function () {
     remoteStorage.setApiKeys('googledrive', {client_id: this.value, api_key: $('#driveApiKey').value});
     config.google.clientId = this.value;
   });
-  $('#driveApiKey').addEventListener('change', function () {
+  document.getElementById('driveApiKey').addEventListener('change', function () {
     remoteStorage.setApiKeys('googledrive', {client_id: $('#driveClientId').value, api_key: this.value});
     config.google.apiKey = this.value;
   });
-  $('#prefMenuLeft').addEventListener('click', function () {
-    if (this.checked) {
-      document.body.classList.remove('menu-right');
-      document.body.classList.add('menu-left');
-      config.menu = true;
-    } else {
-      document.body.classList.remove('menu-left');
-      document.body.classList.add('menu-right');
-      config.menu = false;
-    }
-  });
   document.body.addEventListener('change', function (ev) {
+    // jshint maxcomplexity: 11
     var val = ev.target.value;
     if (ev.target.dataset.target) {
       switch (ev.target.dataset.target) {
       case 'gesture':
-        config.gesture = document.getElementById('prefGesture').checked;
+        config.gesture = ev.target.checked;
+        //if (config.gesture) {
+        //  Gesture.attach(document.getElementById('articleShow'), gestureEvents);
+        //} else {
+        //  Gesture.detach(document.getElementById('articleShow'), gestureEvents);
+        //}
         break;
       case 'vibrate':
-        config.vibrate = document.getElementById('prefVibrate').checked;
+        config.vibrate = ev.target.checked;
         break;
       case 'lang':
         config.lang = val;
@@ -1096,6 +1083,16 @@ function initUI() {
       case 'proxy':
         config.proxy = val;
         break;
+      case 'prefMenuLeft':
+        val = ev.target.checked;
+        config.menu = val;
+        if (val) {
+          document.body.classList.remove('menu-right');
+          document.body.classList.add('menu-left');
+        } else {
+          document.body.classList.remove('menu-left');
+          document.body.classList.add('menu-right');
+        }
       }
     }
   });
@@ -1154,7 +1151,9 @@ function initUI() {
   (function () {
     ['gesture', 'vibrate'].forEach(function (pref) {
       var elmt = document.getElementById('pref' + pref[0].toUpperCase() + pref.substr(1));
-      elmt.checked = config[pref];
+      if (elmt) {
+        elmt.checked = config[pref];
+      }
     });
   }());
 

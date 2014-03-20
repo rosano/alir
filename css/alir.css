@@ -114,10 +114,13 @@ body.menu-right #menu .slider {
   z-index: 1000;
   pointer-events: none;
 }
+body #statusbar .syncInProgress {
+  position: fixed;
+  right: 3.3rem;
+}
 body.sync #statusbar .syncInProgress {
   color: #FFF;
   animation: rotation 2s infinite linear;
-  position: inherit;
 }
 @keyframes rotation {
   from {
@@ -130,9 +133,12 @@ body.sync #statusbar .syncInProgress {
 #menu .onoff {
   color: #888;
 }
-#menu .menuOffline,
-body.online #menu.menuOnline {
+#menu .menuOnline,
+body.online #menu .menuOffline {
   display: none;
+}
+body.online #menu .menuOnline {
+  display: inline;
 }
 body.online #menu .onoff {
   color: #0F0;
@@ -205,7 +211,7 @@ body.menu-right #menu .content .icon-chevron-left {
 }
 [data-tile] > header, [data-tile] > * > header {
   margin: -1rem -0.5rem 1rem -3rem;
-  padding: 0.2rem 1.5rem;
+  padding: 0.2rem 1rem;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
   /*position: sticky;*/
   position: fixed;
@@ -230,9 +236,15 @@ body.menu [data-tile] > header + *, body.menu [data-tile] > * > header + *{
 }
 [data-tile] header h2 > a {
   font-size: 1.6rem;
-  padding: 0.5rem 1.5rem 0.5rem 0;
+  padding: 0.5rem 1rem 0.5rem 0;
   margin-right: .5rem;
-  border-right: 1px outset #888;
+  border-style: outset;
+  border-color: #888;
+  border-width: 0 1px 0 0;
+}
+[data-tile] header h2 > a.right {
+  border-width: 0 0 0 1px;
+  padding: 0 0 0 1rem;
 }
 body.menu-left [data-tile] {
   padding-left: 2.5rem;
@@ -591,16 +603,20 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   display: none;
 }
 /** Settings {{ **/
-#settings .container {
+[data-tile].settings .container {
   border: 1px solid #888;
   border-radius: 2px;
   margin: .5rem 0;
 }
-#settings .container > .header {
+[data-tile].settings .container > .header {
   padding: 0.01rem;
 }
-#settings .container > .header > * {
+[data-tile].settings .container > .header > * {
   margin: 0.5rem;
+}
+.container .header .left {
+  display: inline-block;
+  width: calc(100% - 4rem);
 }
 #settingsAlarm {
   text-align: center;

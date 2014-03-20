@@ -2,11 +2,11 @@
 .header,
 [data-tile] header,
 [data-tile] > * > header {
-  background-color: #f97c17;
+  background-color: #E66000;
   color: white;
 }
 #menu .scrollbar {
-  background-color: rgba(255, 127, 0, .3);
+  background-color: rgba(230, 96, 0, 0.3);
   border-color: #F80;
 }
 body.online #menu .scrollbar {

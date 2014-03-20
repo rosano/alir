@@ -230,13 +230,14 @@ var Tiles = function (global) {
   RemoteStorage.eventHandling(this, "leaving", "shown");
   var current,
       tiles = [],
-      popup = (window.matchMedia("(min-width: 78rem) and (min-height: 30rem)").matches);
+      popup = (window.matchMedia("(min-width: 78rem) and (min-height: 3rem)").matches);
   this.show = function (name) {
     this._emit('leaving', current);
     Array.prototype.forEach.call(document.querySelectorAll('[data-tile]'), function (e) {
       if (e.dataset.tile === name) {
         e.classList.add('shown');
-        window.setTimeout(function () { window.scrollTo(0, 0); }, 600);
+        //window.setTimeout(function () { window.scrollTo(0, 0); }, 600);
+        window.scrollTo(0, 0);
         current = name;
       } else {
         e.classList.remove('shown');
@@ -257,7 +258,8 @@ var Tiles = function (global) {
       if (typeof next.cb === 'function') {
         next.cb();
       }
-      window.setTimeout(function () { window.scrollTo(0, next.y); }, 600);
+      //window.setTimeout(function () { window.scrollTo(0, next.y); }, 600);
+      window.scrollTo(0, 0);
       tiles.splice(i);
     } else {
       if (name !== current && typeof current !== 'undefined') {
@@ -276,7 +278,8 @@ var Tiles = function (global) {
             popupElmt.style.left = (popupElmt.getBoundingClientRect().width - 2) + 'px';
             popupElmt.style.opacity = "1";
           });
-          window.setTimeout(function () { window.scrollTo(0, 0); }, 600);
+          //window.setTimeout(function () { window.scrollTo(0, 0); }, 600);
+          window.scrollTo(0, 0);
           window.location.hash = name;
           this._emit('shown', name);
           current = name;
