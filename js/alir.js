@@ -355,6 +355,27 @@ function Alir() {
         document.getElementById('menu').classList.toggle("show");
         document.body.classList.toggle("menu");
       }
+    },
+    choice: function (choices, title) {
+      var tile = document.querySelector('[data-tile=prompt]'),
+          tileContent = tile.querySelector('.content'),
+          button;
+      tile.querySelector('.title').textContent = title || '';
+      choices.push({'object': 'tiles', 'method': 'back', 'l10nId': 'back'});
+      tileContent.innerHTML = '';
+      choices.forEach(function (choice) {
+        button = document.createElement('button');
+        ['object', 'method', 'params', 'l10nId'].forEach(function (d) {
+          if (typeof choice[d] !== 'undefined') {
+            button.dataset[d] = choice[d];
+          }
+        });
+        if (typeof choice.l10nId !== 'undefined') {
+          button.innerHTML = _(choice.l10nId);
+        }
+        tileContent.appendChild(button);
+      });
+      tiles.go('prompt');
     }
   };
   this.ui.messagebar = document.getElementById('messagebar');
@@ -462,29 +483,6 @@ window.link = {
     var txt = window.encodeURIComponent(document.getElementById('linkText').value);
     this.open('https://twitter.com/intent/tweet?text=' + txt + '&url=');
   }
-};
-
-window.choice = function (choices, title) {
-  "use strict";
-  var tile = document.querySelector('[data-tile=prompt]'),
-      tileContent = tile.querySelector('.content'),
-      button;
-  tile.querySelector('.title').textContent = title || '';
-  choices.push({'object': 'tiles', 'method': 'back', 'l10nId': 'back'});
-  tileContent.innerHTML = '';
-  choices.forEach(function (choice) {
-    button = document.createElement('button');
-    ['object', 'method', 'params', 'l10nId'].forEach(function (d) {
-      if (typeof choice[d] !== 'undefined') {
-        button.dataset[d] = choice[d];
-      }
-    });
-    if (typeof choice.l10nId !== 'undefined') {
-      button.innerHTML = _(choice.l10nId);
-    }
-    tileContent.appendChild(button);
-  });
-  tiles.go('prompt');
 };
 
 RemoteStorage.defineModule('alir', function module(privateClient, publicClient) {
@@ -1107,6 +1105,7 @@ function initUI() {
       }
       t.addEventListener('change', onInput, false);
       t.addEventListener('input', onInput, false);
+      t.addEventListener('focus', onInput, false);
     });
   }());
   // }}
@@ -1159,8 +1158,8 @@ function initUI() {
 
   function onHash() {
     var hash = window.location.hash.substr(1);
-    if (tiles.exists(hash) && tiles.getCurrent() !== hash && ['articleShow', 'link', 'noteEdit', 'noteView', 'prompt'].indexOf(hash) !== -1) {
-      tiles.go(hash);
+    if (tiles.exists(hash) && tiles.getCurrent() !== hash && ['articleShow', 'link', 'noteEdit', 'noteView', 'prompt'].indexOf(hash) === -1) {
+      tiles.show(hash);
       return true;
     }
     return false;

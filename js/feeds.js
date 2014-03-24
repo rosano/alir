@@ -450,7 +450,7 @@ if (navigator.mozAlarms) {
           utils.log(_('alarmsNoAlarms'), 'warning');
         } else {
           alarms.forEach(function (alarm) {
-            utils.log(alarm.data.action + " at " + alarm.date, "debug");
+            utils.log(alarm.data.action + " at " + alarm.date, "info");
           });
         }
       };

@@ -27,7 +27,6 @@ View.toDom = function (str, fullUrl) {
     } else {
       domainUrl = '';
       baseUrl   = '';
-      utils.log('[view] Unable to get base URL from ' + fullUrl, 'error');
     }
     try {
       sandbox = parser.parseFromString(HTMLtoXML(str), "text/html");

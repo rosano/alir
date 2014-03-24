@@ -34,10 +34,14 @@
           <header>
             <h2>
               <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
-              <span>{{=title}}</span>
+              <span class="center">{{=title}}</span>
+              <a class="icon-reorder right" data-object="articles.ui" data-method="menu" ></a>
             </h2>
+          </header>
             <div class="articleMenu folded">
+              <!--
               <p><a class="icon-reorder" data-object="articles.ui" data-method="menu"></a></p>
+              -->
               <div class="articleActions">
                 <p><a class="icon-trash"               data-object="articles" data-method="delete"    data-params="{{=key}},{{=title}}"></a></p>
                 <p><a class="icon-inbox archive"       data-object="articles" data-method="switchTag" data-params="{{=key}},archive" ></a></p>
@@ -49,8 +53,7 @@
                 <p><a class="icon-rss alternate" data-object="articles.ui" data-method="toggleAlternates" data-params="{{=key}}"></a></p>
               </div>
             </div>
-          </header>
-          <section>
+          <section class="body">
             <h3>{{=title}}</h3>
             <div class="toolbar">
               <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}},{{=title}}"></a>
@@ -175,7 +178,8 @@
       <header>
         <h2>
           <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
-          <span data-l10n-id="inputHeader">Note</span>
+          <span class="center" data-l10n-id="inputHeader">Note</span>
+          <a class="icon-pencil right" data-object="articles" data-method="save" ></a>
         </h2>
       </header>
       <form>
@@ -365,6 +369,7 @@
               <a class="icon-chevron-right right"></a>
             </h2>
           </header>
+        </section>
         <section class="container">
           <header class="header">
             <h2 data-object="tiles" data-method="go" data-params="advanced">
@@ -372,6 +377,7 @@
               <a class="icon-chevron-right right"></a>
             </h2>
           </header>
+        </section>
         <section>
           <button name="clearLog" data-l10n-id="settingsClearLog" data-object="alir.ui" data-method="clearLogs">Clear Log</button>
           <pre id="debugLog"></pre>
@@ -526,11 +532,11 @@
         </form>
         <div class="content">
         </div>
-        <p>
-          <button name="back" data-l10n-id="noteBack" data-object="tiles" data-method="back">Back</button>
-          <button data-object="comment" data-method="edit"   data-l10n-id="noteEdit"></button>
-          <button data-object="comment" data-method="delete" data-l10n-id="noteDelete"></button>
-          <button data-object="comment" data-method="share"  data-l10n-id="noteShare"></button>
+        <p class="toolbar">
+          <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
+          <a class="icon-pencil" data-object="comment" data-method="edit"   ></a>
+          <a class="icon-trash"  data-object="comment" data-method="delete" ></a>
+          <a class="icon-share"  data-object="comment" data-method="share"  ></a>
         </p>
       </section>
     </section>
@@ -540,7 +546,8 @@
       <header>
         <h2>
           <a class="icon-chevron-left" data-object="tiles" data-method="back"></a>
-          <span data-l10n-id="noteEditHeader"></span>
+          <span class="center" data-l10n-id="noteEditHeader"></span>
+          <a class="icon-pencil right" data-object="comment" data-method="save" ></a>
         </h2>
       </header>
       <section>
@@ -675,7 +682,6 @@
       </header>
       <section>
         <p class="toolbar">
-          <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
           <a class="icon-plus" data-object="feeds" data-method="create" ></a>
           <a class="icon-refresh" data-object="feeds" data-method="update"></a>
         </p>
@@ -717,7 +723,7 @@
         <fieldset class="inline check compact">
           <p>
             <label for="feedShort" data-l10n-id="feedShort">Left Menu</label>
-            <input type="checkbox" name="feedShort">
+            <input type="checkbox" id="feedShort" name="feedShort">
           </p>
         </fieldset>
         <p class="col2">

@@ -212,7 +212,7 @@ function Article() {
     $('#articleEditTile [name="text"]').value  = "";
     choices.push({'object': 'articles', 'method': 'createArticle', 'l10nId': 'articleCreateArticle'});
     choices.push({'object': 'articles', 'method': 'createUrl', 'l10nId': 'articleCreateUrl'});
-    window.choice(choices, _(''));
+    window.alir.ui.choice(choices, _('articleCreateChoice'));
   };
   this.createArticle = function () {
     var tile = document.querySelector('[data-tile=articleEdit]');
@@ -361,7 +361,7 @@ function Article() {
     window.setTimeout(function () {
       window.scrollTo(0, scroll);
     }, 100);
-    location.hash = currentId;
+    //location.hash = currentId;
   };
   this.hide = function hide() {
     var current = $('#list > [data-key="' + currentId + '"]');
@@ -372,7 +372,7 @@ function Article() {
     }
     window.alir.ui.toggleMenu(false);
     self.setCurrentId();
-    location.hash = '';
+    //location.hash = '';
   };
   this.addTag = function (key) {
     tiles.go('tagTile', function (tag) {
@@ -428,7 +428,7 @@ function Article() {
           actions = $('#articleShowTile .articleMenu .articleActions');
       function style() {
         if (cl.contains('folded')) {
-          actions.style.marginTop = -actions.clientHeight + 'px';
+          actions.style.marginTop = -(actions.clientHeight + 10) + 'px';
         } else {
           actions.style.marginTop = '';
         }
@@ -573,6 +573,7 @@ window.Comment = function () {
     UI.path.value    = path;
     UI.content.value = '';
     window.tiles.go('noteEdit');
+    $('#noteEditTile [name="text"]').focus();
   };
 
   this.read = function (articleId, noteId) {

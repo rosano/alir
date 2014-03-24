@@ -161,10 +161,8 @@ body.menu-right #menu.show .scrollbar {
 }
 #menu .content {
   float: right;
-/*  width: 7.5rem;*/
   line-height: 3em;
-  margin: 3rem 2.5rem;
-/*  padding-right: 2.5rem;*/
+  margin: 3rem 2.5rem 3rem 0;
 }
 body.menu-right #menu .content {
   margin: 0.66rem 0.5rem;
@@ -184,7 +182,7 @@ body.menu-right #menu.show {
 }
 #menu .content > p > * {
   vertical-align: middle;
-  padding: .5rem;
+  padding-right: .4rem;
 }
 #menu a.button {
   padding: 20px 20px;
@@ -216,15 +214,15 @@ body.menu-right #menu .content .icon-chevron-left {
   /*position: sticky;*/
   position: fixed;
   top: 2rem;
-  width: 36rem;
-  z-index: 999;
+  width: 100%;
+  z-index: 1001;
 }
-[data-tile] > header + *, [data-tile] > * > header + *{
+[data-tile] > header + *, [data-tile] > * > .body {
   transform: translate(0, 0);
   transition: transform .5s ease-in-out;
   transition-timing-function: cubic-bezier(0.5, -0.25, 0.5, 1.25);
 }
-body.menu [data-tile] > header + *, body.menu [data-tile] > * > header + *{
+body.menu [data-tile] > header + *, body.menu [data-tile] > * > .body {
   transform: translate(9rem, 0);
 }
 [data-tile] header h2 {
@@ -236,13 +234,26 @@ body.menu [data-tile] > header + *, body.menu [data-tile] > * > header + *{
 }
 [data-tile] header h2 > a {
   font-size: 1.6rem;
-  padding: 0.5rem 1rem 0.5rem 0;
+  padding: 0.5rem .5rem 0.5rem 0;
   margin-right: .5rem;
   border-style: outset;
   border-color: #888;
   border-width: 0 1px 0 0;
 }
-[data-tile] header h2 > a.right {
+[data-tile] header h2 .center {
+  display: inline-block;
+  overflow: hidden;
+  max-width: calc(100% - 6rem);
+  text-overflow: ellipsis;
+}
+[data-tile] > header h2 > .right, [data-tile] > * > header h2 > .right {
+  position: fixed;
+  top: 1.3rem;
+  right: 0;
+  padding: .5rem;
+  border-width: 0;
+}
+.container header h2 > a.right {
   border-width: 0 0 0 1px;
   padding: 0 0 0 1rem;
 }
@@ -357,8 +368,8 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   color: black;
 }
 #articleShowTile .articleMenu .articleActions {
-  transition: margin .5s ease-in-out, color 1s ease-in-out;
-  margin-top: 3rem;
+  transition: margin .3s ease-in-out, color .3s ease-in-out;
+  margin-top: 3.5rem;
 }
 
 #articleShowTile .articleMenu.folded .articleActions {
