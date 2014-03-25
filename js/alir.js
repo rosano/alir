@@ -223,10 +223,10 @@ function Alir() {
       request.onerror = function () {
         utils.log("Install Error : " + this.error.name, "error");
         utils.log(this.error, 'error');
-        window.alir.ui.message('_installKo', "info");
+        window.alir.ui.message(_('installKo'), "info");
       };
       request.onsuccess = function () {
-        window.alir.ui.message('_installOk', "info");
+        window.alir.ui.message(_('installOk'), "info");
         tiles.show('list');
       };
     }());

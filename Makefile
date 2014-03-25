@@ -1,6 +1,6 @@
 js =	lib/polyfill.js lib/remotestorage.js lib/webL10n/l10n.js lib/htmlparser.js lib/showdown.js js/touch.js js/utils.js js/view.js js/articles.js js/feeds.js addon/data/lib/readabilitySAX/DOMasSAX.js addon/data/lib/readabilitySAX/readabilitySAX.js js/scrap.js
 css = css/alir.css css/form.css css/font.css css/widgetCss.css css/theme.css
-cached = css/build.css css/dynamic.css css/user.css css/fonts/icomoon.woff img/icon-256.png img/icon-32.png index.html js/alir.js lib/build.js locales/locales.ini
+cached = css/build.css css/dynamic.css css/user.css css/theme.css css/fonts/icomoon.woff img/icon-256.png img/icon-32.png index.html js/alir.js lib/build.js locales/locales.ini cache.manifest
 
 
 default: help
