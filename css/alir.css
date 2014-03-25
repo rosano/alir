@@ -716,3 +716,64 @@ iframe[seamless], iframe[seamless="*"]:not([seamless="false"]):not([seamless="no
   overflow-y:visible;
   overflow-x:visible;
 }
+#tooltip {
+  width: 10rem;
+  padding: .5rem;
+  color: black;
+  background: yellow;
+  border: 2px solid #000;
+  border-radius: 10px;
+  position: absolute;
+  z-index: 2000;
+  display: none;
+}
+#tooltip:before {
+  content: "";
+  border-width: 0 5px 10px;
+  border-style: solid;
+  border-color: transparent transparent #000 transparent;
+  width: 0;
+  height: 0;
+  display: block;
+  position: relative;
+  bottom: 20px;
+  margin: 0 auto;
+}
+@keyframes pointer {
+  0% { transform: scale(0.1); opacity: 0; }
+  1% { transform: scale(0.15); opacity: 0.8; }
+  100% { opacity: 0; transform: scale(1); }
+}
+#pointer {
+  position: absolute;
+  z-index: 2000;
+  width: 3rem;
+  height: 3rem;
+  display: none;
+  border: 1rem solid red;
+  box-shadow: 0 0 1rem yellow;
+  border-radius: 50%;
+  background-color: transparent;
+  animation: pointer 1s infinite linear;
+}
+#help {
+  position: fixed;
+  width: 50%;
+  top: 25%;
+  left: 25%;
+  background-color: yellow;
+  padding: .5rem;
+  border: 3px black;
+  border-radius: .5rem;
+  box-shadow: 0 0 1rem #888;
+  font-weight: bold;
+  display: none;
+  z-index: 2000;
+}
+#help .content {
+  padding-bottom: 1rem;
+}
+#help .toolbar {
+  text-align: center;
+  padding: 0 1rem;
+}

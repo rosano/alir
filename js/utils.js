@@ -351,6 +351,9 @@ var Tiles = function (global) {
   this.getCurrent = function () {
     return current;
   };
+  this.getCurrentTile = function () {
+    return document.querySelector("[data-tile='" + current + "']");
+  };
   this.exists = function (name) {
     return document.querySelectorAll("[data-tile='" + name + "']").length === 1;
   };

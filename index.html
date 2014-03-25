@@ -156,20 +156,21 @@
     </div>
     <!-- Menu {{ -->
     <div id="menu" class="list">
-      <div class="content">
+      <div class="content" data-help="helpMenuFirst">
         <p><span class="top" ></span><a class="icon-chevron-up" href="#articleShowTile"></a></p>
-        <p data-object="articles" data-method="create"><span class="new" data-l10n-id="menuNew"></span><a class="icon-plus"></a></p>
-        <p data-object="alir.rs"  data-method="sync"><span class="sync" data-l10n-id="menuSync"></span><a class="icon-refresh"></a></p>
-        <p data-object="tiles"    data-method="go" data-params="settings"><span class="settings" data-l10n-id="menuSettings"></span><a class="icon-cog"></a></p>
-        <p data-object="alir"     data-method="onoff">
+        <p data-object="articles" data-method="create" data-help="helpMenuCreate"><span class="new" data-l10n-id="menuNew"></span><a class="icon-plus"></a></p>
+        <p data-object="alir.rs"  data-method="sync" data-help="helpMenuSync"><span class="sync" data-l10n-id="menuSync"></span><a class="icon-refresh"></a></p>
+        <p data-object="tiles"    data-method="go" data-params="settings" data-help="helpMenuSettings"><span class="settings" data-l10n-id="menuSettings"></span><a class="icon-cog"></a></p>
+        <p data-object="alir"     data-method="onoff" data-help="helpMenuOnoff">
           <span class="menuOnline" data-l10n-id="menuOnline"></span>
           <span class="menuOffline" data-l10n-id="menuOffline"></span>
           <a class="icon-off onoff"></a>
         </p>
-        <p data-object="tiles"    data-method="go" data-params="feeds"><span class="" data-l10n-id="menuFeeds"></span><a class="icon-rss"></a></p>
+        <p data-object="tiles"    data-method="go" data-params="feeds" data-help="helpMenuFeeds"><span class="" data-l10n-id="menuFeeds"></span><a class="icon-rss"></a></p>
+        <p data-object="alir.ui"  data-method="help" data-params=""><span class="" data-l10n-id="menuHelp"></span><a class="icon-question-sign"></a></p>
       </div>
       <div class="slider" data-object="alir.ui" data-method="toggleMenu">
-        <div class="scrollbar"></div>
+        <div class="scrollbar" data-help="helpMenuMenu"></div>
       </div>
     </div>
     <!-- }} -->
@@ -209,7 +210,7 @@
           <button data-object="tiles" data-method="back" data-l10n-id="cancel">Cancel</button>
         </p>
         <fieldset class="inline text article">
-          <textarea rows="10" cols="40" name="text" placeholder="Content" data-l10n-id="articleContent"></textarea>
+          <textarea rows="8" cols="40" name="text" placeholder="Content" data-l10n-id="articleContent"></textarea>
         </fieldset>
         <p class="col2 article">
           <button data-object="articles" data-method="save" data-l10n-id="articleSave">Save</button>
@@ -222,13 +223,13 @@
     <div id="main" class="list shown" data-tile="articleList">
       <header>
         <h2>
-          <a class="icon-reorder" data-object="alir.ui" data-method="toggleMenu" ></a>
+          <a class="icon-reorder" data-object="alir.ui" data-method="toggleMenu" data-help="helpListMenu"></a>
           <span class="filters">
-            <a class="icon-inbox archive" data-object="articles.ui" data-method="filterArchive" ></a>
-            <a class="icon-rss feed"      data-object="articles.ui" data-method="filterFeed" ></a>
-            <a class="icon-star star"     data-object="articles.ui" data-method="filterStar" ></a>
-            <a class="icon-tags tags"     data-object="articles.ui" data-method="addFilterTag" ></a>
-            <a class="icon-pencil edit"   data-object="articles.ui" data-method="editArticles" ></a>
+            <a class="icon-inbox archive" data-object="articles.ui" data-method="filterArchive"  data-help="helpListArchive" ></a>
+            <a class="icon-rss feed"      data-object="articles.ui" data-method="filterFeed"     data-help="helpListFeed" ></a>
+            <a class="icon-star star"     data-object="articles.ui" data-method="filterStar"     data-help="helpListStar" ></a>
+            <a class="icon-tags tags"     data-object="articles.ui" data-method="addFilterTag"   data-help="helpListTags" ></a>
+            <a class="icon-pencil edit"   data-object="articles.ui" data-method="editArticles"   data-help="helpListEdit" ></a>
             <a class="icon-trash delete"  data-object="articles.ui" data-method="deleteArticles" ></a>
           </span>
         </h2>
@@ -237,7 +238,7 @@
         <form class="filters">
           <fieldset class="inline text compact">
             <p>
-              <input type="text" name="listFilter" id="listFilter" placeholder="Filter" data-l10n-id="listFilter" />
+              <input type="text" name="listFilter" id="listFilter" placeholder="Filter" data-l10n-id="listFilter" data-help="helpListFilter" />
               <button type="reset"><span class="icon-remove"></span></button>
             </p>
           </fieldset>
@@ -556,7 +557,7 @@
           <input type="hidden" name="noteId" />
           <input type="hidden" name="xpath" />
           <fieldset class="inline text">
-            <textarea id="noteContent" rows="10" cols="40" name="text" placeholder="Note" data-l10n-id="noteContent"></textarea>
+            <textarea id="noteContent" rows="8" cols="40" name="text" placeholder="Note" data-l10n-id="noteContent"></textarea>
             <span id="noteContentLength" class="textareaLength"></span>
           </fieldset>
           <p class="col2">
@@ -622,8 +623,9 @@
           <h3>Contributors</h3>
           <ul>
             <li>thanks Mozilla for the awesome Firefox OS and the Keon phone you offered to me;</li>
-            <li>thanks <a href="http://paul.cx/" target="_blank">Paul Adonot</a> for the advices and encouragements;</li>
+            <li>thanks <a href="http://paul.cx/" target="_blank">Paul Adenot</a> for the advices and encouragements;</li>
             <li>thanks <a href="http://hanblog.info/blog/" target="_blank">Antony</a> for the kick ass ;)</li>
+            <li>thanks <a href="http://tomcanac.com/" target="_blank">Tom Canac</a> for all the feedbacks and advices;</li>
           </ul>
         </section>
         <button data-l10n-id="back" data-object="tiles" data-method="back" >Back</button>
@@ -739,6 +741,16 @@
     <!-- feedShow {{ -->
     <section data-tile="feedShow" id="feedDetail">
     </section>
+    <div id="tooltip"></div>
+    <div id="pointer"></div>
+    <div id="help">
+      <div class="content"></div>
+      <div class="toolbar">
+        <a class="icon-chevron-left prev"></a>
+        <a class="icon-remove close"></a>
+        <a class="icon-chevron-right next"></a>
+      </div>
+    </div>
     <!-- }} -->
     <script type="text/javascript" src="lib/build.js"></script>
     <script type="text/javascript" src="js/alir.js"></script>

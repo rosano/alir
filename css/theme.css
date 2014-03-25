@@ -60,6 +60,7 @@ body.themeRed {
   color: #EEE;
   background-color: #222;
 }
+body.themeRed button,
 body.themeRed .header,
 body.themeRed [data-tile] > header,
 body.themeRed [data-tile] > * > header {
