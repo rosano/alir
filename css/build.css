@@ -17,6 +17,9 @@ body {
   color: yellow;
   transition: color 400ms;
 }
+[data-method] {
+  cursor: pointer;
+}
 /* }} */
 #templates {
   display: none;
@@ -71,19 +74,19 @@ body.net #statusbar .onoff {
   top: 1rem;
   padding: 0;
   height: 100%;
+  width: 11.5rem;
   background-color: #EEE;
   color: #FFF;
   transition: margin .5s ease-in-out, background-color .5s;
+  transition-timing-function: cubic-bezier(0.5, -0.5, 0.5, 1.5);
 }
 body.menu-left #menu {
-  width: 4.5rem;
   left: 0;
-  margin: 0 0 0 -2.5rem;
+  margin: 0 0 0 -9.5rem;
 }
 body.menu-right #menu {
-  width: 4.5rem;
   right: 0;
-  margin: 0 -2.5rem 0 0;
+  margin: 0 -9.5rem 0 0;
 }
 #menu .slider {
   width: 2rem;
@@ -95,11 +98,11 @@ body.menu-right #menu {
   transition: background-color .5s;
 }
 body.menu-left #menu .slider {
-  margin-left: 2.5rem;
+  margin-left: 9.5rem;
   transition: margin .5s ease-in-out;
 }
 body.menu-right #menu .slider {
-  margin-right: 2.5rem;
+  margin-right: 9.5rem;
 }
 #menu .scrollbar {
   position: fixed;
@@ -111,10 +114,13 @@ body.menu-right #menu .slider {
   z-index: 1000;
   pointer-events: none;
 }
+body #statusbar .syncInProgress {
+  position: fixed;
+  right: 3.3rem;
+}
 body.sync #statusbar .syncInProgress {
   color: #FFF;
   animation: rotation 2s infinite linear;
-  position: inherit;
 }
 @keyframes rotation {
   from {
@@ -127,42 +133,56 @@ body.sync #statusbar .syncInProgress {
 #menu .onoff {
   color: #888;
 }
+#menu .menuOnline,
+body.online #menu .menuOffline {
+  display: none;
+}
+body.online #menu .menuOnline {
+  display: inline;
+}
 body.online #menu .onoff {
   color: #0F0;
 }
 body.menu-left #menu .scrollbar {
   left: 0;
   transition: left .5s ease-in-out;
+  transition-timing-function: cubic-bezier(0.5, -0.25, 0.5, 1.25);
 }
 body.menu-left #menu.show .scrollbar {
-  left: 2.5rem;
+  left: 8.5rem;
 }
 body.menu-right #menu .scrollbar {
   right: 0;
   transition: right .5s ease-in-out;
+  transition-timing-function: cubic-bezier(0.5, -0.25, 0.5, 1.25);
 }
 body.menu-right #menu.show .scrollbar {
-  right: 2.5rem;
+  right: 8.5rem;
 }
 #menu .content {
   float: right;
-  width: 1.5rem;
   line-height: 3em;
-  margin: 3rem 2.5rem;
+  margin: 3rem 2.5rem 3rem 0;
 }
 body.menu-right #menu .content {
   margin: 0.66rem 0.5rem;
 }
 body.menu-left #menu.show {
-  margin-left: 0;
+  margin-left: -1rem;
   background-color: #000;
 }
 body.menu-right #menu.show {
-  margin-right: 0;
+  margin-right: -1rem;
   background-color: #000;
 }
 #menu .content > p {
-  text-align: center;
+  text-align: right;
+  font-weight: bold;
+  display: table-row;
+}
+#menu .content > p > * {
+  vertical-align: middle;
+  padding-right: .4rem;
 }
 #menu a.button {
   padding: 20px 20px;
@@ -170,11 +190,6 @@ body.menu-right #menu.show {
 #menu .content .inspect {
   color: #FFFFFF;
   text-decoration: none;
-}
-#menu.list .content .detail,
-#menu.detail .content .main
-{
-  display: none;
 }
 body.menu-left #menu .content .icon-chevron-right,
 body.menu-right #menu .content .icon-chevron-left {
@@ -186,24 +201,29 @@ body.menu-right #menu .content .icon-chevron-left {
 [data-tile] {
   margin-top: 1rem;
   padding-top: 4em;
-  list-style-type: none;
   display: none;
   max-width: 35rem;
-  border-right: 1px solid #888;
   min-height: 100%;
-}
-.noheader[data-tile] {
-  padding-top: 2em;
+  transition: transform .5s ease-in-out;
+  transition-timing-function: cubic-bezier(0.5, -0.25, 0.5, 1.25);
 }
 [data-tile] > header, [data-tile] > * > header {
   margin: -1rem -0.5rem 1rem -3rem;
-  padding: 0.2rem 1.5rem;
+  padding: 0.2rem 1rem;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
   /*position: sticky;*/
   position: fixed;
   top: 2rem;
-  width: 36rem;
-  z-index: 999;
+  width: 100%;
+  z-index: 1001;
+}
+[data-tile] > header + *, [data-tile] > * > .body {
+  transform: translate(0, 0);
+  transition: transform .5s ease-in-out;
+  transition-timing-function: cubic-bezier(0.5, -0.25, 0.5, 1.25);
+}
+body.menu [data-tile] > header + *, body.menu [data-tile] > * > .body {
+  transform: translate(9rem, 0);
 }
 [data-tile] header h2 {
   margin: 0.5rem 0;
@@ -212,11 +232,30 @@ body.menu-right #menu .content .icon-chevron-left {
   white-space: nowrap;
   width: 100%;
 }
-[data-tile] header h2 a {
+[data-tile] header h2 > a {
   font-size: 1.6rem;
-  padding: 0.5rem 1.5rem 0.5rem 0;
-  margin-right: 1rem;
-  border-right: 1px outset #888;
+  padding: 0.5rem .5rem 0.5rem 0;
+  margin-right: .5rem;
+  border-style: outset;
+  border-color: #888;
+  border-width: 0 1px 0 0;
+}
+[data-tile] header h2 .center {
+  display: inline-block;
+  overflow: hidden;
+  max-width: calc(100% - 6rem);
+  text-overflow: ellipsis;
+}
+[data-tile] > header h2 > .right, [data-tile] > * > header h2 > .right {
+  position: fixed;
+  top: 1.3rem;
+  right: 0;
+  padding: .5rem;
+  border-width: 0;
+}
+.container header h2 > a.right {
+  border-width: 0 0 0 1px;
+  padding: 0 0 0 1rem;
 }
 body.menu-left [data-tile] {
   padding-left: 2.5rem;
@@ -252,16 +291,18 @@ body.popup .shown {
 .popup[data-tile] {
   position: absolute;
   top: 0;
-  transition: left 1s, opacity 1s;
+  transition: left .5s, opacity .5s;
   /*left: 42rem;*/
   left: 0rem;
   opacity: 0;
   width: 35rem;
   display: block;
   background-color: inherit;
+  /*
   border-width: 0 1px;
   border-style: solid;
   border-color: #888;
+  */
 }
 body.popup [data-tile] > header, body.popup [data-tile] > * > header {
   width: 36rem;
@@ -278,7 +319,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #list .articleMenu {
   display: none;
 }
-#main.list #list > li.read {
+#list li.read {
   color: #444;
 }
 #articleShowTile h3 {
@@ -305,6 +346,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   width: 1.5rem;
   font-size: 1rem;
   background-color: rgba(255, 255, 255, 1);
+  color: #000;
   z-index: 1000;
   border-width: 0 0 1px 1px;
   border-radius: 0 0 0 .5rem;
@@ -326,8 +368,8 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   color: black;
 }
 #articleShowTile .articleMenu .articleActions {
-  transition: margin 1s ease-in-out, color 1s ease-in-out;
-  margin-top: 3rem;
+  transition: margin .3s ease-in-out, color .3s ease-in-out;
+  margin-top: 3.5rem;
 }
 
 #articleShowTile .articleMenu.folded .articleActions {
@@ -420,7 +462,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #articleShowTile .tabMeta {
   margin: 2rem 0;
 }
-#list .filters {
+#main .filters {
   font-size: 1rem;
 }
 #main .filters fieldset {
@@ -428,8 +470,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 }
 #main .filters a,
 .toolbar a {
-  padding: .5em;
-  /* position: relative; */
+  padding: .4em;
 }
 #main .filters .delete,
 #main.edit .filters a {
@@ -455,7 +496,6 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   border-width: 0 0 1px 0;
   border-style: solid;
   overflow: hidden;
-  transition: transform 1s ease-in-out;
 }
 #main > .filters {
   margin-top: -1em;
@@ -481,9 +521,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #main.archives .filters .archive,
 [data-tags*=",archive,"] .archive,
 #main.feeds .filters .feed,
-[data-tags*=",feed,"] .feed {
-  color: #ff6347;
-}
+[data-tags*=",feed,"] .feed,
 #main.stars .filters .star,
 [data-tags*=",star,"] .star {
   color: yellow;
@@ -576,16 +614,20 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   display: none;
 }
 /** Settings {{ **/
-#settings .container {
+[data-tile].settings .container {
   border: 1px solid #888;
   border-radius: 2px;
   margin: .5rem 0;
 }
-#settings .container > .header {
+[data-tile].settings .container > .header {
   padding: 0.01rem;
 }
-#settings .container > .header > * {
+[data-tile].settings .container > .header > * {
   margin: 0.5rem;
+}
+.container .header .left {
+  display: inline-block;
+  width: calc(100% - 4rem);
 }
 #settingsAlarm {
   text-align: center;
@@ -636,7 +678,7 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   margin: 0;
   font-style: italic;
 }
-#linkTextLength {
+.textareaLength {
   position: relative;
   top: -1.5rem;
   left: calc(100% - 2rem);
@@ -673,6 +715,67 @@ iframe[seamless], iframe[seamless="*"]:not([seamless="false"]):not([seamless="no
   overflow:visible;
   overflow-y:visible;
   overflow-x:visible;
+}
+#tooltip {
+  width: 10rem;
+  padding: .5rem;
+  color: black;
+  background: yellow;
+  border: 2px solid #000;
+  border-radius: 10px;
+  position: absolute;
+  z-index: 2000;
+  display: none;
+}
+#tooltip:before {
+  content: "";
+  border-width: 0 5px 10px;
+  border-style: solid;
+  border-color: transparent transparent #000 transparent;
+  width: 0;
+  height: 0;
+  display: block;
+  position: relative;
+  bottom: 20px;
+  margin: 0 auto;
+}
+@keyframes pointer {
+  0% { transform: scale(0.1); opacity: 0; }
+  1% { transform: scale(0.15); opacity: 0.8; }
+  100% { opacity: 0; transform: scale(1); }
+}
+#pointer {
+  position: absolute;
+  z-index: 2000;
+  width: 3rem;
+  height: 3rem;
+  display: none;
+  border: 1rem solid red;
+  box-shadow: 0 0 1rem yellow;
+  border-radius: 50%;
+  background-color: transparent;
+  animation: pointer 1s infinite linear;
+}
+#help {
+  position: fixed;
+  width: 50%;
+  top: 25%;
+  left: 25%;
+  background-color: yellow;
+  padding: .5rem;
+  border: 3px black;
+  border-radius: .5rem;
+  box-shadow: 0 0 1rem #888;
+  font-weight: bold;
+  display: none;
+  z-index: 2000;
+}
+#help .content {
+  padding-bottom: 1rem;
+}
+#help .toolbar {
+  text-align: center;
+  padding: 0 1rem;
 }
 /** Buttons **/
 button {
@@ -719,10 +822,6 @@ fieldset.inline > p {
   width: 100%;
   background-color: #FFF;
 }
-fieldset.inline > p:hover {
-  border-color: #0F0;
-  box-shadow: 0 0 5px #0F0;
-}
 fieldset.inline > p > * {
   display: inline;
   margin: 0;
@@ -749,7 +848,7 @@ fieldset.inline.text label {
   border-width: 0px;
   background-color: #EEE;
   width: 3rem;
-  max-width: 3rem;
+  max-width: 5rem;
   overflow: auto;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1291,15 +1390,19 @@ input[type="range"] {
 .header,
 [data-tile] header,
 [data-tile] > * > header {
-  background-color: #f97c17;
+  background-color: #E66000;
   color: white;
 }
 #menu .scrollbar {
-  background-color: rgba(255, 127, 0, .3);
+  background-color: rgba(230, 96, 0, 0.3);
   border-color: #F80;
 }
 body.online #menu .scrollbar {
   background-color: #F80;
+}
+fieldset.inline > p:hover {
+  border-color: #f97c17;
+  box-shadow: 0 0 5px #f97c17;
 }
 /* }} */
 /* Green {{ */
@@ -1316,12 +1419,36 @@ body.themeGreen #menu .scrollbar {
 body.themeGreen.online #menu .scrollbar {
   background-color: #0F0;
 }
+body.themeGreen fieldset.inline > p:hover {
+  border-color: #0F0;
+  box-shadow: 0 0 5px #0F0;
+}
+/* }} */
+/* Blue {{ */
+body.themeBlue .header,
+body.themeBlue [data-tile] > header,
+body.themeBlue [data-tile] > * > header {
+  background: #007EB2;
+  color: white;
+}
+body.themeBlue #menu .scrollbar {
+  background-color: rgba(0, 126, 178, .3);
+  border-color: #007EB2;
+}
+body.themeBlue.online #menu .scrollbar {
+  background-color: #007EB2;
+}
+body.themeBlue fieldset.inline > p:hover {
+  border-color: #007EB2;
+  box-shadow: 0 0 5px #007EB2;
+}
 /* }} */
 /* Red {{ */
 body.themeRed {
   color: #EEE;
   background-color: #222;
 }
+body.themeRed button,
 body.themeRed .header,
 body.themeRed [data-tile] > header,
 body.themeRed [data-tile] > * > header {
@@ -1336,6 +1463,10 @@ body.themeRed.online #menu .scrollbar {
   background-color: #F00;
 }
 body.themeRed.online fieldset.inline > p:hover {
+  border-color: #F00;
+  box-shadow: 0 0 5px #F00;
+}
+body.themeRed fieldset.inline > p:hover {
   border-color: #F00;
   box-shadow: 0 0 5px #F00;
 }
