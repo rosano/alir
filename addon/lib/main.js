@@ -9,7 +9,7 @@ var data          = require("sdk/self").data,
     notify,
     panel;
 
-const {Cc, Ci, Cr} = require('chrome');
+const {Cc, Ci} = require('chrome');
 
 // Init storage
 ss.storage.params = {
@@ -203,9 +203,9 @@ function putContent(url, token, content) {
 
   slug   = require('sdk/util/uuid').uuid().toString().replace(/\W/g, '');
   content.id = slug;
-  content.type = 'artcicle';
+  content.type = 'article';
   request({
-    url: url + '/article/' + slug,
+    url: url + 'article/' + slug,
     headers: {
       "Authorization": "Bearer " + token,
       "Content-Type": "application/json"

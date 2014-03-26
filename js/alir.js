@@ -112,19 +112,25 @@ function Alir() {
   // }}
   // status {{
   (function () {
-    //jshint maxstatements: 21
+    //jshint maxstatements: 25
     var status;
     status = {
       installed: false,
       online: navigator.onLine,
       user: true,
       visible: !document.hidden,
-      rs: remoteStorage.connected
+      rs: remoteStorage.connected,
+      fxos: typeof window.MozActivity !== 'undefined' // @FIXME
     };
     if (status.online) {
       document.body.classList.add('net');
     } else {
       document.body.classList.remove('net');
+    }
+    if (status.fxos) {
+      document.body.classList.add('fxos');
+    } else {
+      document.body.classList.remove('fxos');
     }
     // when navigator goes online / offline
     function windowOnline(e) {
@@ -214,8 +220,7 @@ function Alir() {
     (function () {
       var host, request;
       host = window.location.protocol + '//' + window.location.host;
-      // @FIXME dirty hack to detect Firefox OS
-      if (typeof window.MozActivity === 'undefined') {
+      if (window.alir.getStatus().fxos) {
         request = window.navigator.mozApps.install(host + '/hosted.webapp');
       } else {
         request = window.navigator.mozApps.installPackage(host + "/package.manifest");
@@ -227,7 +232,6 @@ function Alir() {
       };
       request.onsuccess = function () {
         window.alir.ui.message(_('installOk'), "info");
-        tiles.show('list');
       };
     }());
   };
@@ -267,6 +271,7 @@ function Alir() {
             }
           });
         }
+        tiles.go("articleList");
         utils.log(utils.format("All %s displayed in %s", type, Math.round((window.performance.now() - startTime[type]))), "debug");
       });
     });
@@ -389,6 +394,9 @@ function Alir() {
       this.pointer.style.display = 'block';
       this.pointer.style.top  = (-40 + rect.top  + rect.height / 2) + 'px';
       this.pointer.style.left = (-40 + rect.left + rect.width / 2) + 'px';
+    },
+    top: function () {
+      window.scrollTo(0, 0);
     }
   };
   this.ui.messagebar = document.getElementById('messagebar');
@@ -441,7 +449,15 @@ function Alir() {
         elmt = $$('[data-help]', tiles.getCurrentTile());
         self.ui.toggleMenu(false);
       }
-      display(curr);
+      // remove hidden elements
+      elmt = elmt.filter(function (e) {
+        var rect = e.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
+      // Wait for menu to disapear
+      window.setTimeout(function () {
+        display(curr);
+      }, 500);
     };
   }());
 }
@@ -1188,19 +1204,19 @@ function initUI() {
       if (tile) {
         h = tile.clientHeight;
         if (header) {
-          hh = header.getBoundingClientRect().bottom;
+          hh = header.getBoundingClientRect().bottom - parseInt(window.getComputedStyle(header).marginBottom, 10);
           tmp = (1 - (window.scrollY / (tile.clientHeight - document.body.clientHeight)));
           if (tmp < -0.5) {
             tmp = 1;
           }
-          scroll.style.top = "calc(" + (hh * tmp) + "px + " + (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%)';
+          scroll.style.top = "calc("  + (hh * tmp) + "px + " + (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%)';
         } else {
           scroll.style.top = (window.scrollY / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
         }
         if (h !== height || scroll.style.height === '') {
           height = h;
           if (header) {
-            scroll.style.height = ((window.innerHeight - header.clientHeight - hh) / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
+            scroll.style.height = ((window.innerHeight - header.clientHeight) / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
           } else {
             scroll.style.height = (window.innerHeight / document.querySelector("[data-tile].shown").clientHeight * 100) + '%';
           }
@@ -1382,11 +1398,11 @@ window.addEventListener('unload', function () {
     localStorage.setItem('config', JSON.stringify(config));
   }
 }, false);
-window.addEventListener('error', function (err) {
+window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
   "use strict";
   try {
-    utils.log("[error] " + err.toString(), "error");
+    utils.log("[error] %s at %s %s", errorMsg, url, lineNumber, "error");
   } catch (e) {
     console.log(e);
   }
-}, false);
+};

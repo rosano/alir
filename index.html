@@ -35,7 +35,7 @@
             <h2>
               <a class="icon-chevron-left" data-object="tiles" data-method="back" ></a>
               <span class="center">{{=title}}</span>
-              <a class="icon-reorder right" data-object="articles.ui" data-method="menu" ></a>
+              <a class="icon-reorder right" data-object="articles.ui" data-method="menu" data-help="helpArticleMenu"></a>
             </h2>
           </header>
             <div class="articleMenu folded">
@@ -59,7 +59,7 @@
               <a class="icon-trash" data-object="articles" data-method="delete" data-params="{{=key}},{{=title}}"></a>
               <a class="icon-pencil compose" data-object="articles" data-method="edit" data-params="{{=key}}"></a>
             </div>
-            <ul class="tabs">
+            <ul class="tabs" data-help="helpArticleTabs">
               <li class="tab-content"><a data-l10n-id="articleTabContent" data-object="articles.ui" data-method="showTab" data-params="content"></a> | </li>
               <li class="tab-notes"><a data-l10n-id="articleTabNotes" data-object="articles.ui" data-method="showTab" data-params="notes"></a> | </li>
               <li class="tab-meta"><a data-l10n-id="articleTabMeta" data-object="articles.ui" data-method="showTab" data-params="meta"></a></li>
@@ -157,7 +157,7 @@
     <!-- Menu {{ -->
     <div id="menu" class="list">
       <div class="content" data-help="helpMenuFirst">
-        <p><span class="top" ></span><a class="icon-chevron-up" href="#articleShowTile"></a></p>
+        <p data-object="alir.ui" data-method="top"><span class="top" ></span><a class="icon-chevron-up"></a></p>
         <p data-object="articles" data-method="create" data-help="helpMenuCreate"><span class="new" data-l10n-id="menuNew"></span><a class="icon-plus"></a></p>
         <p data-object="alir.rs"  data-method="sync" data-help="helpMenuSync"><span class="sync" data-l10n-id="menuSync"></span><a class="icon-refresh"></a></p>
         <p data-object="tiles"    data-method="go" data-params="settings" data-help="helpMenuSettings"><span class="settings" data-l10n-id="menuSettings"></span><a class="icon-cog"></a></p>
@@ -490,12 +490,12 @@
         </h2>
       </header>
       <section>
-        <fieldset>
+        <fieldset id="settingsProxy">
           <legend data-l10n-id="proxyLegend"></legend>
           <fieldset class="inline text">
             <p>
               <label for="proxyUrl" data-l10n-id="proxyUrlLabel"></label>
-              <input type="text" name="proxyUrl" id="proxyUrl" data-l10n-id="proxyUrl" data-target="proxy" />
+              <input type="text" name="proxyUrl" id="proxyUrl" data-l10n-id="proxyUrl" data-target="proxy" data-help="helpSettingsProxy" />
               <button type="reset"><span class="icon-remove"></span></button>
             </p>
           </fieldset>
@@ -503,8 +503,8 @@
         <p>
           <button data-method="install" data-object="alir" class="ifHosted" data-l10n-id="settingsInstall">Install</button>
           <button data-method="update" data-object="alir" class="ifInstalled" data-l10n-id="settingsUpdate">Update</button>
-          <button data-object="alir" data-method="getAll" data-l10n-id="settingsReload">Reload</button>
-          <button data-object="alir" data-method="reset" data-l10n-id="alirReset"></button>
+          <button data-object="alir" data-method="getAll" data-l10n-id="settingsReload" data-help="helpSettingsReload">Reload</button>
+          <button data-object="alir" data-method="reset" data-l10n-id="alirReset" data-help="helpSettingsReset"></button>
         </p>
         <!--
         <p class="float">
@@ -684,8 +684,8 @@
       </header>
       <section>
         <p class="toolbar">
-          <a class="icon-plus" data-object="feeds" data-method="create" ></a>
-          <a class="icon-refresh" data-object="feeds" data-method="update"></a>
+          <a class="icon-plus" data-object="feeds" data-method="create" data-help="helpFeedCreate" ></a>
+          <a class="icon-refresh" data-object="feeds" data-method="update" data-help="helpFeedUpdate"></a>
         </p>
         <ul id="feedsList">
         </ul>

@@ -228,7 +228,8 @@ window.onerror = function (errorMsg, url, lineNumber) {
 var Tiles = function (global) {
   "use strict";
   RemoteStorage.eventHandling(this, "leaving", "shown");
-  var current,
+  var self = this,
+      current,
       tiles = [],
       popup = (window.matchMedia("(min-width: 78rem) and (min-height: 3rem)").matches);
   this.show = function (name) {
@@ -308,6 +309,7 @@ var Tiles = function (global) {
         popupOldElmt.style.opacity = "0";
         setTimeout(function () {
           popupOldElmt.style.left = "0";
+          popupOldElmt.style.opacity = "1";
           popupOldElmt.classList.remove('popup');
           if (tiles.length === 0) {
             document.body.classList.remove('popup');
@@ -321,6 +323,8 @@ var Tiles = function (global) {
           popupNewElmt.classList.add('popup');
           //window.scrollTo(0, 0);
         }
+      } else {
+        self.show(next.name);
       }
       current = next.name;
       window.location.hash = name;
@@ -357,5 +361,20 @@ var Tiles = function (global) {
   this.exists = function (name) {
     return document.querySelectorAll("[data-tile='" + name + "']").length === 1;
   };
+  window.addEventListener('resize', function () {
+    var newState = (window.matchMedia("(min-width: 78rem) and (min-height: 3rem)").matches),
+        curr;
+    if (newState !== popup) {
+      console.log("POPUP changed", popup, newState);
+      if (tiles.length > 0) {
+        curr = current;
+        self.back();
+        popup = newState;
+        self.go(curr);
+      } else {
+        popup = newState;
+      }
+    }
+  }, false);
 };
 window.tiles = new Tiles();

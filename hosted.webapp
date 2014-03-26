@@ -6,10 +6,14 @@
     "128": "/img/icon-128.png",
     "120": "/img/icon-120.png",
     "256": "/img/icon-256.png",
+    "30": "/img/icon-30.png",
     "32": "/img/icon-32.png",
     "48": "/img/icon-48.png",
     "60": "/img/icon-60.png",
-    "90": "/img/icon-60.png"
+    "64": "/img/icon-64.png",
+    "72": "/img/icon-72.png",
+    "90": "/img/icon-90.png",
+    "96": "/img/icon-96.png"
   },
   "developer": {
     "name": "Clochix",
@@ -57,6 +61,6 @@
     }
   },
   "appcache_path": "/cache.manifest",
-  "version": "0.2.09"
+  "version": "0.2.75"
 }
 

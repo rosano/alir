@@ -105,8 +105,7 @@ body.menu-right #menu .slider {
   margin-right: 9.5rem;
 }
 #menu .scrollbar {
-  position: fixed;
-  top: 1rem;
+  position: relative;
   width: calc(2rem - 2px);
   border-width: 1px;
   border-style: solid;
@@ -148,9 +147,6 @@ body.menu-left #menu .scrollbar {
   transition: left .5s ease-in-out;
   transition-timing-function: cubic-bezier(0.5, -0.25, 0.5, 1.25);
 }
-body.menu-left #menu.show .scrollbar {
-  left: 8.5rem;
-}
 body.menu-right #menu .scrollbar {
   right: 0;
   transition: right .5s ease-in-out;
@@ -163,6 +159,11 @@ body.menu-right #menu.show .scrollbar {
   float: right;
   line-height: 3em;
   margin: 3rem 2.5rem 3rem 0;
+}
+@media (max-height: 320px) {
+  #menu .content {
+    line-height: 2.2em;
+  }
 }
 body.menu-right #menu .content {
   margin: 0.66rem 0.5rem;
@@ -206,6 +207,7 @@ body.menu-right #menu .content .icon-chevron-left {
   min-height: 100%;
   transition: transform .5s ease-in-out;
   transition-timing-function: cubic-bezier(0.5, -0.25, 0.5, 1.25);
+  overflow: hidden;
 }
 [data-tile] > header, [data-tile] > * > header {
   margin: -1rem -0.5rem 1rem -3rem;
@@ -217,6 +219,11 @@ body.menu-right #menu .content .icon-chevron-left {
   width: 100%;
   z-index: 1001;
 }
+@media (min-width: 78rem) {
+  [data-tile] > header, [data-tile] > * > header {
+    width: 37rem;
+  }
+}
 [data-tile] > header + *, [data-tile] > * > .body {
   transform: translate(0, 0);
   transition: transform .5s ease-in-out;
@@ -224,6 +231,9 @@ body.menu-right #menu .content .icon-chevron-left {
 }
 body.menu [data-tile] > header + *, body.menu [data-tile] > * > .body {
   transform: translate(9rem, 0);
+}
+body.menu .popup[data-tile] > header + *, body.menu .popup[data-tile] > * > .body {
+  transform: translate(0, 0);
 }
 [data-tile] header h2 {
   margin: 0.5rem 0;
@@ -298,11 +308,13 @@ body.popup .shown {
   width: 35rem;
   display: block;
   background-color: inherit;
-  /*
-  border-width: 0 1px;
-  border-style: solid;
-  border-color: #888;
-  */
+}
+@media (min-width: 78rem) {
+  [data-tile] {
+    border-width: 0 1px;
+    border-style: solid;
+    border-color: #888;
+  }
 }
 body.popup [data-tile] > header, body.popup [data-tile] > * > header {
   width: 36rem;
@@ -635,6 +647,9 @@ body.hosted .ifInstalled, body.installed .ifHosted {
 #settingsAlarm p {
   margin: .5rem;
 }
+body.fxos.installed #settingsProxy {
+  display: none;
+}
 /** }} **/
 /** Credits {{ **/
 #credits .title {
@@ -761,7 +776,9 @@ iframe[seamless], iframe[seamless="*"]:not([seamless="false"]):not([seamless="no
   width: 50%;
   top: 25%;
   left: 25%;
-  background-color: yellow;
+  background-color: #FFF;
+  border: 3px solid black;
+  box-shadow: 0 0 .5rem #000;
   padding: .5rem;
   border: 3px black;
   border-radius: .5rem;
@@ -775,5 +792,5 @@ iframe[seamless], iframe[seamless="*"]:not([seamless="false"]):not([seamless="no
 }
 #help .toolbar {
   text-align: center;
-  padding: 0 1rem;
+  padding: 0 .7rem;
 }

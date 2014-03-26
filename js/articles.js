@@ -46,14 +46,14 @@ function Article() {
       context: 'private',
       hasNotes: Object.keys(obj.notes).length > 0 ? 'hasNotes' : '',
       title: title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-      url: obj.url || '#',
+      url: obj.url || '',
       date: obj.date,
       tags: Array.isArray(obj.tags) ? obj.tags : [],
       alternates: Array.isArray(obj.alternates) ? obj.alternates : [],
       notes: Object.keys(obj.notes).map(function (e, i) { return {id: e, url: obj.id + '/' + e, content: obj.notes[e].content}; }),
       flags: typeof obj.flags === 'object' ? Object.keys(obj.flags).filter(function (e) { return obj.flags[e] === true; }).join(',') : ''
     };
-    if (data.title === '???' && data.url !== '#') {
+    if (data.title === '???' && data.url !== '') {
       data.title = data.url.replace(/\/$/, '').split('/').pop().replace(/[\W]/g, ' ');
     }
     if (utils.trim(data.title) === '') {
