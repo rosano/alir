@@ -253,13 +253,10 @@ body.menu .popup[data-tile] > header + *, body.menu .popup[data-tile] > * > .bod
 [data-tile] header h2 .center {
   display: inline-block;
   overflow: hidden;
-  max-width: calc(100% - 6rem);
+  width: calc(100% - 6rem);
   text-overflow: ellipsis;
 }
 [data-tile] > header h2 > .right, [data-tile] > * > header h2 > .right {
-  position: fixed;
-  top: 1.3rem;
-  right: 0;
   padding: .5rem;
   border-width: 0;
 }
@@ -365,6 +362,11 @@ body.hosted .ifInstalled, body.installed .ifHosted {
   border-style: solid;
   border-color: #888;
   box-shadow: 0 0 .5rem #888;
+}
+.popup[data-tile] .articleMenu {
+  left: calc(100vw - 6.9rem);
+  z-index: 5000;
+  background-color: red;
 }
 #articleShowTile .articleMenu > p {
   position: fixed;
@@ -701,8 +703,15 @@ body.fxos.installed #settingsProxy {
 }
 /** Console {{ **/
 #debugLog {
+  white-space: pre-wrap;
   border: 1px solid #888;
   border-radius: 2px;
+  padding-left: 2rem;
+}
+#debugLog > p {
+  margin: 0;
+  padding: 0;
+  text-indent: -2rem;
 }
 #debugLog .debug   { background-color: transparent; color: black; font-weight: bold;}
 #debugLog .info    { background-color: green; color: white; font-weight: bold;}

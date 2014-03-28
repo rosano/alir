@@ -391,6 +391,7 @@ function Alir() {
     },
     point: function (e) {
       var rect = e.getBoundingClientRect();
+      window.scrollTo(0, window.scrollY - 90 + e.getBoundingClientRect().top);
       this.pointer.style.display = 'block';
       this.pointer.style.top  = (-40 + rect.top  + rect.height / 2) + 'px';
       this.pointer.style.left = (-40 + rect.left + rect.width / 2) + 'px';
@@ -454,6 +455,7 @@ function Alir() {
         var rect = e.getBoundingClientRect();
         return rect.width > 0 && rect.height > 0;
       });
+      window.scrollTo(0, 0);
       // Wait for menu to disapear
       window.setTimeout(function () {
         display(curr);

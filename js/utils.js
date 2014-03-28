@@ -72,7 +72,7 @@ var utils = {
       }
       ui = document.getElementById('debugLog');
       if (ui) {
-        ui.innerHTML = utils.format('<span class="%s">[%s][%s]</span> %s\n', level, curDate, level + new Array(10 - level.length).join(' '), message) + ui.innerHTML;
+        ui.innerHTML = utils.format('<p><span class="%s">[%s][%s]</span> %s<p>', level, curDate, level + new Array(10 - level.length).join(' '), message) + ui.innerHTML;
         if (level === 'error') {
           document.body.classList.add('error');
         }
