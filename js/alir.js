@@ -709,7 +709,7 @@ function initUI() {
         if (config.first === true) {
           // if mozSystem is not available, init a CORS Proxy
           if (typeof xhr.mozSystem !== 'boolean' || xhr.mozSystem !== true) {
-            config.proxy = window.location.protocol + '//www.corsproxy.com/';
+            config.proxy = window.location.protocol + '//cors-proxy.fringe.zone/';
             document.getElementById('proxyUrl').value = config.proxy;
           }
           article = {
