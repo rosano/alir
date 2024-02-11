@@ -147,7 +147,7 @@ window.Network = function () {
         computedUrl += ((/\?/).test(url) ? "&" : "?") + 'ts=' + (new Date()).getTime();
       }
       computedUrl += ((/\?/).test(url) ? "&" : "?") + 'ts=' + (new Date()).getTime();
-      xhr.open("GET", computedUrl, true);
+      xhr.open("GET", (new URL(url)).hostname === 'localhost' ? url : computedUrl, true);
       //xhr.responseType = "document";
       xhr.timeout = this.timeout;
       xhr.onload = function (e) {
